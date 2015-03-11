@@ -4,6 +4,9 @@
 #include "WaterColorCanvas.h"
 #include "Stone.h"
 
+#include "ofxPSBlend.h"
+#include "ofxUI.h"
+
 class testApp : public ofBaseApp{
 
 public:
@@ -16,7 +19,7 @@ public:
 	void drawRockOnSurface();
 	void drawWater();
 	void drawStoneUnderlyingShape();
-	void drawRockOnSurfaceMoreColor();
+	void drawRockOnSurfaceMoreColor(float x, float y );
 
 	Stone stone;
 
@@ -53,4 +56,15 @@ public:
 	static const int STATE_WATER = 0;
 	static const int STATE_PIGMENT = 1;
 	static const int STATE_MIX = 2;
+
+	ofxUISuperCanvas *gui;
+	void setupGui();
+	void guiEvent( ofxUIEventArgs &e );
+
+	// blending
+	ofxPSBlend psBlend;
+	int blendMode;
+
+	void drawIndependently();
+	ofFbo buffer;
 };

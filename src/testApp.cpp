@@ -3,6 +3,13 @@
 //--------------------------------------------------------------
 void testApp::setup(){
 	ofSetLogLevel( OF_LOG_ERROR );
+	ofSetFrameRate( 200 );
+
+	BrushCollection brushCollection;
+	stone.setBrushCollection( brushCollection );
+	stone.init( ofGetWidth() / 2.0, ofGetHeight() / 2.0 );
+
+	setupGui();
 
 	bg.loadImage( "bg_black.png" );
 	brush.loadImage( "water_color_textures_01.png" );
@@ -52,13 +59,20 @@ void testApp::setup(){
 	applyPointillistic = false;
 
 	brushIndex = 0;
+
+	psBlend.setup( ofGetWidth(), ofGetHeight() );
+	//bg.draw( 0, 0 );
+
+	buffer.allocate( ofGetWidth(), ofGetHeight() );
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
 	ofSetWindowTitle( ofToString( ofGetFrameRate() ) );
-
-	canvas.update();
+	
+	//psBlend.begin();
+	//canvas.update();
+	//psBlend.end();
 }
 
 //--------------------------------------------------------------
@@ -101,14 +115,22 @@ void testApp::draw(){
 	ofPopStyle();
 	}
 	*/
-	canvas.draw();
 
-	glBlendFunc( GL_ZERO, GL_SRC_COLOR );
+	//canvas.draw();
+
+	//glBlendFunc( GL_ZERO, GL_SRC_COLOR );
 	//ofBackground( 0 );
-	bg.draw( 0, 0 );
-	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	//bg.draw( 0, 0 );
+	//psBlend.draw( canvas.waterColorCanvas.getTextureReference(), blendMode );
+	//glBlendFunc( GL_ONE, GL_ONE);
 
 	//rockShape.draw( 0, 0 );
+	bg.draw( 0, 0 );
+	stone.draw( 0, 0 );
+	//ofEnableAlphaBlending();
+	//ofEnableBlendMode( OF_BLENDMODE_ADD );
+	//buffer.draw( 0, 0 );
+	//ofDisableBlendMode();
 }
 
 //--------------------------------------------------------------
@@ -182,14 +204,44 @@ void testApp::keyPressed( int key ){
 		applyPointillistic = !applyPointillistic;
 		break;
 	case 'n':
-		stone.init();
+		stone.init( ofGetMouseX(), ofGetMouseY()  );
 		break;
 	case 'z':
-		drawRockOnSurfaceMoreColor();
+		drawRockOnSurfaceMoreColor( ofGetMouseX(), ofGetMouseY() );
 		break;
 	case 'u':
 		brushIndex++;
 		brushIndex %= brushes.size();
+		break;
+	case ' ':
+		gui->toggleVisible();
+		break;
+	case 'i':
+		drawIndependently();
+		break;
+
+	}
+
+	if( key == OF_KEY_UP )
+	{
+		if( blendMode >= 24 )
+		{
+			blendMode = 0;
+		}
+		else {
+			blendMode++;
+		}
+	}
+	if( key == OF_KEY_DOWN )
+	{
+		if( blendMode <= 0 )
+		{
+			blendMode = 24;
+		}
+		else
+		{
+			blendMode--;
+		}
 	}
 }
 
@@ -240,7 +292,6 @@ void testApp::drawRockOnSurface() {
 	randomBrushId = ( int ) ( ofRandom( 0, brushes.size() ) );
 
 	state = STATE_PIGMENT;
-
 	for( int i = 0; i < 1000; i++ ) {
 		if( i % 100 == 0 ) {
 			currentPigment = ( int ) ( ofRandom( 0, canvas.pigments.size() ) );
@@ -266,21 +317,71 @@ void testApp::drawRockOnSurface() {
 			canvas.beginPigmentDraw( currentPigment );
 			ofPushStyle();
 			ofSetColor( ofRandom( 100, 150 ), 0, 0, 300 / currentWidth / ( ( state == 2 ) ? 2 : 1 ) );
-			brushes.at( randomBrushId ).draw( x - currentWidth / 2 * 2, y - currentWidth / 2 * 2, currentWidth * 2, currentWidth * 2 );
+			specialBrush.draw( x - currentWidth / 2 * 2, y - currentWidth / 2 * 2, currentWidth * 2, currentWidth * 2 );
 			ofPopStyle();
 			canvas.endPigmentDraw();
 		}
 	}
 }
 
-void testApp::drawRockOnSurfaceMoreColor()
+void testApp::drawIndependently() {
+	buffer.begin();
+	ofEnableAlphaBlending();
+	ofEnableBlendMode( OF_BLENDMODE_ADD );
+	//ofClear( 0.0f, 0.0f, 0.0f );
+	float alpha = ofMap( ofGetMouseX(), 0, ofGetWidth(), 0, 255 );
+	std::vector< ofColor > colors;
+	ofPushStyle();
+	colors.push_back( ofColor( 200, 160, 90, alpha ) );
+	colors.push_back( ofColor( 176, 75, 55, alpha ) );
+	colors.push_back( ofColor( 54, 47, 39, alpha ) );
+	colors.push_back( ofColor( 141, 120, 55, alpha ) );
+	for( int i = 0; i < stone.getNumberOfCircles(); i++ )
+	{
+		float size = ofRandom( 20, 150 );
+		ofVec2f p = stone.getCenterById( i );
+		p.x += ofGetMouseX();
+		p.y += ofGetMouseY();
+		ofSetColor( colors.at( ofRandom( 0, colors.size() ) ) );
+		int brushIndex = ofRandom( 0, brushes.size() );
+		brushes.at(brushIndex).draw( p.x - size / 2.0, p.y - size / 2, size, size );
+	}
+	
+	ofDisableAlphaBlending();
+	ofPushStyle();
+	ofEnableAlphaBlending();
+	ofEnableBlendMode( OF_BLENDMODE_SUBTRACT );
+	float currentWidth = 10;
+	state = STATE_PIGMENT;
+	randomBrushId = ( int ) ( ofRandom( 0, brushes.size() ) );
+
+	std::vector< ofVec2f > contourPoints = stone.getContourPoints( ofGetMouseX(), ofGetMouseY() );
+	int i = 0;
+	std::cout << "ContourPoints size: " << contourPoints.size() << std::endl;
+	for( int i = 0; i < contourPoints.size(); i++ ) {
+		ofVec2f contourPoint = contourPoints.at( i );
+		//for( ofVec2f contourPoint : stone.getContourPoints( ofGetMouseX(), ofGetMouseY() ) ) {
+		float x = contourPoint.x;
+		float y = contourPoint.y;
+
+		//ofPushStyle();
+		ofSetColor( 0 );
+		specialBrush.draw( x - currentWidth / 2, y - currentWidth / 2, currentWidth, currentWidth );
+		//ofPopStyle();
+	}
+	ofPopStyle();
+	ofDisableAlphaBlending();
+	buffer.end();
+}
+
+void testApp::drawRockOnSurfaceMoreColor( float _x, float _y)
 {
 	// drawing contour
 
 	float currentWidth = 10;
 	state = STATE_PIGMENT;
 	randomBrushId = ( int ) ( ofRandom( 0, brushes.size() ) );
-	std::vector< ofVec2f > contourPoints = stone.getContourPoints( ofGetMouseX(), ofGetMouseY() );
+	std::vector< ofVec2f > contourPoints = stone.getContourPoints( _x, _y );
 	std::cout << "ContourPoints size: " << contourPoints.size() << std::endl;
 	for( int i = 0; i < contourPoints.size(); i++ ) {
 		ofVec2f contourPoint = contourPoints.at( i );
@@ -303,8 +404,8 @@ void testApp::drawRockOnSurfaceMoreColor()
 	state = STATE_PIGMENT;
 	for( int i = 0; i < stone.getNumberOfCircles(); i++ ) {
 		ofVec2f p = stone.getCenterById( i );
-		float x = p.x + ofGetMouseX();
-		float y = p.y + ofGetMouseY();
+		float x = p.x + _x;
+		float y = p.y + _y;
 		currentPigment = ( int ) ( ofRandom( 0, canvas.pigments.size() ) );
 		randomBrushId = ( int ) ( ofRandom( 0, brushes.size() ) );
 		currentWidth = brushes.at( randomBrushId ).width;
@@ -364,5 +465,54 @@ void testApp::gotMessage( ofMessage msg ){
 //--------------------------------------------------------------
 void testApp::dragEvent( ofDragInfo dragInfo ){
 
+}
+
+void testApp::guiEvent( ofxUIEventArgs &e )
+{
+	if( e.getName() == "Rock random Position" )
+	{
+		ofxUIButton * button = e.getButton();
+		if( button->getValue() == 1 )
+		{
+			drawRockOnSurfaceMoreColor( ofRandomWidth(), ofRandomHeight() );
+		}
+		stone.init( ofGetMouseX(), ofGetMouseY()  );
+	}
+	else if( e.getName() == "Size" )
+	{
+		ofxUISlider * button = e.getSlider();
+		stone.setSize( button->getValue() );
+		stone.init( ofGetMouseX(), ofGetMouseY()  );
+	}
+	else if( e.getName() == "Fuzzy" )
+	{
+		ofxUISlider * button = e.getSlider();
+		stone.setFuzzy( button->getValue() );
+		stone.init( ofGetMouseX(), ofGetMouseY() );
+	}
+	else if( e.getName() == "Radius" )
+	{
+		ofxUISlider * button = e.getSlider();
+		stone.setRadius( button->getValue() );
+		stone.init( ofGetMouseX(), ofGetMouseY()  );
+	}
+	std::cout << e.getName() << std::endl;
+}
+
+void testApp::setupGui()
+{
+	gui = new ofxUISuperCanvas( "PROJECTING PARTICLES", OFX_UI_FONT_MEDIUM );
+	gui->addSpacer();
+	gui->addFPSSlider( "FPS" );
+	gui->addSpacer();
+	gui->addSlider( "Size", 0.0f, 100.0f, 35.0f, 100, 20 );
+	gui->addSlider( "Fuzzy", 0.0f, 150.0f, 30.0f, 100, 20 );
+	gui->addSlider( "Radius", 0.0f, 250.0f, 80.0f, 100, 20 );
+	gui->addButton( "Rock random Position", false );
+
+	//gui->autoSizeToFitWidgets();
+	ofAddListener( gui->newGUIEvent, this, &testApp::guiEvent );
+
+	gui->loadSettings( "guiSettings.xml" );
 }
 

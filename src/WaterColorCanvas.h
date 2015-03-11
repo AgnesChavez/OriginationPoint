@@ -16,6 +16,9 @@ public:
     void endWaterDraw();
     void clearLayers();
     vector<PigmentLayer> pigments;
+
+	ofFbo waterColorCanvas;
+
     
 private:
     ofFbo* applyShader(ofShader& shader, ofFbo* fbo, int type, int pigmentNum = 0);
@@ -24,6 +27,8 @@ private:
     ofColor color;
     ofShader noiseShader, waterBleedingShader, waterRenderShader, pigmentFixShader, pigmentRenderShader, blurShader, pigmentShader;;
     ofFbo *tempFbo, *noiseFbo, *waterFbo, *paperFbo;
+
+	
     
     int currentPigment;
     

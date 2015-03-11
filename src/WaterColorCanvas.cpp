@@ -20,6 +20,7 @@ WaterColorCanvas::WaterColorCanvas() {
 	waterFbo->allocate( w, h, GL_RGBA32F ); //water
     paperFbo = new ofFbo();
 	paperFbo->allocate( w, h, GL_RGBA32F ); //fixed color
+	waterColorCanvas.allocate( w, h, GL_RGBA32F );
     clearLayers();
 }
 
@@ -38,22 +39,23 @@ void WaterColorCanvas::update() {
 
 //--------------------------------------------------------------
 void WaterColorCanvas::draw() {
-    
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//waterColorCanvas.begin();
+    //glBlendFunc(GL_ONE, GL_ONE);
     waterRenderShader.begin();
     waterFbo->draw(0, 0);
     waterRenderShader.end();
     
-    glBlendFunc(GL_ZERO, GL_SRC_COLOR);
+    //glBlendFunc(GL_ONE, GL_SRC_COLOR);
     paperFbo->draw(0, 0);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_ONE, GL_ONE);
     
     for (int i = 0; i < pigments.size(); i ++)  {
         tempFbo = applyShader(pigmentRenderShader, pigments[i].fbo, SHADING_TYPE_PIGMENT_RENDER, i);
         glBlendFunc(GL_ZERO, GL_SRC_COLOR);
         tempFbo->draw(0,0);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glBlendFunc(GL_ONE, GL_ONE);
     }
+	//waterColorCanvas.end();
 }
 
 //--------------------------------------------------------------

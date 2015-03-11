@@ -1,14 +1,15 @@
 #include "Stone.h"
 
 
-Stone::Stone()
+Stone::Stone( )
 {
-	setFuzzy( 30.0f );
+
+	setFuzzy( 10.0f );
 	setRadius( 80.0f );
 	setSize( 35 );
 
 	tempImage.allocate( ofGetWindowWidth(), ofGetWindowHeight() );
-	init();
+	layer.allocate( ofGetWidth(), ofGetHeight() );
 }
 
 
@@ -16,12 +17,12 @@ Stone::~Stone()
 {
 }
 
-void Stone::init()
+void Stone::init( float _x, float _y )
 {
 	points.clear();
 	radii.clear();
 
-	ofVec2f center( 0, 0 );
+	ofVec2f center( _x, _y );
 	addCircle( center, getRadius() );
 
 	for( int i = 0; i < getNumberOfCircles(); i++ ) {
@@ -30,7 +31,61 @@ void Stone::init()
 		addCircle( center, getRadius() );
 	}
 
-	//calcContour(ofGetWidth() / 2.0f, ofGetHeight() / 2.0f );
+	calcContour( 0, 0 );
+	renderBorder();
+	renderStone();
+	
+}
+
+void Stone::renderStone()
+{
+	layer.begin();
+	
+	ofPushStyle();
+	ofEnableAlphaBlending();
+	ofEnableBlendMode( OF_BLENDMODE_ADD );
+	
+
+	for( int i = 0; i < getNumberOfStrokes(); i++ )
+	{
+		float size = ofRandom( 20, 150 );
+		ofVec2f p = getCenterById( i );
+		
+		ofSetColor( 170, 20, 40, 120 );
+		brushes.getRandomBrush().draw( p.x - size / 2.0, p.y - size / 2.0, size, size );
+
+	}
+
+	ofDisableAlphaBlending();
+	ofPopStyle();
+
+	layer.end();
+}
+
+void Stone::renderBorder()
+{
+	layer.begin();
+
+	ofPushStyle();
+	ofDisableAlphaBlending();
+	//ofPushStyle();
+	ofEnableAlphaBlending();
+	ofEnableBlendMode( OF_BLENDMODE_SCREEN );
+
+	//std::vector< ofVec2f > contourP = getContourPoints( 0, 0 );
+	for( int i = 0; i < contourPoints.size(); i++ )
+	{
+		float size = ofRandom( 10, 20 );
+		ofVec2f p = contourPoints.at( i );
+
+		ofSetColor( 0 );
+		brushes.getCircleBrush().draw( p.x - size / 2.0, p.y - size / 2.0, size, size );
+	}
+	
+	ofDisableAlphaBlending();
+	ofPopStyle();
+
+	layer.end();
 }
 
 void Stone::addCircle( ofVec2f poi, float rad )
@@ -58,6 +113,11 @@ void Stone::draw( ofVec2f centerLocation )
 	}
 	ofPopMatrix();
 	ofPopStyle();
+}
+
+void Stone::draw( float x, float y )
+{
+	layer.draw( x, y );
 }
 
 void Stone::setFuzzy( float fuzzy )
@@ -139,3 +199,17 @@ void Stone::calcContour(float x, float y )
 		contourPoints.push_back( vecp );
 	}
 }
+
+int Stone::getNumberOfStrokes()
+{
+	return getNumberOfCircles();
+}
+
+void Stone::setBrushCollection( BrushCollection _b )
+{
+	this->brushes = _b;
+}
+
+
+
+
