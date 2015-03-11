@@ -11,7 +11,7 @@ void testApp::setup(){
 
 	setupGui();
 
-	bg.loadImage( "bg_black.png" );
+	bg.loadImage( "bg_brown.png" );
 	brush.loadImage( "water_color_textures_01.png" );
 	specialBrush.loadImage( "brush.png" );
 	for( int i = 1; i < 26; i++ ) {
