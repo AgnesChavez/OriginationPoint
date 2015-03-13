@@ -10,8 +10,9 @@ public:
 
 	ofImage getRandomBrush();
 	ofImage getCircleBrush();
+	ofImage getOwnBrush1();
 private:
 	std::vector< ofImage > brushes;
-	ofImage circleBrush;
+	ofImage circleBrush, ownBrush1;
 };
 

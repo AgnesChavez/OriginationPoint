@@ -15,6 +15,7 @@ BrushCollection::BrushCollection()
 	}
 
 	circleBrush.loadImage( "brush.png" );
+	ownBrush1.loadImage( "own_brush_2.png" );
 }
 
 
@@ -30,4 +31,9 @@ ofImage BrushCollection::getRandomBrush()
 ofImage BrushCollection::getCircleBrush()
 {
 	return circleBrush;
+}
+
+ofImage BrushCollection::getOwnBrush1()
+{
+	return ownBrush1;
 }

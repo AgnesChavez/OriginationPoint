@@ -1,9 +1,11 @@
 ofxOpenCv
-ofxSvg
+ofxOsc
 ofxXmlSettings
+ofxConvexHull
 ofxCv
 ofxFontStash
 ofxPSBlend
+ofxTimeMeasurements
 ofxUI
 ofxUnicode
-ofxVoro
+ofxVoronoi2D
