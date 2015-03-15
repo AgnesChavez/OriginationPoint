@@ -1,22 +1,19 @@
 #pragma once
 
 #include "ofMain.h"
-//#include "WaterColorCanvas.h"
 #include "Stone.h"
 #include "VoronoiLayer.h"
 
 #include "ofxPSBlend.h"
 #include "ofxUI.h"
 #include "ofxTimeMeasurements.h"
+#include "KinectWrapper.h"
 
 class testApp : public ofBaseApp{
-
 public:
 	void setup();
 	void update();
 	void draw();
-
-	void clearLayers();
 
 	std::vector< Stone > stones;
 	VoronoiLayer voro;
@@ -32,14 +29,16 @@ public:
 	void dragEvent( ofDragInfo dragInfo );
 	void gotMessage( ofMessage msg );
 
+	KinectWrapper wrapper;
+	bool displayKinect;
+	float kinectToStoneDistance;
+
 	ofImage bg;
 	void reinit();
-	ofFbo buffer;
 	bool doGrow;
 
 	BrushCollection brushCollection;
 	ColorCollection stone8ColorCollection;
-
 
 	ofxUISuperCanvas *gui;
 	void setupGui();
@@ -48,6 +47,4 @@ public:
 	// blending
 	ofxPSBlend psBlend;
 	int blendMode;
-
-	
 };

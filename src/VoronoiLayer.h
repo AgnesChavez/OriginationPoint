@@ -1,7 +1,15 @@
 #pragma once
 
-#include "ofxVoronoi2D.h"
 #include "ofMain.h"
+#include "ofxVoro.h"
+
+struct Point1 {
+	float x, y;
+
+	bool operator <( const Point1 &p ) const {
+		return x < p.x || ( x == p.x && y < p.y );
+	}
+};
 
 class VoronoiLayer
 {
@@ -14,21 +22,25 @@ public:
 	void render();
 	void draw( float x, float y );
 	void clear();
-	void setDisplayMode( int dm );
 	std::vector< ofVec2f > getPoints();
+	std::vector< ofPolyline > getLines();
+	ofPolyline getLine( int id );
+	bool isInside( int id, float _x, float _y );
 
 	void setTransparency( float _trans );
-	vector<ofVec2f> pts;
+	void setSmoothAmount( int smoothA );
+	vector<ofVec2f> pts;	
 
 private:
-	
-	ofxVoronoi2D voronoi;
-	
-	ofMesh mesh;
+	voro::container * con;
+	std::vector< Point1 > convex_hull( std::vector < Point1> points );
+	float cross( const Point1 &O, const Point1 &A, const Point1 &B );
+
 	unsigned int count;
-	int displayMode;
 	float transparency;
 
 	ofFbo buffer;
+	std::vector< ofPolyline > lines;
+	int smoothAmount;
 };
 

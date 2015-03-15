@@ -3,12 +3,15 @@
 //--------------------------------------------------------------
 void testApp::setup(){
 	ofSetLogLevel( OF_LOG_ERROR );
+	ofSetVerticalSync( true );
+	ofSetFrameRate( 30 );
 
-	TIME_SAMPLE_SET_FRAMERATE( 20.0f );
+	wrapper.openKinect();
+	wrapper.openDepthStream();
+
+	TIME_SAMPLE_SET_FRAMERATE( 30.0f );
 	//TIME_SAMPLE_SET_AVERAGE_RATE( 0.01 );
 	TIME_SAMPLE_SET_DRAW_LOCATION( TIME_MEASUREMENTS_TOP_RIGHT );
-
-	//ofSetFrameRate( 200 );
 
 	stone8ColorCollection.addColor( 187, 58, 62 );
 	stone8ColorCollection.addColor( 156, 121, 57 );
@@ -17,30 +20,31 @@ void testApp::setup(){
 	stone8ColorCollection.addColor( 150, 89, 58 );
 	stone8ColorCollection.addColor( 106, 72, 70 );
 
-	
-
 	bg.loadImage( "bg_b.png" );
 	
-	buffer.allocate( ofGetWidth(), ofGetHeight() );
-
-	points = 10;
+	points = 20;
 	reinit();
 	setupGui();
 
+	kinectToStoneDistance = 120;
+	displayKinect = true;
 	doGrow = false;
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
 	ofSetWindowTitle( ofToString( ofGetFrameRate() ) );
-	//voro.setTransparency( ofMap( ofGetMouseX(), 0, ofGetWidth(), 0, 255 ) );
-	//stones.at( 0 ).setTransparency( ofMap(ofGetMouseX(), 0, ofGetWidth(), 0, 255 ) );
 
 	if( doGrow ) {
 		for( int i = 0; i < stones.size(); i++ ) {
-			stones.at( i ).grow();
+			stones.at( i ).grow( voro.getLine( i ) );
 		}
 	}
+
+	bool inside = voro.isInside( 0, ofGetMouseX(), ofGetMouseY() );
+	std::cout << inside << std::endl;
+
+	wrapper.updateDepthFrame();
 }
 
 //--------------------------------------------------------------
@@ -56,13 +60,43 @@ void testApp::draw(){
 	TS_STOP( "stones_draw" );
 
 	TS_START( "voro_draw" );
+	voro.compute();
 	voro.render();
 	voro.draw( 0, 0 );
 	TS_STOP( "voro_draw" );
+
+	ofPixels pix;
+	pix = wrapper.grayscaleImage.getPixelsRef();
+	//wrapper.grayscaleImage.threshold( 160 );
+	for( int i = 0; i < wrapper.grayscaleImage.height; i++ )
+	{
+		for( int j = 0; j < wrapper.grayscaleImage.width; j++ )
+		{
+			//wrapper.grayscaleImage.
+			int editValue = pix.getColor( j, i ).r;
+
+			if( ( editValue >= kinectToStoneDistance - 2 ) && ( editValue <= kinectToStoneDistance + 2 ) ) //check whether value is within range.
+			{
+				pix.setColor( j, i, ofColor( 255 ) );
+				//image.at<uchar>( i, j ) = 255;
+			}
+			else
+			{
+				pix.setColor( j, i, ofColor( 0 ) );
+			}
+		}
+	}
+	wrapper.grayscaleImage.setFromPixels( pix );
+
+	if( displayKinect ) {
+		wrapper.grayscaleImage.draw( 0, 0 );
+	}
 }
 
 //--------------------------------------------------------------
 void testApp::keyPressed( int key ){
+	int randomId = ( int ) ( ofRandom( 0, stones.size() ) );
+
 	switch( key ) {
 	case 's':
 		ofSaveScreen( ofToString( ofGetTimestampString() + ".png" ) );
@@ -76,11 +110,12 @@ void testApp::keyPressed( int key ){
 		reinit();
 		break;
 	case 'c':
-		stones.at( ofRandom( 0, stones.size() ) ).rerender();
+		
+		stones.at( randomId ).rerender( voro.getLine( randomId ) );
 		break;
 	case 'p':
 		for( int i = 0; i < stones.size(); i++ ) {
-			stones.at( i ).calcContour();
+			stones.at( i ).calcBorder();
 			stones.at( i ).renderBorder();
 		}
 		break;
@@ -89,12 +124,7 @@ void testApp::keyPressed( int key ){
 		break;
 	case ' ':
 		gui->toggleVisible();
-		break;
-	case '1':
-	case '2':
-	case '3':
-	case '4':
-		voro.setDisplayMode( key );
+		displayKinect = !displayKinect;
 		break;
 	}
 }
@@ -140,21 +170,8 @@ void testApp::dragEvent( ofDragInfo dragInfo ){
 
 void testApp::guiEvent( ofxUIEventArgs &e )
 {
-	if( e.getName() == "Rock random Position" )
-	{
-		ofxUIButton * button = e.getButton();
-		if( button->getValue() == 1 )
-		{
-			Stone s;
-			s.setBrushCollection( brushCollection );
-			s.setColorCollection( stone8ColorCollection );
-
-			s.init( ofRandomWidth(), ofRandomHeight() );
-
-			stones.push_back( s );
-		}
-	}
-	else if( e.getName() == "Init" )
+	
+	if( e.getName() == "Init" )
 	{
 		ofxUIButton * button = e.getButton();
 		if( button->getValue() == 1 )
@@ -168,7 +185,7 @@ void testApp::guiEvent( ofxUIEventArgs &e )
 		if( button->getValue() == 1 )
 		{
 			for( int i = 0; i < stones.size(); i++ ) {
-				stones.at( i ).rerender();
+				stones.at( i ).rerender( voro.getLine( i ) );
 			}
 		}
 	}
@@ -229,6 +246,30 @@ void testApp::guiEvent( ofxUIEventArgs &e )
 		}
 	}
 
+	else if( e.getName() == "VoroTransparency" )
+	{
+		ofxUISlider * slider = e.getSlider();
+		voro.setTransparency( slider->getValue() );
+	}
+	else if( e.getName() == "StonesTransparency" )
+	{
+		ofxUISlider * slider = e.getSlider();
+		for( int i = 0; i < stones.size(); i++ ) {
+			stones.at( i ).setTransparency( slider->getValue() );
+		}
+	}
+	else if( e.getName() == "BorderTransparency" )
+	{
+		ofxUISlider * slider = e.getSlider();
+		for( int i = 0; i < stones.size(); i++ ) {
+			stones.at( i ).setBorderTransparency( slider->getValue() );
+		}
+	}
+	else if( e.getName() == "Voronoi Smooth" )
+	{
+		ofxUISlider * slider = e.getSlider();
+		voro.setSmoothAmount( slider->getValue() );
+	}
 }
 
 void testApp::setupGui()
@@ -250,10 +291,15 @@ void testApp::setupGui()
 	gui->addSlider( "Fuzzy", 0.0f, 150.0f, 30.0f, 200, 20 );
 	gui->addSlider( "Radius", 0.0f, 250.0f, 80.0f, 200, 20 );
 	gui->addSlider( "Transparency", 0.0f, 255.0f, 255.0f, 200, 20 );
-	gui->addButton( "Rock random Position", false );
+	gui->addSpacer();
+	gui->addSlider( "VoroTransparency", 0.0f, 255.0, 255.0f );
+	gui->addSlider( "StonesTransparency", 0.0f, 255.0, 255.0f );
+	gui->addSlider( "BorderTransparency", 0.0f, 255.0f, 255.0f );
+	gui->addSpacer( 2 );
+	gui->addSlider( "KinectDistance", 0.0f, 255.0f, &kinectToStoneDistance );
+	gui->addSlider( "Voronoi Smooth", 0.0f, 20.0f, 0.0, 200.0, 20.0 );
 	
 	gui->addButton( "Init", false );
-
 
 	gui->autoSizeToFitWidgets();
 	ofAddListener( gui->newGUIEvent, this, &testApp::guiEvent );
@@ -264,35 +310,43 @@ void testApp::setupGui()
 void testApp::reinit()
 {
 	TS_START( "reinit" );
-	TS_START( "clearing" );
 	voro.clear();
 	stones.clear();
-	TS_STOP( "clearing" );
-	TS_START( "voro_addpoints" );
 	for( int i = 0; i < (int)(points); i++ ) {
 		voro.addPoint( ofRandomWidth(), ofRandomHeight() );
 	}
-	TS_STOP( "voro_addpoints" );
-	TS_START( "stone_inits" );
+	
+	voro.compute();
 	for( int i = 0; i < voro.pts.size(); i++ ) {
 		ofVec2f * p = &voro.pts.at( i );
-	//for( ofVec2f *p : voro.pts ) {
 		Stone s;
-		TS_START( "add_collections" );
 		s.setBrushCollection( brushCollection );
 		s.setColorCollection( stone8ColorCollection );
-		TS_STOP( "add_collections" );
-		TS_START( "stone_init" );
-		s.init( p->x, p->y );
-		TS_STOP( "stone_init" );
-		TS_START( "stone_push" );
+		s.init( p->x, p->y, voro.getLine( i ) );
+
+		// TODO CHECK FOR IF NEW POINTS ARE ONLY INSIDE OF CORRESPONDING FACES
+		// TODO GOOGLE HOW TO GET INDIVIDUAL FACES OF MESH
+		// TODO GOOGLE HOW TO GET CELL FACES OF VORONOI DIAGRAM EASILY
+		/*
+		std::vector< ofMeshFace > faces = voro.getFaces();
+		std::vector< ofMeshFace > correspondingFaces;
+		for( int i = 0; i < faces.size(); i++ ) {
+			ofMeshFace f = faces.at( i );
+			for( int j = 0; j < 3; j++ ) {
+				ofVec3f v = f.getVertex( j );
+				if( ( int ) ( v.x ) == ( int ) ( p->x ) && ( int ) ( v.y ) == ( int ) ( p->y ) ) {
+					std::cout << "equals at i" << std::endl;
+					correspondingFaces.push_back( f );
+					//continue;
+				}
+			}
+		}
+		int foo = 0;
+		std::cout << correspondingFaces.size() << std::endl;
+		*/
 		stones.push_back( s );
-		TS_STOP( "stone_push" );
 	}
-	TS_STOP( "stone_inits" );
-	TS_START( "voro_compute" );
-	voro.compute();
-	TS_STOP( "voro_compute" );
+	
 	TS_STOP( "reinit" );
 }
 

@@ -4,8 +4,9 @@ ofxXmlSettings
 ofxConvexHull
 ofxCv
 ofxFontStash
+ofxKinectV2
 ofxPSBlend
 ofxTimeMeasurements
 ofxUI
 ofxUnicode
-ofxVoronoi2D
+ofxVoro

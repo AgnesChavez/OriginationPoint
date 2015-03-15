@@ -9,6 +9,7 @@ Stone::Stone( ) :
 	setRadius( 40.0f );
 	setSize( 60 );
 	transparency = 255;
+	borderTransparency = 255;
 	brushStokeCount = 50;
 	brushStrokeSizeMin = 20;
 	brushStrokeSizeMax = 80;
@@ -27,7 +28,7 @@ Stone::~Stone()
 {
 }
 
-void Stone::init( float _x, float _y )
+void Stone::init( float _x, float _y, ofPolyline line  )
 {
 	TS_START( "clear" );
 	layer.begin();
@@ -37,9 +38,6 @@ void Stone::init( float _x, float _y )
 	underlyingLayer.begin();
 	ofClear( 1.0 );
 	underlyingLayer.end();
-	
-
-	//ofSeedRandom();
 
 	points.clear();
 	radii.clear();
@@ -48,27 +46,25 @@ void Stone::init( float _x, float _y )
 	TS_START( "circle_add" );
 	ofVec2f center( _x, _y );
 	addCircle( center, getRadius() );
-
+	centroid = ofPoint( _x, _y );
 	for( int i = 0; i < getNumberOfCircles(); i++ ) {
 		center.x += ofRandomf() * fuzzy;
 		center.y += ofRandomf() * fuzzy;
-		addCircle( center, radius );
+		if( line.inside( center ) ) {
+			addCircle( center, radius );
+		}
 	}
 	TS_STOP( "circle_add" );
-	TS_START( "render_underl" );
-	ofBackground( 0 );
-	//renderUnderlying();
-	TS_STOP( "render_underl" );
 
-	
+	ofBackground( 0 );	
 	
 	TS_START( "rendering" );
 	//renderStone();
 	TS_START( "render_stone" );
-	renderStone8();
+	renderStone8( line );
 	TS_STOP( "render_stone" );
 	TS_START( "calc_cont" );
-	calcContour();
+	calcBorder();
 	TS_STOP( "calc_cont" );
 
 	TS_START( "render_border" );
@@ -78,7 +74,7 @@ void Stone::init( float _x, float _y )
 	TS_STOP( "rendering" );
 }
 
-void Stone::renderStone()
+void Stone::renderStone( ofPolyline line )
 {
 	layer.begin();
 	
@@ -87,13 +83,16 @@ void Stone::renderStone()
 	ofEnableBlendMode( OF_BLENDMODE_ADD );
 	
 
-	for( int i = 0; i < getNumberOfStrokes(); i++ )
+	for( int i = 0; i < getNumberOfStrokes(); )
 	{
 		float size = ofRandom( 20, 100 );
 		ofVec2f p = getCenterById( i );
 		
 		ofSetColor( ofRandom( 0, 49 ), ofRandom( 0, 49 ), ofRandom( 0, 49 ), 180 );
-		brushes.getRandomBrush().draw( p.x - size / 2.0, p.y - size / 2.0, size, size );
+		if( line.inside( p ) ) {
+			brushes.getRandomBrush().draw( p.x - size / 2.0, p.y - size / 2.0, size, size );
+			i++;
+		}
 
 	}
 
@@ -105,15 +104,6 @@ void Stone::renderStone()
 
 void Stone::renderBorder()
 {
-	/*
-	layer.begin();
-
-	
-
-	layer.end();
-
-	*/
-
 	underlyingLayer.begin();
 	ofPushStyle();
 	ofEnableAlphaBlending();
@@ -121,12 +111,47 @@ void Stone::renderBorder()
 
 	if( contourPoints.size() > 0 ) {
 		ofNoFill();
+		/*
 		ofBeginShape();
-		for( int i = 0; i < contourPoints.size(); i += 2 ) {
+		for( int i = 0; i < contourPoints.size(); i += 1 ) {
 			ofPoint _poi = contourPoints.at( i );
 			ofVertex( _poi );
 		}
 		ofEndShape( true );
+		*/
+		
+		ofPoint lastP( contourPoints.at( 0 ) );
+		ofPushStyle();
+		ofFill();
+
+		for( int i = 0; i < contourPoints.size(); i += 1 ) {
+			ofVec2f from( lastP );
+			ofVec2f to( contourPoints.at( i ) );
+			ofLine( from, to );
+			/*
+			float dist = from.distance( to );
+			dist /= 4;
+			float step = 1.0f / dist;
+			for( float j = 0.0f; j < 1.0f; j += step ) {
+				ofVec2f _pos = from.getInterpolated( to, j );
+				_pos += ofVec2f( ofRandom( -5, 5 ), ofRandom( -5, 5) );
+				ofSetColor( 255, 130 );
+				int size = ofRandom( 3, 8 );
+				ofEllipse( _pos.x, _pos.y, size, size );
+				//brushes.getOwnBrush1().draw(  );
+			}
+			*/
+			lastP = ofPoint( to );
+		}
+		ofPopStyle();
+		float s = ofRandom( brushStrokeSizeMin, brushStrokeSizeMax );
+		int randomId = ofRandom( 0, points.size() );
+		ofVec2f p = getCenterById( randomId );
+
+		ofSetColor( colors.getRandomColor(), brushStrokeAlpha );
+		locationsPointsDrawn.push_back( ofVec2f( p.x - s / 2.0, p.y - s / 2.0 ) );
+		brushes.getOwnBrush1().draw( p.x - s / 2.0, p.y - s / 2.0, s, s );
+		
 	}
 
 	ofDisableAlphaBlending();
@@ -173,6 +198,7 @@ void Stone::draw( float x, float y )
 	ofPushStyle();
 	ofSetColor( 255, transparency );
 	layer.draw( x, y );
+	ofSetColor( 255, borderTransparency );
 	underlyingLayer.draw( x, y );
 	ofPopStyle();
 	TS_STOP( "stone_draw" );
@@ -220,64 +246,12 @@ float Stone::getRadiusById( int id )
 
 std::vector< ofPoint > Stone::getContourPoints( float x, float y )
 {
-	//calcContour( x, y );
 	return contourPoints;
 }
 
-void Stone::calcContour()
+void Stone::calcBorder()
 {
-	TS_START( "drawing" );
-	/*
-	tempFbo.begin();
-	ofBackground( 0 );
-	ofPushStyle();
-	ofSetColor( 255 );
-	for( int i = 0; i < points.size(); i++ ) {
-		ofVec2f p = points.at( i );
-		float rad = radii.at( i );
-		ofEllipse( p.x, p.y, rad, rad );
-	}
-	ofPopStyle();
-	tempFbo.end();
-	*/
-	TS_STOP( "drawing" );
-
-	//contourFinder.setMinAreaRadius( 10 );
-	//contourFinder.setMaxAreaRadius( 200 );
-	contourFinder.setThreshold( 120 );
-
-	//reader.readToPixels( tempFbo, pixels );
-	TS_START( "moving_pix" );
-	//underlyingLayer.readToPixels( pixels );
-	//testMat= ofxCv::toCv( pixels );
-	TS_STOP( "moving_pix" );
-	
-	//for( int i = 0; i < 1; i++ ) {
-		//cv::erode( testMat, testMat, erodeKernel );
-	//}
-
-	TS_START( "point_calc" );
-	//TODO: insert convex hull here
-	std::cout << "points: " << locationsPointsDrawn.size() << std::endl;
-	//while( locationsPointsDrawn.size() > 1000 ) {
-//		std::cout << "Erasing. now: " << locationsPointsDrawn.size() << std::endl;
-//		locationsPointsDrawn.erase( locationsPointsDrawn.begin() );
-//	}
 	contourPoints = convexHull.getConvexHull( locationsPointsDrawn );
-
-	int hey = 0;
-	/*
-	contourFinder.findContours( pixels );
-	contourPoints.clear();
-
-	std::vector< cv::Point > cPoints = contourFinder.getContour( 0 );
-	for( int i = 0; i < cPoints.size(); i++ ) {
-		ofVec2f vecp( cPoints.at( i ).x, cPoints.at( i ).y );
-		contourPoints.push_back( vecp );
-	}
-
-	*/
-	TS_STOP( "point_calc" );
 }
 
 int Stone::getNumberOfStrokes()
@@ -290,7 +264,7 @@ void Stone::setBrushCollection( BrushCollection _b )
 	this->brushes = _b;
 }
 
-void Stone::renderStone8()
+void Stone::renderStone8(ofPolyline line )
 {
 	layer.begin();
 
@@ -298,16 +272,18 @@ void Stone::renderStone8()
 	ofEnableAlphaBlending();
 	//ofEnableBlendMode( OF_BLENDMODE_ADD );
 
-	for( int i = 0; i < brushStokeCount; i++ )
+	for( int i = 0; i < brushStokeCount; )
 	{
 		float s = ofRandom( brushStrokeSizeMin, brushStrokeSizeMax );
-		int randomId = ofRandom( 0, getNumberOfCircles() );
+		int randomId = ofRandom( 0, points.size() );
 		ofVec2f p = getCenterById( randomId );
 
 		ofSetColor( colors.getRandomColor(), brushStrokeAlpha );
-		locationsPointsDrawn.push_back( ofVec2f( p.x - s / 2.0, p.y - s / 2.0 ) );
-		brushes.getOwnBrush1().draw( p.x - s / 2.0, p.y - s / 2.0, s, s );
-
+		if( line.inside( p ) ) {
+			locationsPointsDrawn.push_back( ofVec2f( p.x, p.y ) );
+			brushes.getOwnBrush1().draw( p.x - s / 2.0, p.y - s / 2.0, s, s );
+			i++;
+		}
 	}
 
 	ofDisableAlphaBlending();
@@ -317,7 +293,7 @@ void Stone::renderStone8()
 }
 
 
-void Stone::rerender()
+void Stone::rerender( ofPolyline line  )
 {
 	TS_START( "rerender" );
 	layer.begin();
@@ -330,65 +306,56 @@ void Stone::rerender()
 
 	locationsPointsDrawn.clear();
 
+	currentGrowRad = 0.0f;
+
 	//renderUnderlying();
 
 	
 
 	//renderStone();
-	renderStone8();
-	calcContour();
+	renderStone8(line);
+	calcBorder();
 	renderBorder();
 	
 	TS_STOP( "rerender" );
 }
 
-void Stone::grow()
+void Stone::grow(ofPolyline line)
 {
-	currentGrowRad += 0.2f;
-	/*	
-	underlyingLayer.begin();
-	ofPushStyle();
+	currentGrowRad += 0.5f;
+	if( currentGrowRad < 1000 ) {
+		calcBorder();
 
-	float _x = currentGrowRad * cos( ofRandom( 0, TWO_PI ) );
-	float _y = currentGrowRad * sin( ofRandom( 0, TWO_PI ) );
-	ofVec2f _pos = centroid + ofVec2f( _x, _y );
-	ofEllipse( _pos.x, _pos.y, 7, 7 );
+		underlyingLayer.begin();
+		ofClear( 1.0 );
+		underlyingLayer.end();
 
-	ofPopStyle();
-	underlyingLayer.end();
-	*/
-	
+		//renderBorder();
 
+		layer.begin();
 
-	calcContour();
+		ofPushStyle();
+		ofEnableAlphaBlending();
+		for( int i = 0; i < 5; i++ ) {
+			float deg = ofRandom( 0, TWO_PI );
+			float _x = currentGrowRad * cos( deg );
+			float _y = currentGrowRad * sin( deg );
+			float s = ofRandom( brushStrokeSizeMin, brushStrokeSizeMax );
+			int randomId = ofRandom( 0, points.size() );
+			ofVec2f p = getCenterById( randomId );
+			p += ofVec2f( _x, _y );
 
-	underlyingLayer.begin();
-	ofClear( 1.0 );
-	underlyingLayer.end();
+			ofSetColor( colors.getRandomColor(), brushStrokeAlpha );
+			if( line.inside( p ) ) {
+				locationsPointsDrawn.push_back( ofVec2f( p.x, p.y ) );
+				brushes.getRandomBrush().draw( p.x - s / 2.0, p.y - s / 2.0, s, s );
+			}
+		}
+		ofDisableAlphaBlending();
+		ofPopStyle();
 
-	renderBorder();
-	
-	layer.begin();
-
-	ofPushStyle();
-	ofEnableAlphaBlending();
-	for( int i = 0; i < 5; i++ ) {
-		float deg = ofRandom( 0, TWO_PI );
-		float _x = currentGrowRad * cos( deg );
-		float _y = currentGrowRad * sin( deg );
-		float s = ofRandom( brushStrokeSizeMin, brushStrokeSizeMax );
-		int randomId = ofRandom( 0, getNumberOfCircles() );
-		ofVec2f p = getCenterById( randomId );
-		p += ofVec2f( _x, _y );
-
-		ofSetColor( colors.getRandomColor(), brushStrokeAlpha );
-		locationsPointsDrawn.push_back( ofVec2f( p.x , p.y ) );
-		brushes.getRandomBrush().draw( p.x - s / 2.0, p.y - s / 2.0, s, s );
+		layer.end();
 	}
-	ofDisableAlphaBlending();
-	ofPopStyle();
-
-	layer.end();
 }
 
 
@@ -440,4 +407,9 @@ float Stone::getBrushStrokeSizeMax()
 float Stone::getBrushStrokeAlpha()
 {
 	return this->brushStrokeAlpha;
+}
+
+void Stone::setBorderTransparency( float _trans )
+{
+	this->borderTransparency = _trans;
 }

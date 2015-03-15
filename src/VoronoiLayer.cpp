@@ -4,10 +4,16 @@
 VoronoiLayer::VoronoiLayer()
 {
 	count = 0;
-	displayMode = 0;
 	transparency = 255;
 
 	buffer.allocate( ofGetWidth(), ofGetHeight() );
+
+	con = new voro::container( -0, ofGetWidth(),
+		-0, ofGetHeight(),
+		-10, 10,
+		1, 1, 1, 1, 1, 1, 8 );
+
+	smoothAmount = 0;
 }
 
 
@@ -22,30 +28,58 @@ void VoronoiLayer::addPoint( float x, float y )
 
 void VoronoiLayer::compute()
 {
-	if( pts.size() != count ){
-		voronoi.compute( pts, ofRectangle( 0.0f, 0.0f, ofGetWidth(), ofGetHeight() ), 0.0f );
-		count = pts.size();
+	delete con;
+	con = new voro::container( -0, ofGetWidth(),
+		-0, ofGetHeight(),
+		-2, 2,
+		1, 1, 1, 1, 1, 1, 8 );
 
-		mesh.clear();
-		voronoi.buildMesh( mesh );
+	for( int i = 0; i < pts.size(); i++ ) {
+		addCellSeed( *con, ofPoint( pts.at( i ) ), i, false );
+	}
 
-		// random face colors
-		unsigned int N = mesh.getIndices().size(), M = mesh.getVertices().size();
-		vector<ofFloatColor> colors;
-		colors.resize( M );
-		for( unsigned int i = 0; i < N; i += 3 ){
-			ofFloatColor c(
-				ofRandom( 1.0f ), // R
-				ofRandom( 1.0f ), // G
-				ofRandom( 1.0f )  // B
-				);
-			colors[ mesh.getIndex( i + 0 ) ] = c; // cell center
-			colors[ mesh.getIndex( i + 1 ) ] = ofFloatColor( 1.0f, 1.0f, 1.0f, 0.0f ); // cell border
-			colors[ mesh.getIndex( i + 2 ) ] = ofFloatColor( 1.0f, 1.0f, 1.0f, 0.0f ); // cell border
+	lines.clear();
+
+	std::vector< std::vector< ofPoint > > edgePoints = getCellsVertices( *con );
+	for( int k = 0; k < edgePoints.size(); k++ ) {
+		std::vector< ofPoint > selectedPoints = edgePoints.at( k );
+		ofPoint centroid = getCellsCentroids( *con ).at( k );
+		std::vector< Point1 > pppps;
+		for( int i = 0; i < selectedPoints.size(); i++ ) {
+			Point1 p;
+			p.x = selectedPoints.at( i ).x;
+			p.y = selectedPoints.at( i ).y;
+			pppps.push_back( p );
+			for( int j = 0; j < selectedPoints.size(); j++ ) {
+				ofPoint p1 = selectedPoints.at( i );
+				ofPoint p2 = selectedPoints.at( j );
+				ofPoint p3 = centroid;
+			}
 		}
-		for( unsigned int i = 0; i < M; ++i ) mesh.addColor( colors[ i ] );
+		ofPolyline line;
+		line.setClosed( true );
+		std::vector< Point1 > ps = convex_hull( pppps );
+		for( int i = 0; i < ps.size(); i++ ) {
+			Point1 from = ps.at( i );
+			Point1 to;
+			if( i == ps.size() - 1 ) {
+				to = ps.at( 0 );
+			}
+			else {
+				to = ps.at( i + 1 );
+			}
 
+			for( float j = 0; j < 1.0; j += 0.08 ) {
+				float _x = ofLerp( from.x, to.x, j );
+				float _y = ofLerp( from.y, to.y, j );
+				line.addVertex( _x, _y );
+			}
+		}
 
+		line.setClosed( true );
+		line = line.getSmoothed( smoothAmount );
+		line = line.getResampledBySpacing( 10 );
+		lines.push_back( line );
 	}
 }
 
@@ -60,19 +94,14 @@ void VoronoiLayer::draw( float x, float y )
 void VoronoiLayer::clear()
 {
 	pts.clear();
-	mesh.clear();
+	for( int i = 0; i < lines.size(); i++ ) {
+		lines.at( i ).clear();
+	}
 	count = 0;
-}
-
-void VoronoiLayer::setDisplayMode( int dm )
-{
-	this->displayMode = dm;
 }
 
 void VoronoiLayer::render()
 {
-	if( count < 1 ) return;
-
 	buffer.begin();
 	ofClear( 0.0 );
 	ofPushStyle();
@@ -81,29 +110,12 @@ void VoronoiLayer::render()
 		ofCircle( pts[ i ].x, pts[ i ].y, 4 );
 	}
 
-	switch( displayMode ){
-	case '1':
-		glPointSize( 5.0f );
-		mesh.drawVertices();
-		// mesh.draw(OF_MESH_POINTS);
-		break;
-	case '2':
-		mesh.drawWireframe();
-		// mesh.draw(OF_MESH_WIREFRAME);
-		break;
-	case '3':
-		//mesh.draw(OF_MESH_FILL);
-		mesh.drawFaces();
-		break;
-	default:
-		// draw cells
-		ofxSegmentIterator it = voronoi.edges();
-		for( ; it; ++it ){
-			ofxSegment e = *it;
-			ofLine( e.p1, e.p2 );
-		}
+	ofSetColor( 255, 0, 0 );
+	glLineWidth( 5 );
+	for( int i = 0; i < lines.size(); i++ ) {
+		lines.at( i ).draw();
 	}
-
+	
 	ofPopStyle();
 	buffer.end();
 }
@@ -116,4 +128,53 @@ std::vector< ofVec2f > VoronoiLayer::getPoints()
 void VoronoiLayer::setTransparency( float _trans )
 {
 	this->transparency = _trans;
+}
+
+std::vector< Point1 > VoronoiLayer::convex_hull( std::vector < Point1> points )
+{
+	int n = points.size(), k = 0;
+	vector<Point1> H( 2 * n );
+
+	// Sort points lexicographically
+	sort( points.begin(), points.end() );
+
+	// Build lower hull
+	for( int i = 0; i < n; ++i ) {
+		while( k >= 2 && cross( H[ k - 2 ], H[ k - 1 ], points[ i ] ) <= 0 ) k--;
+		H[ k++ ] = points[ i ];
+	}
+
+	// Build upper hull
+	for( int i = n - 2, t = k + 1; i >= 0; i-- ) {
+		while( k >= t && cross( H[ k - 2 ], H[ k - 1 ], points[ i ] ) <= 0 ) k--;
+		H[ k++ ] = points[ i ];
+	}
+
+	H.resize( k );
+	return H;
+}
+
+float VoronoiLayer::cross( const Point1 &O, const Point1 &A, const Point1 &B )
+{
+	return ( A.x - O.x ) * ( B.y - O.y ) - ( A.y - O.y ) * ( B.x - O.x );
+}
+
+std::vector< ofPolyline > VoronoiLayer::getLines()
+{
+	return lines;
+}
+
+ofPolyline VoronoiLayer::getLine( int id )
+{
+	return lines.at( id );
+}
+
+bool VoronoiLayer::isInside( int id, float _x, float _y )
+{
+	return lines.at( id ).inside( _x, _y );
+}
+
+void VoronoiLayer::setSmoothAmount( int smoothA )
+{
+	this->smoothAmount = smoothA;
 }

@@ -15,15 +15,15 @@ class Stone
 public:
 	Stone();
 	~Stone();
-	void init( float _x, float _y );
+	void init( float _x, float _y, ofPolyline line  );
 	void draw( float x, float y );
-	void rerender();
-	void renderStone8();
-	void calcContour();
-	void renderStone();
+	void rerender(ofPolyline line );
+	void renderStone8(ofPolyline line );
+	void calcBorder();
+	void renderStone(ofPolyline line );
 	void renderBorder();
 
-	void grow();
+	void grow(ofPolyline line );
 
 	cv::Mat erodeKernel;
 	cv::Mat testMat;
@@ -37,6 +37,7 @@ public:
 	float getFuzzy();
 	int getNumberOfCircles();
 	void setTransparency( float _trans );
+	void setBorderTransparency( float _trans );
 
 	void setBrushStrokeCount( int count );
 	int getBrushStrokeCount();
@@ -62,7 +63,7 @@ public:
 private:
 	float radius, fuzzy;
 	int size;
-	float transparency;
+	float transparency, borderTransparency;
 	ofVec2f centroid;
 
 	float currentGrowRad;
