@@ -10,7 +10,6 @@ void testApp::setup(){
 	wrapper.openDepthStream();
 
 	TIME_SAMPLE_SET_FRAMERATE( 30.0f );
-	//TIME_SAMPLE_SET_AVERAGE_RATE( 0.01 );
 	TIME_SAMPLE_SET_DRAW_LOCATION( TIME_MEASUREMENTS_TOP_RIGHT );
 
 	stone8ColorCollection.addColor( 187, 58, 62 );
@@ -20,9 +19,28 @@ void testApp::setup(){
 	stone8ColorCollection.addColor( 150, 89, 58 );
 	stone8ColorCollection.addColor( 106, 72, 70 );
 
+	stoneCurtain.setBrushCollection( brushCollection );
+	stoneCurtain.setColorCollection( stone8ColorCollection );
+
+	stoneCurtain.render();
+
+
 	bg.loadImage( "bg_b.png" );
-	
-	points = 20;
+
+	int x = 0;
+	int y = 0;
+	int w = 1920;
+	int h = 1080;
+
+	warper.setSourceRect( ofRectangle( 0, 0, ofGetWidth(), ofGetHeight() ) );              // this is the source rectangle which is the size of the image and located at ( 0, 0 )
+	warper.setTopLeftCornerPosition( ofPoint( x, y ) );             // this is position of the quad warp corners, centering the image on the screen.
+	warper.setTopRightCornerPosition( ofPoint( x + w, y ) );        // this is position of the quad warp corners, centering the image on the screen.
+	warper.setBottomLeftCornerPosition( ofPoint( x, y + h ) );      // this is position of the quad warp corners, centering the image on the screen.
+	warper.setBottomRightCornerPosition( ofPoint( x + w, y + h ) ); // this is position of the quad warp corners, centering the image on the screen.
+	warper.setup();
+	warper.load(); // reload last saved changes.
+
+	points = 15;
 	reinit();
 	setupGui();
 
@@ -41,17 +59,19 @@ void testApp::update(){
 		}
 	}
 
-	bool inside = voro.isInside( 0, ofGetMouseX(), ofGetMouseY() );
-	std::cout << inside << std::endl;
-
 	wrapper.updateDepthFrame();
 }
 
 //--------------------------------------------------------------
 void testApp::draw(){
+	ofPushMatrix();
+	ofMatrix4x4 mat = warper.getMatrix();
+	ofMultMatrix( mat );
 	TS_START( "bg_draw" );
 	bg.draw( 0, 0 );
 	TS_STOP( "bg_end" );
+
+	
 
 	TS_START( "stones_draw" );
 	for( int i = 0; i < stones.size(); i++ ) {
@@ -91,6 +111,24 @@ void testApp::draw(){
 	if( displayKinect ) {
 		wrapper.grayscaleImage.draw( 0, 0 );
 	}
+
+	stoneCurtain.draw( 0, 0 );
+
+	ofPopMatrix();
+	ofPushStyle();
+
+	ofSetColor( ofColor::magenta );
+	warper.drawQuadOutline();
+
+	ofSetColor( ofColor::yellow );
+	warper.drawCorners();
+
+	ofSetColor( ofColor::magenta );
+	warper.drawHighlightedCorner();
+
+	ofSetColor( ofColor::red );
+	warper.drawSelectedCorner();
+	ofPopStyle();
 }
 
 //--------------------------------------------------------------
@@ -126,6 +164,18 @@ void testApp::keyPressed( int key ){
 		gui->toggleVisible();
 		displayKinect = !displayKinect;
 		break;
+	}
+
+	if( key == 't' || key == 'T' ) {
+		warper.toggleShow();
+	}
+
+	if( key == 'l' || key == 'L' ) {
+		warper.load();
+	}
+
+	if( key == 'h' || key == 'H' ) {
+		warper.save();
 	}
 }
 
@@ -179,16 +229,6 @@ void testApp::guiEvent( ofxUIEventArgs &e )
 			reinit();
 		}
 	}
-	else if( e.getName() == "Rerender" )
-	{
-		ofxUIButton * button = e.getButton();
-		if( button->getValue() == 1 )
-		{
-			for( int i = 0; i < stones.size(); i++ ) {
-				stones.at( i ).rerender( voro.getLine( i ) );
-			}
-		}
-	}
 	else if( e.getName() == "Size" )
 	{
 		ofxUISlider * slider = e.getSlider();
@@ -217,35 +257,6 @@ void testApp::guiEvent( ofxUIEventArgs &e )
 			stones.at( i ).setTransparency( slider->getValue() );
 		}
 	}
-	else if( e.getName() == "BrushStrokeCount" )
-	{
-		ofxUISlider * slider = e.getSlider();
-		for( int i = 0; i < stones.size(); i++ ) {
-			stones.at( i ).setBrushStrokeCount( slider->getValue() );
-		}
-	}
-	else if( e.getName() == "BrushStokeSizeMin" )
-	{
-		ofxUISlider * slider = e.getSlider();
-		for( int i = 0; i < stones.size(); i++ ) {
-			stones.at( i ).setBrushStrokeSizeMin( slider->getValue() );
-		}
-	}
-	else if( e.getName() == "BrushStokeSizeMax" )
-	{
-		ofxUISlider * slider = e.getSlider();
-		for( int i = 0; i < stones.size(); i++ ) {
-			stones.at( i ).setBrushStrokeSizeMax( slider->getValue() );
-		}
-	}
-	else if( e.getName() == "BrushStrokeSizeAlpha" )
-	{
-		ofxUISlider * slider = e.getSlider();
-		for( int i = 0; i < stones.size(); i++ ) {
-			stones.at( i ).setBrushStrokeAlpha( slider->getValue() );
-		}
-	}
-
 	else if( e.getName() == "VoroTransparency" )
 	{
 		ofxUISlider * slider = e.getSlider();
@@ -270,6 +281,10 @@ void testApp::guiEvent( ofxUIEventArgs &e )
 		ofxUISlider * slider = e.getSlider();
 		voro.setSmoothAmount( slider->getValue() );
 	}
+	else if( e.getName() == "Voronoi Thickness" ) {
+		ofxUISlider * slider = e.getSlider();
+		voro.setLineThickness( slider->getValue() );
+	}
 }
 
 void testApp::setupGui()
@@ -280,17 +295,12 @@ void testApp::setupGui()
 	gui->addFPSSlider( "FPS" );
 	gui->addSpacer();
 	
-	gui->addSlider( "BrushStrokeCount", 0.0f, 150.0f, testStone.getBrushStrokeCount(), 200, 20 );
-	gui->addSlider( "BrushStokeSizeMin", 0.0f, 200.0f, testStone.getBrushStrokeSizeMin(), 200, 20 );
-	gui->addSlider( "BrushStrokeSizeMax", 0.0f, 200.0f, testStone.getBrushStrokeSizeMax(), 200, 20 );
-	gui->addSlider( "BrushStrokeSizeAlpha", 0.0f, 255.0f, testStone.getBrushStrokeAlpha(), 200, 20 );
-	gui->addButton( "Rerender", false );
-	gui->addSpacer();
 	gui->addSlider( "Points", 0.0f, 200.0f, &points );
 	gui->addSlider( "Size", 0.0f, 100.0f, 35.0f, 200, 20 );
 	gui->addSlider( "Fuzzy", 0.0f, 150.0f, 30.0f, 200, 20 );
 	gui->addSlider( "Radius", 0.0f, 250.0f, 80.0f, 200, 20 );
 	gui->addSlider( "Transparency", 0.0f, 255.0f, 255.0f, 200, 20 );
+	gui->addSlider( "Voronoi Thickness", 0.0, 20.0, voro.getLineThickness(), 200.0, 20.0 );
 	gui->addSpacer();
 	gui->addSlider( "VoroTransparency", 0.0f, 255.0, 255.0f );
 	gui->addSlider( "StonesTransparency", 0.0f, 255.0, 255.0f );
@@ -324,29 +334,14 @@ void testApp::reinit()
 		s.setColorCollection( stone8ColorCollection );
 		s.init( p->x, p->y, voro.getLine( i ) );
 
-		// TODO CHECK FOR IF NEW POINTS ARE ONLY INSIDE OF CORRESPONDING FACES
-		// TODO GOOGLE HOW TO GET INDIVIDUAL FACES OF MESH
-		// TODO GOOGLE HOW TO GET CELL FACES OF VORONOI DIAGRAM EASILY
-		/*
-		std::vector< ofMeshFace > faces = voro.getFaces();
-		std::vector< ofMeshFace > correspondingFaces;
-		for( int i = 0; i < faces.size(); i++ ) {
-			ofMeshFace f = faces.at( i );
-			for( int j = 0; j < 3; j++ ) {
-				ofVec3f v = f.getVertex( j );
-				if( ( int ) ( v.x ) == ( int ) ( p->x ) && ( int ) ( v.y ) == ( int ) ( p->y ) ) {
-					std::cout << "equals at i" << std::endl;
-					correspondingFaces.push_back( f );
-					//continue;
-				}
-			}
-		}
-		int foo = 0;
-		std::cout << correspondingFaces.size() << std::endl;
-		*/
 		stones.push_back( s );
 	}
 	
 	TS_STOP( "reinit" );
+}
+
+void testApp::exit()
+{
+	warper.save();
 }
 

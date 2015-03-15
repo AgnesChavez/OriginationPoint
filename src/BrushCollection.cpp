@@ -12,10 +12,22 @@ BrushCollection::BrushCollection()
 		ofImage im;
 		im.loadImage( ss.str() );
 		brushes.push_back( im );
+
+		ofFbo fboImage;
+		fboImage.allocate( im.width, im.height );
+		fboImage.begin();
+		ofClear( 1.0f );
+		ofEnableAlphaBlending();
+		im.draw( 0, 0 );
+		fboImage.end();
+
+		fboBrushes.push_back( fboImage );
 	}
 
 	circleBrush.loadImage( "brush.png" );
 	ownBrush1.loadImage( "own_brush_2.png" );
+
+
 }
 
 
@@ -23,9 +35,10 @@ BrushCollection::~BrushCollection()
 {
 }
 
-ofImage BrushCollection::getRandomBrush()
+ofFbo BrushCollection::getRandomBrush()
 {
-	return brushes.at( ofRandom( 0, brushes.size() ) );
+	//return brushes.at( ofRandom( 0, brushes.size() ) );
+	return fboBrushes.at( ofRandom( 0, brushes.size() ) );
 }
 
 ofImage BrushCollection::getCircleBrush()

@@ -14,6 +14,7 @@ VoronoiLayer::VoronoiLayer()
 		1, 1, 1, 1, 1, 1, 8 );
 
 	smoothAmount = 0;
+	thickness = 3;
 }
 
 
@@ -111,7 +112,7 @@ void VoronoiLayer::render()
 	}
 
 	ofSetColor( 255, 0, 0 );
-	glLineWidth( 5 );
+	glLineWidth( thickness );
 	for( int i = 0; i < lines.size(); i++ ) {
 		lines.at( i ).draw();
 	}
@@ -177,4 +178,14 @@ bool VoronoiLayer::isInside( int id, float _x, float _y )
 void VoronoiLayer::setSmoothAmount( int smoothA )
 {
 	this->smoothAmount = smoothA;
+}
+
+void VoronoiLayer::setLineThickness( float _thick )
+{
+	this->thickness = _thick;
+}
+
+float VoronoiLayer::getLineThickness()
+{
+	return this->thickness;
 }

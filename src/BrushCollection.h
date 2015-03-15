@@ -8,10 +8,11 @@ public:
 	BrushCollection();
 	~BrushCollection();
 
-	ofImage getRandomBrush();
+	ofFbo getRandomBrush();
 	ofImage getCircleBrush();
 	ofImage getOwnBrush1();
 private:
+	std::vector< ofFbo > fboBrushes;
 	std::vector< ofImage > brushes;
 	ofImage circleBrush, ownBrush1;
 };

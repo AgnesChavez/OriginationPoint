@@ -1,11 +1,9 @@
 ofxOpenCv
-ofxOsc
 ofxXmlSettings
 ofxConvexHull
 ofxCv
 ofxFontStash
-ofxKinectV2
-ofxPSBlend
+ofxQuadWarp
 ofxTimeMeasurements
 ofxUI
 ofxUnicode

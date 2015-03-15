@@ -9,6 +9,8 @@
 
 #include "BrushCollection.h"
 #include "ColorCollection.h"
+#include "VoronoiLayer.h"
+
 
 class Stone
 {
@@ -25,7 +27,6 @@ public:
 
 	void grow(ofPolyline line );
 
-	cv::Mat erodeKernel;
 	cv::Mat testMat;
 	ofPixels pixels;
 
@@ -38,6 +39,8 @@ public:
 	int getNumberOfCircles();
 	void setTransparency( float _trans );
 	void setBorderTransparency( float _trans );
+
+	ofFbo getStoneBuffer();
 
 	void setBrushStrokeCount( int count );
 	int getBrushStrokeCount();
@@ -65,6 +68,8 @@ private:
 	int size;
 	float transparency, borderTransparency;
 	ofVec2f centroid;
+
+	ofPolyline border;
 
 	float currentGrowRad;
 

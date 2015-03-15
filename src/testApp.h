@@ -4,10 +4,13 @@
 #include "Stone.h"
 #include "VoronoiLayer.h"
 
-#include "ofxPSBlend.h"
 #include "ofxUI.h"
 #include "ofxTimeMeasurements.h"
+#include "ofxQuadWarp.h"
+
 #include "KinectWrapper.h"
+#include "StoneCurtain.h"
+
 
 class testApp : public ofBaseApp{
 public:
@@ -28,10 +31,13 @@ public:
 	void windowResized( int w, int h );
 	void dragEvent( ofDragInfo dragInfo );
 	void gotMessage( ofMessage msg );
+	void exit();
 
 	KinectWrapper wrapper;
 	bool displayKinect;
 	float kinectToStoneDistance;
+
+	ofxQuadWarp warper;
 
 	ofImage bg;
 	void reinit();
@@ -40,11 +46,9 @@ public:
 	BrushCollection brushCollection;
 	ColorCollection stone8ColorCollection;
 
+	StoneCurtain stoneCurtain;
+
 	ofxUISuperCanvas *gui;
 	void setupGui();
 	void guiEvent( ofxUIEventArgs &e );
-
-	// blending
-	ofxPSBlend psBlend;
-	int blendMode;
 };
