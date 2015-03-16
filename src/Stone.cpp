@@ -17,8 +17,17 @@ Stone::Stone( )
 
 	currentGrowRad = 10;
 
-	layer.allocate( ofGetWidth(), ofGetHeight() );
-	underlyingLayer.allocate( ofGetWidth(), ofGetHeight() );
+	bufferWidth = 1920;
+	bufferHeight = 1080;
+	ofFbo::Settings settings;
+	settings.useDepth = true;
+	settings.useStencil = true;
+	settings.depthStencilAsTexture = true;
+	settings.width = bufferWidth;
+	settings.height = bufferHeight;
+
+	layer.allocate( settings );
+	underlyingLayer.allocate( settings );
 }
 
 
@@ -29,11 +38,11 @@ Stone::~Stone()
 void Stone::init( float _x, float _y, ofPolyline line  )
 {
 	layer.begin();
-	ofClear( 1.0 );
+	ofClear( 0.0 );
 	layer.end();
 
 	underlyingLayer.begin();
-	ofClear( 1.0 );
+	ofClear( 0.0 );
 	underlyingLayer.end();
 
 	points.clear();
@@ -71,7 +80,6 @@ void Stone::renderStone( ofPolyline line )
 			brushes.getRandomBrush().draw( p.x - size / 2.0, p.y - size / 2.0, size, size );
 			i++;
 		}
-
 	}
 
 	ofDisableAlphaBlending();
@@ -100,37 +108,22 @@ void Stone::renderBorder()
 			convexPoints.at( i ) = p;
 		}
 
-		TS_START_NIF( "convexhullcalc" );
 		std::vector< Point1 > ps = VoronoiLayer::convex_hull( convexPoints );
-		TS_STOP_NIF( "convexhullcalc" );
 
 		border.clear();
 		border.setClosed( true );
-		
-		TS_START_NIF( "point_calc" );
+	
+		std::vector< ofPoint > finalPoints( ps.size() );
+#pragma omp parallel for 
 		for( int i = 0; i < ps.size(); i++ ) {
 			Point1 from = ps.at( i );
-			Point1 to;
-			if( i == ps.size() - 1 ) {
-				to = ps.at( 0 );
-			}
-			else {
-				to = ps.at( i + 1 );
-			}
-
-			for( float j = 0; j < 1.0; j += 0.2 ) {
-				float _x = ofLerp( from.x, to.x, j );
-				float _y = ofLerp( from.y, to.y, j );
-				border.addVertex( _x, _y );
-				
-			}
+			finalPoints.at(i ) = ofPoint( from.x, from.y );
 		}
-		TS_STOP_NIF( "point_calc" );
+
+		border.addVertices( finalPoints );
 		
 		border.setClosed( true );
-		TS_START( "resampling" );
-		border = border.getResampledBySpacing( 15 );
-		TS_STOP( "resampling" );
+		border = border.getResampledBySpacing( 25 );
 
 		ofSetColor( 51, 25, 0, 255 );
 		float s = 10;
@@ -187,9 +180,9 @@ void Stone::draw( float x, float y )
 {
 	ofPushStyle();
 	ofSetColor( 255, transparency );
-	layer.draw( x, y );
+	layer.draw( x, y, 1920, 1080 );
 	ofSetColor( 255, borderTransparency );
-	underlyingLayer.draw( x, y );
+	underlyingLayer.draw( x, y, 1920, 1080 );
 	ofPopStyle();
 }
 
@@ -310,33 +303,30 @@ void Stone::rerender( ofPolyline line  )
 
 void Stone::grow(ofPolyline line)
 {
-	currentGrowRad += 0.5f;
-	if( currentGrowRad < 1000 ) {
+	if( currentGrowRad < 500 ) {
+		currentGrowRad += 0.5f;
 		calcBorder();
 
 		underlyingLayer.begin();
 		ofClear( 1.0 );
 		underlyingLayer.end();
-		TS_START( "renderborder" );
 		renderBorder();
-		TS_STOP( "renderborder" );
 
-		TS_START( "drawing" );
 		layer.begin();
 
 		ofPushStyle();
 		ofEnableAlphaBlending();
 		std::vector< ofVec2f > pointsToDraw( 5 );
-//#pragma omp parallel for 
+		ofVec2f p = line.getCentroid2D();
+#pragma omp parallel for 
 		for( int i = 0; i < 5; i++ ) {
 			float deg = ofRandom( 0, TWO_PI );
 			float _x = currentGrowRad * cos( deg );
 			float _y = currentGrowRad * sin( deg );
 			int randomId = ofRandom( 0, points.size() );
-			ofVec2f p = line.getCentroid2D();
-			//ofVec2f p = getCenterById( randomId );
-			p += ofVec2f( _x, _y );
-			pointsToDraw.at( i ) = p;
+			
+			ofVec2f pToSave = p + ofVec2f( _x, _y );
+			pointsToDraw.at( i ) = pToSave;
 		}
 
 		for( int i = 0; i < pointsToDraw.size(); i++ ) {
@@ -352,14 +342,13 @@ void Stone::grow(ofPolyline line)
 		ofPopStyle();
 
 		layer.end();
-		TS_STOP( "drawing" );
 	}
 }
 
 void Stone::grow()
 {
 	currentGrowRad += 0.5f;
-	if( currentGrowRad < 1000 ) {
+	if( currentGrowRad < 500 ) {
 		calcBorder();
 
 		underlyingLayer.begin();

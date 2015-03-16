@@ -41,7 +41,7 @@ void testApp::setup(){
 	warper.setup();
 	warper.load(); // reload last saved changes.
 
-	points = 15;
+	points = 10;
 	reinit();
 	setupGui();
 
@@ -53,13 +53,16 @@ void testApp::setup(){
 
 //--------------------------------------------------------------
 void testApp::update(){
-	ofSetWindowTitle( ofToString( ofGetFrameRate() ) );
-
+	//ofSetWindowTitle( ofToString( ofGetFrameRate() ) );
+	TS_START( "grow_all" );
 	if( doGrow ) {
 		for( int i = 0; i < stones.size(); i++ ) {
+			TS_START( "grow_indi" );
 			stones.at( i ).grow( voro.getLine( i ) );
+			TS_STOP( "grow_indi" );
 		}
 	}
+	TS_STOP( "grow_all" );
 	TS_START( "kinect update" );
 	wrapper.updateDepthFrame();
 	TS_STOP( "kinect update" );
@@ -351,7 +354,7 @@ void testApp::reinit()
 	voro.clear();
 	stones.clear();
 	for( int i = 0; i < (int)(points); i++ ) {
-		voro.addPoint( ofRandomWidth(), ofRandomHeight() );
+		voro.addPoint( ofRandom( 1920 ), ofRandom( 1080 ) );
 	}
 	
 	voro.compute();

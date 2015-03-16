@@ -88,6 +88,7 @@ private:
 	std::vector< ofPoint > locationsPointsDrawn;
 	ofxConvexHull convexHull;
 
+	int bufferWidth, bufferHeight;
 	ofFbo layer, underlyingLayer;
 	BrushCollection brushes;
 	ColorCollection colors;

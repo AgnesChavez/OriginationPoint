@@ -3,7 +3,7 @@
 
 StoneCurtain::StoneCurtain()
 {
-	buffer.allocate( ofGetWidth(), ofGetHeight() );
+	buffer.allocate( 1920, 1080 );
 	transparency = 255;
 }
 
@@ -37,9 +37,9 @@ void StoneCurtain::render()
 	
 	ofPolyline pl;
 	pl.addVertex( 0, 0 );
-	pl.addVertex( 0, ofGetHeight() );
-	pl.addVertex( ofGetWidth(), 0 );
-	pl.addVertex( ofGetWidth(), ofGetHeight() );
+	pl.addVertex( 0, 1080 );
+	pl.addVertex( 1920, 0 );
+	pl.addVertex( 1920, 1080 );
 	pl.setClosed( true );
 
 
@@ -50,8 +50,8 @@ void StoneCurtain::render()
 			Stone s;
 			s.setBrushCollection( brushes );
 			s.setColorCollection( colors );
-			float xpos = ( ofGetWidth() / xStoneCount * x ) + ( ofGetWidth() / xStoneCount / 2.0 );
-			float ypos = ( ofGetHeight() / yStoneCount * y ) + ( ofGetHeight() / yStoneCount / 2.0 );
+			float xpos = ( 1980 / xStoneCount * x ) + ( 1920 / xStoneCount / 2.0 );
+			float ypos = ( 1080 / yStoneCount * y ) + ( 1080 / yStoneCount / 2.0 );
 			
 			s.init( xpos, ypos, pl );
 			stones.push_back( s );
@@ -59,7 +59,7 @@ void StoneCurtain::render()
 	}
 
 	for( int i = 0; i < stones.size(); i++ ) {
-		for( int k = 0; k < 100; k++ ) {
+		for( int k = 0; k < 50; k++ ) {
 			stones.at( i ).grow();
 		}
 	}

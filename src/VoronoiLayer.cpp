@@ -6,10 +6,10 @@ VoronoiLayer::VoronoiLayer()
 	count = 0;
 	transparency = 255;
 
-	buffer.allocate( ofGetWidth(), ofGetHeight() );
+	buffer.allocate( 1920, 1080 );
 
-	con = new voro::container( -0, ofGetWidth(),
-		-0, ofGetHeight(),
+	con = new voro::container( -0, 1920,
+		-0, 1080,
 		-10, 10,
 		1, 1, 1, 1, 1, 1, 8 );
 
@@ -92,7 +92,7 @@ void VoronoiLayer::draw( float x, float y )
 {
 	ofPushStyle();
 	ofSetColor( 255, transparency );
-	buffer.draw( x, y );
+	buffer.draw( x, y, 1920, 1080 );
 	ofPopStyle();
 }
 
@@ -108,6 +108,7 @@ void VoronoiLayer::clear()
 void VoronoiLayer::render()
 {
 	buffer.begin();
+	ofEnableSmoothing();
 	ofClear( 0.0 );
 	ofPushStyle();
 
