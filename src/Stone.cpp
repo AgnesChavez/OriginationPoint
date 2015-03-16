@@ -21,7 +21,7 @@ Stone::Stone( )
 	bufferHeight = 1080;
 	ofFbo::Settings settings;
 	settings.useDepth = true;
-	settings.useStencil = true;
+	settings.useStencil = false;
 	settings.depthStencilAsTexture = true;
 	settings.width = bufferWidth;
 	settings.height = bufferHeight;
@@ -123,7 +123,7 @@ void Stone::renderBorder()
 		border.addVertices( finalPoints );
 		
 		border.setClosed( true );
-		border = border.getResampledBySpacing( 25 );
+		border = border.getResampledBySpacing( 20 );
 
 		ofSetColor( 51, 25, 0, 255 );
 		float s = 10;
@@ -314,12 +314,13 @@ void Stone::grow(ofPolyline line)
 
 		layer.begin();
 
+		int nrToCheck = (int)( ofMap( currentGrowRad, 0, 500, 5, 20 ) );
 		ofPushStyle();
 		ofEnableAlphaBlending();
-		std::vector< ofVec2f > pointsToDraw( 5 );
+		std::vector< ofVec2f > pointsToDraw( nrToCheck );
 		ofVec2f p = line.getCentroid2D();
 #pragma omp parallel for 
-		for( int i = 0; i < 5; i++ ) {
+		for( int i = 0; i < nrToCheck; i++ ) {
 			float deg = ofRandom( 0, TWO_PI );
 			float _x = currentGrowRad * cos( deg );
 			float _y = currentGrowRad * sin( deg );
@@ -329,11 +330,13 @@ void Stone::grow(ofPolyline line)
 			pointsToDraw.at( i ) = pToSave;
 		}
 
+		ofPolyline lineToCheck = line.getResampledBySpacing( 80 );
+
 		for( int i = 0; i < pointsToDraw.size(); i++ ) {
 			ofVec2f p = pointsToDraw.at( i );
 			float s = ofRandom( brushStrokeSizeMin, brushStrokeSizeMax );
 			ofSetColor( colors.getRandomColor(), brushStrokeAlpha );
-			if( line.inside( p ) ) {
+			if( lineToCheck.inside( p ) ) {
 				locationsPointsDrawn.push_back( ofVec2f( p.x, p.y ) );
 				brushes.getRandomBrush().draw( p.x - s / 2.0, p.y - s / 2.0, s, s );
 			}

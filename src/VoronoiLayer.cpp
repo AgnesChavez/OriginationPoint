@@ -5,8 +5,14 @@ VoronoiLayer::VoronoiLayer()
 {
 	count = 0;
 	transparency = 255;
+	ofFbo::Settings settings;
+	settings.useDepth = true;
+	settings.useStencil = true;
+	settings.depthStencilAsTexture = true;
+	settings.width = 1920;
+	settings.height = 1080;
 
-	buffer.allocate( 1920, 1080 );
+	buffer.allocate( settings );
 
 	con = new voro::container( -0, 1920,
 		-0, 1080,

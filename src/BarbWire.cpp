@@ -12,6 +12,7 @@ BarbWire::BarbWire()
 	barbWireThickness = 2;
 
 	hueVal = 0;
+	brightness = 255;
 	transparency = 255;	
 }
 
@@ -23,7 +24,7 @@ BarbWire::~BarbWire()
 void BarbWire::draw()
 {
 	ofPushStyle();
-	ofSetColor( ofColor::fromHsb( hueVal, 255, 255 ), transparency );
+	ofSetColor( ofColor::fromHsb( hueVal, 255, brightness ), transparency );
 	glLineWidth( barbWireThickness );
 	for( int i = 0; i < xLines.size(); i++ ) {
 		
@@ -113,4 +114,14 @@ void BarbWire::setThickness( float _thick )
 float BarbWire::getThickness()
 {
 	return this->barbWireThickness;
+}
+
+void BarbWire::setBrightness( float _bright )
+{
+	this->brightness = _bright;
+}
+
+float BarbWire::getBrightness()
+{
+	return this->brightness;
 }

@@ -304,6 +304,10 @@ void testApp::guiEvent( ofxUIEventArgs &e )
 		ofxUISlider * slider = e.getSlider();
 		barbWire.setThickness( slider->getValue() );
 	}
+	else if( e.getName() == "Barbwire Brightness" ){
+		ofxUISlider * slider = e.getSlider();
+		barbWire.setBrightness( slider->getValue() );
+	}
 }
 
 void testApp::setupGui()
@@ -339,6 +343,7 @@ void testApp::setupGui()
 	gui->addLabel( "Barbwire" );
 	gui->addSlider( "Barbwire Color", 0.0f, 360.0f, barbWire.getHue(), 200.0, 20.0 );
 	gui->addSlider( "Barbwire Transparency", 0.0f, 255.0, barbWire.getTransparency(), 200.0, 20.0 );
+	gui->addSlider( "Barbwire Brightness", 0.0f, 255.0, barbWire.getBrightness(), 200.0, 20.0 );
 	gui->addSlider( "Barbwire Thickness", 0.0f, 10.0, barbWire.getThickness(), 200.0, 20.0 );
 	
 	gui->addButton( "Init", false );

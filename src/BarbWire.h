@@ -17,6 +17,8 @@ public:
 	float getHue();
 	void setThickness( float _thick );
 	float getThickness();
+	void setBrightness( float _bright );
+	float getBrightness();
 
 private:
 	int gridResolutionX, gridResolutionY;
@@ -26,6 +28,6 @@ private:
 	float barbWireKnobSize;
 	float gridDeformAmount;
 	float barbWireThickness;
-	int hueVal;
+	int hueVal, brightness;
 };
 

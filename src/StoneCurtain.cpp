@@ -3,7 +3,13 @@
 
 StoneCurtain::StoneCurtain()
 {
-	buffer.allocate( 1920, 1080 );
+	ofFbo::Settings settings;
+	settings.useDepth = true;
+	settings.useStencil = true;
+	settings.depthStencilAsTexture = true;
+	settings.width = 1920;
+	settings.height = 1080;
+	buffer.allocate( settings );
 	transparency = 255;
 }
 
