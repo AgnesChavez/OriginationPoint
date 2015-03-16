@@ -249,7 +249,7 @@ void KinectWrapper::updateDepthFrame()
 	IDepthFrame * pDepthFrame = nullptr;
 	hResult = pDepthReader->AcquireLatestFrame( &pDepthFrame );
 	if( FAILED( hResult ) ) {
-		std::cerr << "Error: pDepthReader->AcquireLatestFrame" << std::endl;
+		//std::cerr << "Error: pDepthReader->AcquireLatestFrame" << std::endl;
 	}
 	else {
 		hResult = pDepthFrame->AccessUnderlyingBuffer( &this->depthBufferSize, reinterpret_cast< UINT16** >( &bufferMat->data ) );

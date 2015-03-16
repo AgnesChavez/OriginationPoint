@@ -13,7 +13,7 @@ VoronoiLayer::VoronoiLayer()
 		-10, 10,
 		1, 1, 1, 1, 1, 1, 8 );
 
-	smoothAmount = 0;
+	smoothAmount = 15;
 	thickness = 3;
 }
 
@@ -29,38 +29,42 @@ void VoronoiLayer::addPoint( float x, float y )
 
 void VoronoiLayer::compute()
 {
-	delete con;
-	con = new voro::container( -0, ofGetWidth(),
-		-0, ofGetHeight(),
-		-2, 2,
-		1, 1, 1, 1, 1, 1, 8 );
+	TS_START( "reinit" );
+	con->clear();
 
 	for( int i = 0; i < pts.size(); i++ ) {
 		addCellSeed( *con, ofPoint( pts.at( i ) ), i, false );
 	}
 
 	lines.clear();
+	edgePoints.clear();
 
-	std::vector< std::vector< ofPoint > > edgePoints = getCellsVertices( *con );
-	for( int k = 0; k < edgePoints.size(); k++ ) {
+	TS_STOP( "reinit" );
+
+	edgePoints = getCellsVertices( *con );
+
+	for( int k = 0; k < edgePoints.size(); ++k ) {
 		std::vector< ofPoint > selectedPoints = edgePoints.at( k );
 		ofPoint centroid = getCellsCentroids( *con ).at( k );
-		std::vector< Point1 > pppps;
-		for( int i = 0; i < selectedPoints.size(); i++ ) {
+		std::vector< Point1 > pppps(selectedPoints.size() );
+#pragma omp parallel for 
+		for( int i = 0; i < selectedPoints.size(); ++i ) {
 			Point1 p;
 			p.x = selectedPoints.at( i ).x;
 			p.y = selectedPoints.at( i ).y;
-			pppps.push_back( p );
-			for( int j = 0; j < selectedPoints.size(); j++ ) {
+			// optimization for parallelization
+			pppps.at( i ) = p;
+			for( int j = 0; j < selectedPoints.size(); ++j ) {
 				ofPoint p1 = selectedPoints.at( i );
 				ofPoint p2 = selectedPoints.at( j );
 				ofPoint p3 = centroid;
 			}
 		}
+
 		ofPolyline line;
 		line.setClosed( true );
 		std::vector< Point1 > ps = convex_hull( pppps );
-		for( int i = 0; i < ps.size(); i++ ) {
+		for( int i = 0; i < ps.size(); ++i ) {
 			Point1 from = ps.at( i );
 			Point1 to;
 			if( i == ps.size() - 1 ) {
@@ -70,7 +74,7 @@ void VoronoiLayer::compute()
 				to = ps.at( i + 1 );
 			}
 
-			for( float j = 0; j < 1.0; j += 0.08 ) {
+			for( float j = 0; j < 1.0; j += 0.1 ) {
 				float _x = ofLerp( from.x, to.x, j );
 				float _y = ofLerp( from.y, to.y, j );
 				line.addVertex( _x, _y );
@@ -188,4 +192,9 @@ void VoronoiLayer::setLineThickness( float _thick )
 float VoronoiLayer::getLineThickness()
 {
 	return this->thickness;
+}
+
+int VoronoiLayer::getSmoothAmount()
+{
+	return this->smoothAmount;
 }

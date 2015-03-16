@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "ofxVoro.h"
+#include "ofxTimeMeasurements.h"
 
 struct Point1 {
 	float x, y;
@@ -32,6 +33,7 @@ public:
 
 	void setTransparency( float _trans );
 	void setSmoothAmount( int smoothA );
+	int getSmoothAmount();
 	vector<ofVec2f> pts;	
 
 	static std::vector< Point1 > convex_hull( std::vector < Point1> points );
@@ -39,7 +41,7 @@ public:
 
 private:
 	voro::container * con;
-	
+	std::vector< std::vector< ofPoint > > edgePoints;
 
 	unsigned int count;
 	float transparency;

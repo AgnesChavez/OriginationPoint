@@ -12,18 +12,19 @@ void testApp::setup(){
 	TIME_SAMPLE_SET_FRAMERATE( 30.0f );
 	TIME_SAMPLE_SET_DRAW_LOCATION( TIME_MEASUREMENTS_TOP_RIGHT );
 
-	stone8ColorCollection.addColor( 187, 58, 62 );
-	stone8ColorCollection.addColor( 156, 121, 57 );
-	stone8ColorCollection.addColor( 190, 164, 54 );
-	stone8ColorCollection.addColor( 175, 169, 45 );
-	stone8ColorCollection.addColor( 150, 89, 58 );
-	stone8ColorCollection.addColor( 106, 72, 70 );
+	stone8ColorCollection.addColor( 236, 73, 78 );
+	stone8ColorCollection.addColor( 197, 153, 72 );
+	stone8ColorCollection.addColor( 211, 182, 60 );
+	stone8ColorCollection.addColor( 197, 190, 51 );
+	stone8ColorCollection.addColor( 202, 120, 78 );
+	stone8ColorCollection.addColor( 152, 103, 100 );
 
 	stoneCurtain.setBrushCollection( brushCollection );
 	stoneCurtain.setColorCollection( stone8ColorCollection );
 
 	stoneCurtain.render();
 
+	barbWire.init();
 
 	bg.loadImage( "bg_b.png" );
 
@@ -47,6 +48,7 @@ void testApp::setup(){
 	kinectToStoneDistance = 120;
 	displayKinect = true;
 	doGrow = false;
+	currentCurtainY = -1080;
 }
 
 //--------------------------------------------------------------
@@ -58,8 +60,9 @@ void testApp::update(){
 			stones.at( i ).grow( voro.getLine( i ) );
 		}
 	}
-
+	TS_START( "kinect update" );
 	wrapper.updateDepthFrame();
+	TS_STOP( "kinect update" );
 }
 
 //--------------------------------------------------------------
@@ -67,11 +70,12 @@ void testApp::draw(){
 	ofPushMatrix();
 	ofMatrix4x4 mat = warper.getMatrix();
 	ofMultMatrix( mat );
-	TS_START( "bg_draw" );
 	bg.draw( 0, 0 );
-	TS_STOP( "bg_end" );
 
-	
+	currentCurtainY += 1;
+	TS_START( "curtain_draw" );
+	stoneCurtain.draw( 0, currentCurtainY );
+	TS_STOP( "curtain_draw" );
 
 	TS_START( "stones_draw" );
 	for( int i = 0; i < stones.size(); i++ ) {
@@ -79,15 +83,22 @@ void testApp::draw(){
 	}
 	TS_STOP( "stones_draw" );
 
-	TS_START( "voro_draw" );
-	voro.compute();
+
+	TS_START( "voro_all" );
+	TS_START( "voro_compute" );
+	//voro.compute();
+	TS_STOP( "voro_compute" );
+	TS_START( "voro_render" );
 	voro.render();
+	TS_STOP( "voro_render" );
+	TS_START( "voro_draw" );
 	voro.draw( 0, 0 );
 	TS_STOP( "voro_draw" );
+	TS_STOP( "voro_all" );
 
+	TS_START( "kinect" );
 	ofPixels pix;
 	pix = wrapper.grayscaleImage.getPixelsRef();
-	//wrapper.grayscaleImage.threshold( 160 );
 	for( int i = 0; i < wrapper.grayscaleImage.height; i++ )
 	{
 		for( int j = 0; j < wrapper.grayscaleImage.width; j++ )
@@ -111,8 +122,9 @@ void testApp::draw(){
 	if( displayKinect ) {
 		wrapper.grayscaleImage.draw( 0, 0 );
 	}
-
-	stoneCurtain.draw( 0, 0 );
+	TS_STOP( "kinect" );
+	
+	barbWire.draw();
 
 	ofPopMatrix();
 	ofPushStyle();
@@ -148,14 +160,7 @@ void testApp::keyPressed( int key ){
 		reinit();
 		break;
 	case 'c':
-		
 		stones.at( randomId ).rerender( voro.getLine( randomId ) );
-		break;
-	case 'p':
-		for( int i = 0; i < stones.size(); i++ ) {
-			stones.at( i ).calcBorder();
-			stones.at( i ).renderBorder();
-		}
 		break;
 	case 'g':
 		doGrow = !doGrow;
@@ -163,19 +168,8 @@ void testApp::keyPressed( int key ){
 	case ' ':
 		gui->toggleVisible();
 		displayKinect = !displayKinect;
-		break;
-	}
-
-	if( key == 't' || key == 'T' ) {
 		warper.toggleShow();
-	}
-
-	if( key == 'l' || key == 'L' ) {
-		warper.load();
-	}
-
-	if( key == 'h' || key == 'H' ) {
-		warper.save();
+		break;
 	}
 }
 
@@ -285,12 +279,34 @@ void testApp::guiEvent( ofxUIEventArgs &e )
 		ofxUISlider * slider = e.getSlider();
 		voro.setLineThickness( slider->getValue() );
 	}
+	else if( e.getName() == "CurtainTransparency" ) {
+		ofxUISlider * slider = e.getSlider();
+		stoneCurtain.setTransparency( slider->getValue() );
+	} 
+	else if( e.getName() == "Stone Border Size" ) {
+		ofxUISlider * slider = e.getSlider();
+		for( int i = 0; i < stones.size(); i++ ) {
+			stones.at( i ).setBorderSize( slider->getValue() );
+		}
+	} 
+	else if( e.getName() == "Barbwire Color" ){
+		ofxUISlider * slider = e.getSlider();
+		barbWire.setHue( slider->getValue() );
+	}
+	else if( e.getName() == "Barbwire Transparency" ){
+		ofxUISlider * slider = e.getSlider();
+		barbWire.setTransparency( slider->getValue() );
+	}
+	else if( e.getName() == "Barbwire Thickness" ){
+		ofxUISlider * slider = e.getSlider();
+		barbWire.setThickness( slider->getValue() );
+	}
 }
 
 void testApp::setupGui()
 {
 	Stone testStone = stones.at( 0 );
-	gui = new ofxUISuperCanvas( "PROJECTING PARTICLES", OFX_UI_FONT_MEDIUM );
+	gui = new ofxUISuperCanvas( "The Other", OFX_UI_FONT_MEDIUM );
 	gui->addSpacer();
 	gui->addFPSSlider( "FPS" );
 	gui->addSpacer();
@@ -300,14 +316,27 @@ void testApp::setupGui()
 	gui->addSlider( "Fuzzy", 0.0f, 150.0f, 30.0f, 200, 20 );
 	gui->addSlider( "Radius", 0.0f, 250.0f, 80.0f, 200, 20 );
 	gui->addSlider( "Transparency", 0.0f, 255.0f, 255.0f, 200, 20 );
-	gui->addSlider( "Voronoi Thickness", 0.0, 20.0, voro.getLineThickness(), 200.0, 20.0 );
 	gui->addSpacer();
-	gui->addSlider( "VoroTransparency", 0.0f, 255.0, 255.0f );
+	gui->addLabel( "Stone" );
+	gui->addSlider( "Stone Border Size", 0.0, 60.0, testStone.getBorderSize(), 200.0, 20.0 );
 	gui->addSlider( "StonesTransparency", 0.0f, 255.0, 255.0f );
 	gui->addSlider( "BorderTransparency", 0.0f, 255.0f, 255.0f );
-	gui->addSpacer( 2 );
+	gui->addSpacer( );
+	gui->addLabel( "Kinect" );
 	gui->addSlider( "KinectDistance", 0.0f, 255.0f, &kinectToStoneDistance );
-	gui->addSlider( "Voronoi Smooth", 0.0f, 20.0f, 0.0, 200.0, 20.0 );
+	gui->addSpacer();
+	gui->addLabel( "Voronoi" );
+	gui->addSlider( "VoroTransparency", 0.0f, 255.0, 255.0f );
+	gui->addSlider( "Voronoi Thickness", 0.0, 20.0, voro.getLineThickness(), 200.0, 20.0 );
+	gui->addSlider( "Voronoi Smooth", 0.0f, 40.0f, voro.getSmoothAmount(), 200.0, 20.0 );
+	gui->addSpacer();
+	gui->addLabel( "Stone Curtain" );
+	gui->addSlider( "CurtainTransparency", 0.0f, 255.0f, 255.0f );
+	gui->addSpacer();
+	gui->addLabel( "Barbwire" );
+	gui->addSlider( "Barbwire Color", 0.0f, 360.0f, barbWire.getHue(), 200.0, 20.0 );
+	gui->addSlider( "Barbwire Transparency", 0.0f, 255.0, barbWire.getTransparency(), 200.0, 20.0 );
+	gui->addSlider( "Barbwire Thickness", 0.0f, 10.0, barbWire.getThickness(), 200.0, 20.0 );
 	
 	gui->addButton( "Init", false );
 
@@ -319,7 +348,6 @@ void testApp::setupGui()
 
 void testApp::reinit()
 {
-	TS_START( "reinit" );
 	voro.clear();
 	stones.clear();
 	for( int i = 0; i < (int)(points); i++ ) {
@@ -327,6 +355,7 @@ void testApp::reinit()
 	}
 	
 	voro.compute();
+
 	for( int i = 0; i < voro.pts.size(); i++ ) {
 		ofVec2f * p = &voro.pts.at( i );
 		Stone s;
@@ -337,7 +366,6 @@ void testApp::reinit()
 		stones.push_back( s );
 	}
 	
-	TS_STOP( "reinit" );
 }
 
 void testApp::exit()

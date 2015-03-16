@@ -3,7 +3,6 @@
 
 Stone::Stone( )
 {
-	TS_START( "stone_construc" );
 	setFuzzy( 10.0f );
 	setRadius( 40.0f );
 	setSize( 60 );
@@ -14,11 +13,12 @@ Stone::Stone( )
 	brushStrokeSizeMax = 80;
 	brushStrokeAlpha = 140;
 
+	borderSize = 30;
+
 	currentGrowRad = 10;
 
 	layer.allocate( ofGetWidth(), ofGetHeight() );
 	underlyingLayer.allocate( ofGetWidth(), ofGetHeight() );
-	TS_STOP( "stone_construc" );
 }
 
 
@@ -28,7 +28,6 @@ Stone::~Stone()
 
 void Stone::init( float _x, float _y, ofPolyline line  )
 {
-	TS_START( "clear" );
 	layer.begin();
 	ofClear( 1.0 );
 	layer.end();
@@ -40,8 +39,6 @@ void Stone::init( float _x, float _y, ofPolyline line  )
 	points.clear();
 	radii.clear();
 
-	TS_STOP( "clear" );
-	TS_START( "circle_add" );
 	ofVec2f center( _x, _y );
 	addCircle( center, getRadius() );
 	centroid = ofPoint( _x, _y );
@@ -52,7 +49,6 @@ void Stone::init( float _x, float _y, ofPolyline line  )
 			addCircle( center, radius );
 		}
 	}
-	TS_STOP( "circle_add" );
 	ofBackground( 0 );
 }
 
@@ -94,18 +90,24 @@ void Stone::renderBorder()
 	if( contourPoints.size() > 0 ) {
 		ofFill();
 		
-		std::vector< Point1 > convexPoints;
+		std::vector< Point1 > convexPoints( contourPoints.size() );
+#pragma omp parallel for 
 		for( int i = 0; i < contourPoints.size(); i += 1 ) {
 			ofPoint _poi = contourPoints.at( i );
 			Point1 p;
 			p.x = _poi.x;
 			p.y = _poi.y;
-			convexPoints.push_back( p );
+			convexPoints.at( i ) = p;
 		}
+
+		TS_START_NIF( "convexhullcalc" );
 		std::vector< Point1 > ps = VoronoiLayer::convex_hull( convexPoints );
+		TS_STOP_NIF( "convexhullcalc" );
+
 		border.clear();
 		border.setClosed( true );
 		
+		TS_START_NIF( "point_calc" );
 		for( int i = 0; i < ps.size(); i++ ) {
 			Point1 from = ps.at( i );
 			Point1 to;
@@ -116,39 +118,32 @@ void Stone::renderBorder()
 				to = ps.at( i + 1 );
 			}
 
-			for( float j = 0; j < 1.0; j += 0.1 ) {
+			for( float j = 0; j < 1.0; j += 0.2 ) {
 				float _x = ofLerp( from.x, to.x, j );
 				float _y = ofLerp( from.y, to.y, j );
 				border.addVertex( _x, _y );
 				
 			}
 		}
-
+		TS_STOP_NIF( "point_calc" );
+		
 		border.setClosed( true );
+		TS_START( "resampling" );
 		border = border.getResampledBySpacing( 15 );
+		TS_STOP( "resampling" );
 
-
-		ofSetColor( 130, 113, 43 );
-		glLineWidth( 5 );
+		ofSetColor( 51, 25, 0, 255 );
 		float s = 10;
-		ofPoint lastp = border.getVertices().at( 0 );
 		ofSeedRandom( 0 );
+
+		TS_START( "drawing_b" );
 		for( int i = 0; i < border.getVertices().size(); i++ ) {
-			
-			glLineWidth( ofRandom( 2, 7 ) );
-			
 			ofPoint p = border.getVertices().at( i );
-			//ofLine( lastp, p );
-			ofSetColor( 51, 25, 0, 255  );
-			brushes.getRandomBrush().draw( p.x - 15, p.y - 15, 30, 30 );
-
-			lastp = p;
+			brushes.getRandomBrush().draw( p.x - borderSize / 2.0, p.y - borderSize / 2.0, borderSize, borderSize );
 		}
+		TS_STOP( "drawing_b" );
 
-		ofLine( border.getVertices().at( border.getVertices().size() - 1), border.getVertices().at( 0 ) );
 		ofSeedRandom();
-
-		//border.draw();
 	}
 
 	ofDisableAlphaBlending();
@@ -159,7 +154,6 @@ void Stone::renderBorder()
 void Stone::renderUnderlying()
 {
 	underlyingLayer.begin();
-	//ofClear( 255, 255, 255 );
 	ofBackground( 0 );
 	centroid = ofVec2f( 0, 0 );
 	for( int i = 0; i < points.size(); i++ ) {
@@ -191,14 +185,12 @@ void Stone::addCircle( ofVec2f poi, float rad )
 
 void Stone::draw( float x, float y )
 {
-	TS_START( "stone_draw" );
 	ofPushStyle();
 	ofSetColor( 255, transparency );
 	layer.draw( x, y );
 	ofSetColor( 255, borderTransparency );
 	underlyingLayer.draw( x, y );
 	ofPopStyle();
-	TS_STOP( "stone_draw" );
 }
 
 void Stone::setFuzzy( float fuzzy )
@@ -325,6 +317,54 @@ void Stone::grow(ofPolyline line)
 		underlyingLayer.begin();
 		ofClear( 1.0 );
 		underlyingLayer.end();
+		TS_START( "renderborder" );
+		renderBorder();
+		TS_STOP( "renderborder" );
+
+		TS_START( "drawing" );
+		layer.begin();
+
+		ofPushStyle();
+		ofEnableAlphaBlending();
+		std::vector< ofVec2f > pointsToDraw( 5 );
+//#pragma omp parallel for 
+		for( int i = 0; i < 5; i++ ) {
+			float deg = ofRandom( 0, TWO_PI );
+			float _x = currentGrowRad * cos( deg );
+			float _y = currentGrowRad * sin( deg );
+			int randomId = ofRandom( 0, points.size() );
+			ofVec2f p = line.getCentroid2D();
+			//ofVec2f p = getCenterById( randomId );
+			p += ofVec2f( _x, _y );
+			pointsToDraw.at( i ) = p;
+		}
+
+		for( int i = 0; i < pointsToDraw.size(); i++ ) {
+			ofVec2f p = pointsToDraw.at( i );
+			float s = ofRandom( brushStrokeSizeMin, brushStrokeSizeMax );
+			ofSetColor( colors.getRandomColor(), brushStrokeAlpha );
+			if( line.inside( p ) ) {
+				locationsPointsDrawn.push_back( ofVec2f( p.x, p.y ) );
+				brushes.getRandomBrush().draw( p.x - s / 2.0, p.y - s / 2.0, s, s );
+			}
+		}
+		ofDisableAlphaBlending();
+		ofPopStyle();
+
+		layer.end();
+		TS_STOP( "drawing" );
+	}
+}
+
+void Stone::grow()
+{
+	currentGrowRad += 0.5f;
+	if( currentGrowRad < 1000 ) {
+		calcBorder();
+
+		underlyingLayer.begin();
+		ofClear( 1.0 );
+		underlyingLayer.end();
 
 		renderBorder();
 
@@ -338,15 +378,15 @@ void Stone::grow(ofPolyline line)
 			float _y = currentGrowRad * sin( deg );
 			float s = ofRandom( brushStrokeSizeMin, brushStrokeSizeMax );
 			int randomId = ofRandom( 0, points.size() );
-			ofVec2f p = line.getCentroid2D();
+			
+			ofVec2f p( points.at( 0 ) );
 			//ofVec2f p = getCenterById( randomId );
 			p += ofVec2f( _x, _y );
 
 			ofSetColor( colors.getRandomColor(), brushStrokeAlpha );
-			if( line.inside( p ) ) {
-				locationsPointsDrawn.push_back( ofVec2f( p.x, p.y ) );
-				brushes.getRandomBrush().draw( p.x - s / 2.0, p.y - s / 2.0, s, s );
-			}
+			locationsPointsDrawn.push_back( ofVec2f( p.x, p.y ) );
+			brushes.getRandomBrush().draw( p.x - s / 2.0, p.y - s / 2.0, s, s );
+
 		}
 		ofDisableAlphaBlending();
 		ofPopStyle();
@@ -354,6 +394,7 @@ void Stone::grow(ofPolyline line)
 		layer.end();
 	}
 }
+
 
 
 void Stone::setColorCollection( ColorCollection _c )
@@ -414,4 +455,14 @@ void Stone::setBorderTransparency( float _trans )
 ofFbo Stone::getStoneBuffer()
 {
 	return layer;
+}
+
+void Stone::setBorderSize( int _bsize )
+{
+	this->borderSize = _bsize;
+}
+
+int Stone::getBorderSize()
+{
+	return this->borderSize;
 }

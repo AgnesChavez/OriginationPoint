@@ -4,7 +4,7 @@
 #include "BrushCollection.h"
 #include "Stone.h"
 
-class StoneCurtain
+class StoneCurtain 
 {
 public:
 	StoneCurtain();
@@ -16,10 +16,13 @@ public:
 	void render();
 	void draw( float x, float y );
 
+	void setTransparency( float _trans );
+
 	std::vector< Stone > stones;
 
-private:
+protected:
 	ofFbo buffer;
+	float transparency;
 
 	BrushCollection brushes;
 	ColorCollection colors;

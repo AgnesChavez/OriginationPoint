@@ -26,6 +26,7 @@ public:
 	void renderBorder();
 
 	void grow(ofPolyline line );
+	void grow();
 
 	cv::Mat testMat;
 	ofPixels pixels;
@@ -39,6 +40,8 @@ public:
 	int getNumberOfCircles();
 	void setTransparency( float _trans );
 	void setBorderTransparency( float _trans );
+	void setBorderSize( int _bsize );
+	int getBorderSize();
 
 	ofFbo getStoneBuffer();
 
@@ -68,6 +71,7 @@ private:
 	int size;
 	float transparency, borderTransparency;
 	ofVec2f centroid;
+	int borderSize;
 
 	ofPolyline border;
 

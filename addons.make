@@ -3,6 +3,7 @@ ofxXmlSettings
 ofxConvexHull
 ofxCv
 ofxFontStash
+ofxMSATimer
 ofxQuadWarp
 ofxTimeMeasurements
 ofxUI

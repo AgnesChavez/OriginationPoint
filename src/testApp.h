@@ -10,7 +10,7 @@
 
 #include "KinectWrapper.h"
 #include "StoneCurtain.h"
-
+#include "BarbWire.h"
 
 class testApp : public ofBaseApp{
 public:
@@ -47,6 +47,9 @@ public:
 	ColorCollection stone8ColorCollection;
 
 	StoneCurtain stoneCurtain;
+	int currentCurtainY;
+
+	BarbWire barbWire;
 
 	ofxUISuperCanvas *gui;
 	void setupGui();
