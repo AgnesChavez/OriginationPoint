@@ -330,7 +330,7 @@ void Stone::grow(ofPolyline line)
 			pointsToDraw.at( i ) = pToSave;
 		}
 
-		ofPolyline lineToCheck = line.getResampledBySpacing( 80 );
+		ofPolyline lineToCheck = line.getResampledBySpacing( 100 );
 
 		for( int i = 0; i < pointsToDraw.size(); i++ ) {
 			ofVec2f p = pointsToDraw.at( i );

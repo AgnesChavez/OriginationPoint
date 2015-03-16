@@ -19,6 +19,18 @@ void testApp::setup(){
 	stone8ColorCollection.addColor( 202, 120, 78 );
 	stone8ColorCollection.addColor( 152, 103, 100 );
 
+	brightYellowColorCollection.addColor( 195, 189, 75 );
+	brightYellowColorCollection.addColor( 150, 144, 70 );
+	brightYellowColorCollection.addColor( 73, 78, 46 );
+	brightYellowColorCollection.addColor( 201, 198, 85 );
+	brightYellowColorCollection.addColor( 209, 202, 95 );
+
+	brownColorCollection.addColor( 102, 51, 0 );
+	brownColorCollection.addColor( 153, 102, 51 );
+	brownColorCollection.addColor( 187, 153, 102 );
+
+
+
 	stoneCurtain.setBrushCollection( brushCollection );
 	stoneCurtain.setColorCollection( stone8ColorCollection );
 
@@ -368,7 +380,7 @@ void testApp::reinit()
 		ofVec2f * p = &voro.pts.at( i );
 		Stone s;
 		s.setBrushCollection( brushCollection );
-		s.setColorCollection( stone8ColorCollection );
+		s.setColorCollection( brownColorCollection );
 		s.init( p->x, p->y, voro.getLine( i ) );
 
 		stones.push_back( s );

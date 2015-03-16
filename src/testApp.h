@@ -44,7 +44,7 @@ public:
 	bool doGrow;
 
 	BrushCollection brushCollection;
-	ColorCollection stone8ColorCollection;
+	ColorCollection stone8ColorCollection, brightYellowColorCollection, brownColorCollection;
 
 	StoneCurtain stoneCurtain;
 	int currentCurtainY;
