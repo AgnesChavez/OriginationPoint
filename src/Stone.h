@@ -55,7 +55,7 @@ public:
 	void setBrushCollection( BrushCollection _b );
 	void setColorCollection( ColorCollection _c );
 
-	void toggleDrawBorder( bool _b );
+	void toggleRenderBorder( bool _b );
 	void toggleDrawStone( bool _s );
 
 

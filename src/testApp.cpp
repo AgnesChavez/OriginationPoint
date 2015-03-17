@@ -10,15 +10,8 @@ void testApp::setup(){
 	TIME_SAMPLE_SET_FRAMERATE( 40.0f );
 	TIME_SAMPLE_SET_DRAW_LOCATION( TIME_MEASUREMENTS_TOP_RIGHT );
 
-	post.init( ofGetWidth(), ofGetHeight() );
-	post.createPass<FxaaPass>()->setEnabled( false );
-	post.createPass<BloomPass>()->setEnabled( false );
-	post.createPass<DofPass>()->setEnabled( false );
-	post.createPass<KaleidoscopePass>()->setEnabled( false );
-	post.createPass<NoiseWarpPass>()->setEnabled( false );
-	post.createPass<ToonPass>()->setEnabled( false );
-	post.createPass<EdgePass>()->setEnabled( true );
-	post.createPass<VerticalTiltShifPass>()->setEnabled( false );
+	post.init( 1920, 1080 );
+	post.createPass<EdgePass>()->setEnabled( false );
 	post.createPass<ContrastPass>()->setEnabled( false );
 
 	wrapper.openKinect();
@@ -133,12 +126,10 @@ void testApp::update(){
 	TS_STOP_NIF( "kinect update" );
 
 	if( isUpdated ) {
-		TS_START( "dilate" );
-		wrapper.grayscaleImage.dilate();
-		wrapper.grayscaleImage.dilate();
+		TS_START( "open" );
 		wrapper.grayscaleImage.erode();
-		wrapper.grayscaleImage.erode();
-		TS_STOP( "dilate" );
+		wrapper.grayscaleImage.dilate();
+		TS_STOP( "open" );
 
 		TS_START( "kinect_limit" );
 		kinectFbo.begin();
@@ -160,8 +151,9 @@ void testApp::update(){
 		kinectShader.end();
 		kinectFbo2.end();
 		TS_STOP( "kinect_limit" );
-	}
 
+		
+	}
 }
 
 //--------------------------------------------------------------
@@ -169,18 +161,16 @@ void testApp::draw(){
 	ofPushMatrix();
 	ofMatrix4x4 mat = warper.getMatrix();
 	ofMultMatrix( mat );
-	//post.begin();
+	
 	bg.draw( 0, 0 );
-
 	
-	
-
+	//post.begin();
 	TS_START( "stones_draw" );
 	for( int i = 0; i < stones.size(); i++ ) {
 		stones.at( i ).draw( 0, 0 );
 	}
 	TS_STOP( "stones_draw" );
-
+	//post.end();
 
 	TS_START( "voro_all" );
 	TS_START( "voro_compute" );
@@ -205,9 +195,7 @@ void testApp::draw(){
 	if( displayKinect ) {
 		kinectFbo2.draw( 250, 0 );
 	}
-
-	//post.end();
-
+	
 	ofPopMatrix();
 	ofPushStyle();
 
@@ -399,8 +387,12 @@ void testApp::guiEvent( ofxUIEventArgs &e )
 	else if( e.getName() == "Border ON/OFF" ){
 		ofxUIToggle * toggle = e.getToggle();
 		for( int i = 0; i < stones.size(); i++ ) {
-			stones.at( i ).toggleDrawBorder( toggle->getValue() );
+			stones.at( i ).toggleRenderBorder( toggle->getValue() );
 		}
+	}
+	else if( e.getName() == "Voronoi ON/OFF" ){
+		ofxUIToggle * toggle = e.getToggle();
+		voro.toggleRender();
 	}
 }
 
@@ -423,15 +415,21 @@ void testApp::setupGui()
 	gui->addSlider( "StonesTransparency", 0.0f, 255.0, 255.0f );
 	gui->addSlider( "Stones Saturation", 0.0f, 255.0, 255.0f );
 	gui->addSlider( "BorderTransparency", 0.0f, 255.0f, 255.0f );
+	gui->addSpacer( 3.0f );
 	gui->setWidgetPosition( OFX_UI_WIDGET_POSITION_RIGHT );
 	gui->addToggle( "Border ON/OFF", true );
 	gui->setWidgetPosition( OFX_UI_WIDGET_POSITION_DOWN );
-	gui->addSpacer( );
+	
 	gui->addLabel( "Kinect" );
 	gui->addSlider( "KinectDistance", 0.0f, 255.0f, &kinectToStoneDistance );
 	gui->addSpacer();
 	gui->addLabel( "Voronoi" );
 	gui->addSlider( "VoroTransparency", 0.0f, 255.0, 255.0f );
+	gui->addSpacer( 3.0f );
+	gui->setWidgetPosition( OFX_UI_WIDGET_POSITION_RIGHT );
+	gui->addToggle( "Voronoi ON/OFF", true );
+	gui->setWidgetPosition( OFX_UI_WIDGET_POSITION_DOWN );
+	
 	gui->addSlider( "Voronoi Thickness", 0.0, 20.0, voro.getLineThickness(), 200.0, 20.0 );
 	gui->addSlider( "Voronoi Smooth", 0.0f, 40.0f, voro.getSmoothAmount(), 200.0, 20.0 );
 	gui->addSpacer();

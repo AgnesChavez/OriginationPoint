@@ -21,6 +21,8 @@ VoronoiLayer::VoronoiLayer()
 
 	smoothAmount = 15;
 	thickness = 3;
+
+	isDrawn = true;
 }
 
 
@@ -35,71 +37,72 @@ void VoronoiLayer::addPoint( float x, float y )
 
 void VoronoiLayer::compute()
 {
-	TS_START( "reinit" );
-	con->clear();
+	if( isDrawn ) {
+		con->clear();
 
-	for( int i = 0; i < pts.size(); i++ ) {
-		addCellSeed( *con, ofPoint( pts.at( i ) ), i, false );
-	}
+		for( int i = 0; i < pts.size(); i++ ) {
+			addCellSeed( *con, ofPoint( pts.at( i ) ), i, false );
+		}
 
-	lines.clear();
-	edgePoints.clear();
+		lines.clear();
+		edgePoints.clear();
 
-	TS_STOP( "reinit" );
+		edgePoints = getCellsVertices( *con );
 
-	edgePoints = getCellsVertices( *con );
-
-	for( int k = 0; k < edgePoints.size(); ++k ) {
-		std::vector< ofPoint > selectedPoints = edgePoints.at( k );
-		ofPoint centroid = getCellsCentroids( *con ).at( k );
-		std::vector< Point1 > pppps(selectedPoints.size() );
+		for( int k = 0; k < edgePoints.size(); ++k ) {
+			std::vector< ofPoint > selectedPoints = edgePoints.at( k );
+			ofPoint centroid = getCellsCentroids( *con ).at( k );
+			std::vector< Point1 > pppps( selectedPoints.size() );
 #pragma omp parallel for 
-		for( int i = 0; i < selectedPoints.size(); ++i ) {
-			Point1 p;
-			p.x = selectedPoints.at( i ).x;
-			p.y = selectedPoints.at( i ).y;
-			// optimization for parallelization
-			pppps.at( i ) = p;
-			for( int j = 0; j < selectedPoints.size(); ++j ) {
-				ofPoint p1 = selectedPoints.at( i );
-				ofPoint p2 = selectedPoints.at( j );
-				ofPoint p3 = centroid;
+			for( int i = 0; i < selectedPoints.size(); ++i ) {
+				Point1 p;
+				p.x = selectedPoints.at( i ).x;
+				p.y = selectedPoints.at( i ).y;
+				// optimization for parallelization
+				pppps.at( i ) = p;
+				for( int j = 0; j < selectedPoints.size(); ++j ) {
+					ofPoint p1 = selectedPoints.at( i );
+					ofPoint p2 = selectedPoints.at( j );
+					ofPoint p3 = centroid;
+				}
 			}
+
+			ofPolyline line;
+			line.setClosed( true );
+			std::vector< Point1 > ps = convex_hull( pppps );
+			for( int i = 0; i < ps.size(); ++i ) {
+				Point1 from = ps.at( i );
+				Point1 to;
+				if( i == ps.size() - 1 ) {
+					to = ps.at( 0 );
+				}
+				else {
+					to = ps.at( i + 1 );
+				}
+
+				for( float j = 0; j < 1.0; j += 0.1 ) {
+					float _x = ofLerp( from.x, to.x, j );
+					float _y = ofLerp( from.y, to.y, j );
+					line.addVertex( _x, _y );
+				}
+			}
+
+			line.setClosed( true );
+			line = line.getSmoothed( smoothAmount );
+			line = line.getResampledBySpacing( 10 );
+			lines.push_back( line );
 		}
-
-		ofPolyline line;
-		line.setClosed( true );
-		std::vector< Point1 > ps = convex_hull( pppps );
-		for( int i = 0; i < ps.size(); ++i ) {
-			Point1 from = ps.at( i );
-			Point1 to;
-			if( i == ps.size() - 1 ) {
-				to = ps.at( 0 );
-			}
-			else {
-				to = ps.at( i + 1 );
-			}
-
-			for( float j = 0; j < 1.0; j += 0.1 ) {
-				float _x = ofLerp( from.x, to.x, j );
-				float _y = ofLerp( from.y, to.y, j );
-				line.addVertex( _x, _y );
-			}
-		}
-
-		line.setClosed( true );
-		line = line.getSmoothed( smoothAmount );
-		line = line.getResampledBySpacing( 10 );
-		lines.push_back( line );
 	}
 }
 
 void VoronoiLayer::draw( float x, float y )
 {
-	ofPushStyle();
-	ofSetColor( 255, transparency );
-	buffer.draw( x, y, 1920, 1080 );
-	ofPopStyle();
+	if( isDrawn ) {
+		ofPushStyle();
+		ofSetColor( 255, transparency );
+		buffer.draw( x, y, 1920, 1080 );
+		ofPopStyle();
+	}
 }
 
 void VoronoiLayer::clear()
@@ -204,4 +207,9 @@ float VoronoiLayer::getLineThickness()
 int VoronoiLayer::getSmoothAmount()
 {
 	return this->smoothAmount;
+}
+
+void VoronoiLayer::toggleRender()
+{
+	isDrawn = !isDrawn;
 }

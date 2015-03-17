@@ -30,6 +30,7 @@ public:
 	bool isInside( int id, float _x, float _y );
 	void setLineThickness( float _thick );
 	float getLineThickness();
+	void toggleRender();
 
 	void setTransparency( float _trans );
 	void setSmoothAmount( int smoothA );
@@ -46,6 +47,7 @@ private:
 	unsigned int count;
 	float transparency;
 	float thickness;
+	bool isDrawn;
 
 	ofFbo buffer;
 	std::vector< ofPolyline > lines;

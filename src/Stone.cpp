@@ -427,7 +427,7 @@ float Stone::getTransparency()
 	return this->transparency;
 }
 
-void Stone::toggleDrawBorder( bool _b )
+void Stone::toggleRenderBorder( bool _b )
 {
 	this->tDrawBorder = _b;
 }
