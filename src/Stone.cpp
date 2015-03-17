@@ -32,7 +32,6 @@ Stone::Stone( )
 	underlyingLayer.allocate( settings );
 }
 
-
 Stone::~Stone()
 {
 }
