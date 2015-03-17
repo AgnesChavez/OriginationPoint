@@ -7,6 +7,7 @@
 #include "ofxUI.h"
 #include "ofxTimeMeasurements.h"
 #include "ofxQuadWarp.h"
+#include "ofxPostProcessing.h"
 
 #include "KinectWrapper.h"
 #include "StoneCurtain.h"
@@ -36,6 +37,8 @@ public:
 	KinectWrapper wrapper;
 	bool displayKinect;
 	float kinectToStoneDistance;
+	ofShader kinectShader;
+	ofFbo kinectFbo, kinectFbo2;
 
 	ofxQuadWarp warper;
 
@@ -50,6 +53,8 @@ public:
 	int currentCurtainY;
 
 	BarbWire barbWire;
+
+	ofxPostProcessing post;
 
 	ofxUISuperCanvas *gui;
 	void setupGui();

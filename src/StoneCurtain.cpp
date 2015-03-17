@@ -5,7 +5,7 @@ StoneCurtain::StoneCurtain()
 {
 	ofFbo::Settings settings;
 	settings.useDepth = true;
-	settings.useStencil = true;
+	settings.useStencil = false;
 	settings.depthStencilAsTexture = true;
 	settings.width = 1920;
 	settings.height = 1080;
@@ -32,9 +32,7 @@ void StoneCurtain::draw( float x, float y )
 {
 	ofPushStyle();
 	ofSetColor( 255, transparency );
-	for( int i = 0; i < stones.size(); i++ ) {
-		stones.at( i ).draw( x, y );
-	}
+	buffer.draw( x, y );
 	ofPopStyle();
 }
 
@@ -49,8 +47,8 @@ void StoneCurtain::render()
 	pl.setClosed( true );
 
 
-	int xStoneCount = 4;
-	int yStoneCount = 4;
+	int xStoneCount = 8;
+	int yStoneCount = 6;
 	for( int y = 0; y < yStoneCount; y++ ) {
 		for( int x = 0; x < xStoneCount; x++ ) {
 			Stone s;
@@ -65,7 +63,7 @@ void StoneCurtain::render()
 	}
 
 	for( int i = 0; i < stones.size(); i++ ) {
-		for( int k = 0; k < 50; k++ ) {
+		for( int k = 0; k < 100; k++ ) {
 			stones.at( i ).grow();
 		}
 	}
@@ -84,8 +82,5 @@ void StoneCurtain::render()
 
 void StoneCurtain::setTransparency( float _trans )
 {
-	for( int i = 0; i < stones.size(); i++ ) {
-		stones.at( i ).setTransparency( _trans );
-		stones.at( i ).setBorderTransparency( _trans );
-	}
+	this->transparency = _trans;
 }

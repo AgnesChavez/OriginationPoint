@@ -19,17 +19,12 @@ public:
 	~Stone();
 	void init( float _x, float _y, ofPolyline line  );
 	void draw( float x, float y );
-	void rerender(ofPolyline line );
-	void renderStone8(ofPolyline line );
+	void rerender();
 	void calcBorder();
-	void renderStone(ofPolyline line );
 	void renderBorder();
 
 	void grow(ofPolyline line );
 	void grow();
-
-	cv::Mat testMat;
-	ofPixels pixels;
 
 
 	void setRadius( float rad );
@@ -39,9 +34,12 @@ public:
 	float getFuzzy();
 	int getNumberOfCircles();
 	void setTransparency( float _trans );
+	float getTransparency();
 	void setBorderTransparency( float _trans );
 	void setBorderSize( int _bsize );
 	int getBorderSize();
+	void setSaturation( float _sat );
+	float getSaturation();
 
 	ofFbo getStoneBuffer();
 
@@ -54,36 +52,27 @@ public:
 	void setBrushStrokeAlpha( float alpha );
 	float getBrushStrokeAlpha();
 
-	
-
-
 	void setBrushCollection( BrushCollection _b );
 	void setColorCollection( ColorCollection _c );
 
-	ofVec2f getCenterById( int id );
-	float getRadiusById( int id );
 
 	std::vector< ofPoint > getContourPoints( float x, float y);
 
+	static vector<ofVec3f> resamplePolylineToCount( const ofPolyline& polyline, int n );
 
 private:
 	float radius, fuzzy;
 	int size;
-	float transparency, borderTransparency;
+	float transparency, borderTransparency, saturation;
 	ofVec2f centroid;
 	int borderSize;
 
 	ofPolyline border;
 
 	float currentGrowRad;
+	float maxGrowRad;
 
-	void addCircle( ofVec2f poi, float rad );
-	
-	void renderUnderlying();
 	int getNumberOfStrokes();
-
-	std::vector< ofVec2f > points;
-	std::vector< float > radii;
 
 	std::vector< ofPoint > locationsPointsDrawn;
 	ofxConvexHull convexHull;
@@ -99,8 +88,5 @@ private:
 	ofFbo tempFbo;
 	ofxCv::ContourFinder contourFinder;
 	std::vector< ofPoint > contourPoints;
-
-
-	
 };
 

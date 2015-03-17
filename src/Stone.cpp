@@ -12,10 +12,12 @@ Stone::Stone( )
 	brushStrokeSizeMin = 20;
 	brushStrokeSizeMax = 80;
 	brushStrokeAlpha = 140;
+	saturation = 255;
 
 	borderSize = 30;
 
 	currentGrowRad = 10;
+	maxGrowRad = 600;
 
 	bufferWidth = 1920;
 	bufferHeight = 1080;
@@ -45,47 +47,7 @@ void Stone::init( float _x, float _y, ofPolyline line  )
 	ofClear( 0.0 );
 	underlyingLayer.end();
 
-	points.clear();
-	radii.clear();
-
-	ofVec2f center( _x, _y );
-	addCircle( center, getRadius() );
 	centroid = ofPoint( _x, _y );
-	for( int i = 0; i < getNumberOfCircles(); i++ ) {
-		center.x += ofRandomf() * fuzzy;
-		center.y += ofRandomf() * fuzzy;
-		if( line.inside( center ) ) {
-			addCircle( center, radius );
-		}
-	}
-	ofBackground( 0 );
-}
-
-void Stone::renderStone( ofPolyline line )
-{
-	layer.begin();
-	
-	ofPushStyle();
-	ofEnableAlphaBlending();
-	ofEnableBlendMode( OF_BLENDMODE_ADD );
-	
-
-	for( int i = 0; i < getNumberOfStrokes(); )
-	{
-		float size = ofRandom( 20, 100 );
-		ofVec2f p = getCenterById( i );
-		
-		ofSetColor( ofRandom( 0, 49 ), ofRandom( 0, 49 ), ofRandom( 0, 49 ), 180 );
-		if( line.inside( p ) ) {
-			brushes.getRandomBrush().draw( p.x - size / 2.0, p.y - size / 2.0, size, size );
-			i++;
-		}
-	}
-
-	ofDisableAlphaBlending();
-	ofPopStyle();
-
-	layer.end();
 }
 
 void Stone::renderBorder()
@@ -144,38 +106,6 @@ void Stone::renderBorder()
 	underlyingLayer.end();
 }
 
-void Stone::renderUnderlying()
-{
-	underlyingLayer.begin();
-	ofBackground( 0 );
-	centroid = ofVec2f( 0, 0 );
-	for( int i = 0; i < points.size(); i++ ) {
-		centroid += points.at( i );
-	}
-	centroid /= points.size();
-	ofPushStyle();
-	ofDisableAlphaBlending();
-	ofFill();
-	ofSetColor( 255 );
-	ofPushMatrix();
-	for( int i = 0; i < points.size(); i++ ) {
-		ofVec2f p = points.at( i );
-		float rad = radii.at( i );
-		ofEllipse( p.x, p.y, rad, rad );
-	}
-	ofPopMatrix();
-	ofPopStyle();
-
-	underlyingLayer.end();
-}
-
-
-void Stone::addCircle( ofVec2f poi, float rad )
-{
-	points.push_back( poi );
-	radii.push_back( rad );
-}
-
 void Stone::draw( float x, float y )
 {
 	ofPushStyle();
@@ -216,15 +146,6 @@ int Stone::getNumberOfCircles()
 	return this->size;
 }
 
-ofVec2f Stone::getCenterById( int id )
-{
-	return points.at( id );
-}
-
-float Stone::getRadiusById( int id )
-{
-	return radii.at( id );
-}
 
 std::vector< ofPoint > Stone::getContourPoints( float x, float y )
 {
@@ -248,36 +169,7 @@ void Stone::setBrushCollection( BrushCollection _b )
 	this->brushes = _b;
 }
 
-void Stone::renderStone8(ofPolyline line )
-{
-	layer.begin();
-
-	ofPushStyle();
-	ofEnableAlphaBlending();
-	//ofEnableBlendMode( OF_BLENDMODE_ADD );
-
-	for( int i = 0; i < brushStokeCount; )
-	{
-		float s = ofRandom( brushStrokeSizeMin, brushStrokeSizeMax );
-		int randomId = ofRandom( 0, points.size() );
-		ofVec2f p = getCenterById( randomId );
-
-		ofSetColor( colors.getRandomColor(), brushStrokeAlpha );
-		if( line.inside( p ) ) {
-			locationsPointsDrawn.push_back( ofVec2f( p.x, p.y ) );
-			brushes.getOwnBrush1().draw( p.x - s / 2.0, p.y - s / 2.0, s, s );
-			i++;
-		}
-	}
-
-	ofDisableAlphaBlending();
-	ofPopStyle();
-
-	layer.end();
-}
-
-
-void Stone::rerender( ofPolyline line  )
+void Stone::rerender()
 {
 	TS_START( "rerender" );
 	layer.begin();
@@ -295,7 +187,6 @@ void Stone::rerender( ofPolyline line  )
 	//renderStone();
 	calcBorder();
 	renderBorder();
-	renderStone8(line);
 	
 	
 	TS_STOP( "rerender" );
@@ -303,7 +194,7 @@ void Stone::rerender( ofPolyline line  )
 
 void Stone::grow(ofPolyline line)
 {
-	if( currentGrowRad < 500 ) {
+	if( currentGrowRad < maxGrowRad ) {
 		currentGrowRad += 0.5f;
 		calcBorder();
 
@@ -314,7 +205,7 @@ void Stone::grow(ofPolyline line)
 
 		layer.begin();
 
-		int nrToCheck = (int)( ofMap( currentGrowRad, 0, 500, 5, 20 ) );
+		int nrToCheck = ( int ) ( ofMap( currentGrowRad, 0, maxGrowRad, 5, 15 ) );
 		ofPushStyle();
 		ofEnableAlphaBlending();
 		std::vector< ofVec2f > pointsToDraw( nrToCheck );
@@ -324,23 +215,34 @@ void Stone::grow(ofPolyline line)
 			float deg = ofRandom( 0, TWO_PI );
 			float _x = currentGrowRad * cos( deg );
 			float _y = currentGrowRad * sin( deg );
-			int randomId = ofRandom( 0, points.size() );
+			//int randomId = ofRandom( 0, points.size() );
 			
 			ofVec2f pToSave = p + ofVec2f( _x, _y );
 			pointsToDraw.at( i ) = pToSave;
 		}
 
 		ofPolyline lineToCheck = line.getResampledBySpacing( 100 );
+		std::vector< ofVec2f > tempLocationsDrawn( nrToCheck);
 
+#pragma omp parallel for 
 		for( int i = 0; i < pointsToDraw.size(); i++ ) {
 			ofVec2f p = pointsToDraw.at( i );
-			float s = ofRandom( brushStrokeSizeMin, brushStrokeSizeMax );
-			ofSetColor( colors.getRandomColor(), brushStrokeAlpha );
-			if( lineToCheck.inside( p ) ) {
-				locationsPointsDrawn.push_back( ofVec2f( p.x, p.y ) );
-				brushes.getRandomBrush().draw( p.x - s / 2.0, p.y - s / 2.0, s, s );
+			ofRectangle bb = lineToCheck.getBoundingBox();
+			// first check for bounding box inside as its quicker to compute
+			if( bb.inside( p ) ) {
+				if( lineToCheck.inside( p ) ) {
+					tempLocationsDrawn.at( i ) = ofVec2f( p.x, p.y );
+				}
 			}
 		}
+
+		for( int i = 0; i < tempLocationsDrawn.size(); i++ ) {
+			ofVec2f p = tempLocationsDrawn.at( i );
+			float s = ofRandom( brushStrokeSizeMin, brushStrokeSizeMax );
+			ofSetColor( colors.getRandomColor(), brushStrokeAlpha );
+			brushes.getRandomBrush().draw( p.x - s / 2.0, p.y - s / 2.0, s, s );
+		}
+
 		ofDisableAlphaBlending();
 		ofPopStyle();
 
@@ -351,7 +253,7 @@ void Stone::grow(ofPolyline line)
 void Stone::grow()
 {
 	currentGrowRad += 0.5f;
-	if( currentGrowRad < 500 ) {
+	if( currentGrowRad < maxGrowRad ) {
 		calcBorder();
 
 		underlyingLayer.begin();
@@ -362,16 +264,18 @@ void Stone::grow()
 
 		layer.begin();
 
+		int nrToCheck = ( int ) ( ofMap( currentGrowRad, 0, maxGrowRad, 5, 15 ) );
+
 		ofPushStyle();
 		ofEnableAlphaBlending();
-		for( int i = 0; i < 5; i++ ) {
+		for( int i = 0; i < nrToCheck; i++ ) {
 			float deg = ofRandom( 0, TWO_PI );
 			float _x = currentGrowRad * cos( deg );
 			float _y = currentGrowRad * sin( deg );
 			float s = ofRandom( brushStrokeSizeMin, brushStrokeSizeMax );
-			int randomId = ofRandom( 0, points.size() );
+			//int randomId = ofRandom( 0, points.size() );
 			
-			ofVec2f p( points.at( 0 ) );
+			ofVec2f p( centroid );
 			//ofVec2f p = getCenterById( randomId );
 			p += ofVec2f( _x, _y );
 
@@ -457,4 +361,30 @@ void Stone::setBorderSize( int _bsize )
 int Stone::getBorderSize()
 {
 	return this->borderSize;
+}
+
+void Stone::setSaturation( float _sat )
+{
+	this->saturation = _sat;
+}
+
+float Stone::getSaturation()
+{
+	return this->saturation;
+}
+
+vector<ofVec3f> Stone::resamplePolylineToCount( const ofPolyline& polyline, int n )
+{
+	vector<ofVec3f> points;
+	float jump = 1.0f / ( n - 1 );
+
+	for( int i = 0; i < n; i++ ) {
+		points.push_back( polyline.getPointAtPercent( min( i*jump, 0.99999f ) ) );
+	}
+	return points;
+}
+
+float Stone::getTransparency()
+{
+	return this->transparency;
 }

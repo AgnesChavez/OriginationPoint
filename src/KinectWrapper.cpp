@@ -243,8 +243,9 @@ void KinectWrapper::updateColorFrame()
 	SafeRelease( pColorFrame );
 }
 
-void KinectWrapper::updateDepthFrame()
+bool KinectWrapper::updateDepthFrame()
 {
+	bool isNewFrame = false;
 	HRESULT hResult = S_OK;
 	IDepthFrame * pDepthFrame = nullptr;
 	hResult = pDepthReader->AcquireLatestFrame( &pDepthFrame );
@@ -256,10 +257,13 @@ void KinectWrapper::updateDepthFrame()
 		if( SUCCEEDED( hResult ) ){
 			bufferMat->convertTo( *depthMat, CV_8U, -255.0f / 4500.0f, 255.0f );
 			grayscaleImage.setFromPixels( depthMat->data, depthWidth, depthHeight );
+			isNewFrame = true;
 		}
 	}
 
 	SafeRelease( pDepthFrame );
+
+	return isNewFrame;
 }
 
 void KinectWrapper::updateSkeleton()

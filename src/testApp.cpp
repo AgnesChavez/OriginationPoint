@@ -4,13 +4,61 @@
 void testApp::setup(){
 	ofSetLogLevel( OF_LOG_ERROR );
 	ofSetVerticalSync( true );
-	ofSetFrameRate( 30 );
+	ofSetFrameRate( 40 );
+
+	TIME_SAMPLE_SET_FRAMERATE( 40.0f );
+	TIME_SAMPLE_SET_DRAW_LOCATION( TIME_MEASUREMENTS_TOP_RIGHT );
+
+	post.init( ofGetWidth(), ofGetHeight() );
+	post.createPass<FxaaPass>()->setEnabled( false );
+	post.createPass<BloomPass>()->setEnabled( false );
+	post.createPass<DofPass>()->setEnabled( false );
+	post.createPass<KaleidoscopePass>()->setEnabled( false );
+	post.createPass<NoiseWarpPass>()->setEnabled( false );
+	post.createPass<ToonPass>()->setEnabled( false );
+	post.createPass<EdgePass>()->setEnabled( true );
+	post.createPass<VerticalTiltShifPass>()->setEnabled( false );
+	post.createPass<ContrastPass>()->setEnabled( false );
 
 	wrapper.openKinect();
 	wrapper.openDepthStream();
+	kinectFbo.allocate( wrapper.depthWidth, wrapper.depthHeight, GL_RGBA );
+	kinectFbo2.allocate( wrapper.depthWidth, wrapper.depthHeight, GL_RGBA );
+	string fragShaderSrc = STRINGIFY(
+		// fragment shader
+		uniform float min;
+		uniform float max;
 
-	TIME_SAMPLE_SET_FRAMERATE( 30.0f );
-	TIME_SAMPLE_SET_DRAW_LOCATION( TIME_MEASUREMENTS_TOP_RIGHT );
+		// this is how we receive the texture
+		uniform sampler2DRect tex;
+
+		void main()
+		{
+			vec4 colToSet = vec4( 0, 0, 0, 1 );
+
+			vec2 st = gl_TexCoord[ 0 ].st;
+			vec3 col = texture2DRect( tex, st ).rgb;
+			if( col.x > min ) {
+				if( col.x < max ) {
+					colToSet = vec4( 1, 1, 1, 1 );
+				}
+			}
+			gl_FragColor = colToSet;
+		} 
+	);
+
+	std::string vertShaderSrc = STRINGIFY(
+		void main() {
+			gl_TexCoord[ 0 ] = gl_MultiTexCoord0;
+			gl_Position = ftransform();
+		}
+	);
+
+	kinectShader.setupShaderFromSource( GL_VERTEX_SHADER, vertShaderSrc );
+	kinectShader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragShaderSrc );
+	kinectShader.linkProgram();
+
+	
 
 	stone8ColorCollection.addColor( 236, 73, 78 );
 	stone8ColorCollection.addColor( 197, 153, 72 );
@@ -57,14 +105,18 @@ void testApp::setup(){
 	reinit();
 	setupGui();
 
-	kinectToStoneDistance = 120;
+	kinectToStoneDistance = 163.3f;
 	displayKinect = true;
 	doGrow = false;
 	currentCurtainY = -1080;
+
+	ofBackground( 0 );
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
+	currentCurtainY += 1;
+	
 	//ofSetWindowTitle( ofToString( ofGetFrameRate() ) );
 	TS_START( "grow_all" );
 	if( doGrow ) {
@@ -75,9 +127,40 @@ void testApp::update(){
 		}
 	}
 	TS_STOP( "grow_all" );
-	TS_START( "kinect update" );
-	wrapper.updateDepthFrame();
-	TS_STOP( "kinect update" );
+	TS_START_NIF( "kinect update" );
+	bool isUpdated = wrapper.updateDepthFrame();
+	TS_STOP_NIF( "kinect update" );
+
+	if( isUpdated ) {
+		TS_START( "dilate" );
+		wrapper.grayscaleImage.dilate();
+		wrapper.grayscaleImage.dilate();
+		wrapper.grayscaleImage.erode();
+		wrapper.grayscaleImage.erode();
+		TS_STOP( "dilate" );
+
+		TS_START( "kinect_limit" );
+		kinectFbo.begin();
+		ofClear( 0, 0, 0, 255 );
+		wrapper.grayscaleImage.draw( 0, 0 );
+		kinectFbo.end();
+		kinectFbo2.begin();
+		ofClear( 0, 255 );
+		kinectShader.begin();
+		kinectShader.setUniform1f( "min", ( float ) ( ( kinectToStoneDistance - 1 ) / 255.0 ) );
+		kinectShader.setUniform1f( "max", ( float ) ( ( kinectToStoneDistance + 1 ) / 255.0 ) );
+		kinectShader.setUniformTexture( "tex", kinectFbo.getTextureReference(), 0 );
+		glBegin( GL_QUADS );
+		glTexCoord2f( 0, 0 ); glVertex3f( 0, 0, 0 );
+		glTexCoord2f( wrapper.grayscaleImage.width, 0 ); glVertex3f( wrapper.grayscaleImage.width, 0, 0 );
+		glTexCoord2f( wrapper.grayscaleImage.width, wrapper.grayscaleImage.height ); glVertex3f( wrapper.grayscaleImage.width, wrapper.grayscaleImage.height, 0 );
+		glTexCoord2f( 0, wrapper.grayscaleImage.height );  glVertex3f( 0, wrapper.grayscaleImage.height, 0 );
+		glEnd();
+		kinectShader.end();
+		kinectFbo2.end();
+		TS_STOP( "kinect_limit" );
+	}
+
 }
 
 //--------------------------------------------------------------
@@ -85,9 +168,10 @@ void testApp::draw(){
 	ofPushMatrix();
 	ofMatrix4x4 mat = warper.getMatrix();
 	ofMultMatrix( mat );
+	//post.begin();
 	bg.draw( 0, 0 );
 
-	currentCurtainY += 1;
+	
 	TS_START( "curtain_draw" );
 	stoneCurtain.draw( 0, currentCurtainY );
 	TS_STOP( "curtain_draw" );
@@ -103,43 +187,27 @@ void testApp::draw(){
 	TS_START( "voro_compute" );
 	//voro.compute();
 	TS_STOP( "voro_compute" );
+
 	TS_START( "voro_render" );
 	voro.render();
 	TS_STOP( "voro_render" );
+
 	TS_START( "voro_draw" );
 	voro.draw( 0, 0 );
 	TS_STOP( "voro_draw" );
 	TS_STOP( "voro_all" );
+	
+	
 
-	TS_START( "kinect" );
-	ofPixels pix;
-	pix = wrapper.grayscaleImage.getPixelsRef();
-	for( int i = 0; i < wrapper.grayscaleImage.height; i++ )
-	{
-		for( int j = 0; j < wrapper.grayscaleImage.width; j++ )
-		{
-			//wrapper.grayscaleImage.
-			int editValue = pix.getColor( j, i ).r;
-
-			if( ( editValue >= kinectToStoneDistance - 2 ) && ( editValue <= kinectToStoneDistance + 2 ) ) //check whether value is within range.
-			{
-				pix.setColor( j, i, ofColor( 255 ) );
-				//image.at<uchar>( i, j ) = 255;
-			}
-			else
-			{
-				pix.setColor( j, i, ofColor( 0 ) );
-			}
-		}
-	}
-	wrapper.grayscaleImage.setFromPixels( pix );
+	
 
 	if( displayKinect ) {
-		wrapper.grayscaleImage.draw( 0, 0 );
+		kinectFbo2.draw( 250, 0 );
 	}
-	TS_STOP( "kinect" );
 	
 	barbWire.draw();
+
+	//post.end();
 
 	ofPopMatrix();
 	ofPushStyle();
@@ -175,7 +243,7 @@ void testApp::keyPressed( int key ){
 		reinit();
 		break;
 	case 'c':
-		stones.at( randomId ).rerender( voro.getLine( randomId ) );
+		stones.at( randomId ).rerender();
 		break;
 	case 'g':
 		doGrow = !doGrow;
@@ -186,6 +254,9 @@ void testApp::keyPressed( int key ){
 		warper.toggleShow();
 		break;
 	}
+
+	unsigned idx = key - '0';
+	if( idx < post.size() ) post[ idx ]->setEnabled( !post[ idx ]->getEnabled() );
 }
 
 
@@ -320,6 +391,12 @@ void testApp::guiEvent( ofxUIEventArgs &e )
 		ofxUISlider * slider = e.getSlider();
 		barbWire.setBrightness( slider->getValue() );
 	}
+	else if( e.getName() == "Stones Saturation" ){
+		ofxUISlider * slider = e.getSlider();
+		for( int i = 0; i < stones.size(); i++ ) {
+			stones.at( i ).setSaturation( slider->getValue() );
+		}
+	}
 }
 
 void testApp::setupGui()
@@ -339,6 +416,7 @@ void testApp::setupGui()
 	gui->addLabel( "Stone" );
 	gui->addSlider( "Stone Border Size", 0.0, 60.0, testStone.getBorderSize(), 200.0, 20.0 );
 	gui->addSlider( "StonesTransparency", 0.0f, 255.0, 255.0f );
+	gui->addSlider( "Stones Saturation", 0.0f, 255.0, 255.0f );
 	gui->addSlider( "BorderTransparency", 0.0f, 255.0f, 255.0f );
 	gui->addSpacer( );
 	gui->addLabel( "Kinect" );
@@ -368,6 +446,7 @@ void testApp::setupGui()
 
 void testApp::reinit()
 {
+	TS_START( "init" );
 	voro.clear();
 	stones.clear();
 	for( int i = 0; i < (int)(points); i++ ) {
@@ -385,7 +464,7 @@ void testApp::reinit()
 
 		stones.push_back( s );
 	}
-	
+	TS_STOP( "init" );
 }
 
 void testApp::exit()

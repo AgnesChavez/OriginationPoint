@@ -49,7 +49,7 @@ public:
 
 	void updateColorFrame();
 
-	void updateDepthFrame();
+	bool updateDepthFrame();
 
 	void updateSkeleton();
 	Joint * getJointData( unsigned int bodyIndex, JointType jointType );
