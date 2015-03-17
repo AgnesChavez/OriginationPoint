@@ -38,7 +38,6 @@ void StoneCurtain::draw( float x, float y )
 
 void StoneCurtain::render()
 {
-	
 	ofPolyline pl;
 	pl.addVertex( 0, 0 );
 	pl.addVertex( 0, 1080 );
@@ -47,8 +46,8 @@ void StoneCurtain::render()
 	pl.setClosed( true );
 
 
-	int xStoneCount = 8;
-	int yStoneCount = 6;
+	int xStoneCount = 6;
+	int yStoneCount = 4;
 	for( int y = 0; y < yStoneCount; y++ ) {
 		for( int x = 0; x < xStoneCount; x++ ) {
 			Stone s;
@@ -71,13 +70,16 @@ void StoneCurtain::render()
 	
 	buffer.begin();
 	ofPushStyle();
-	ofSetColor( 255, 255 );
+	//ofSetColor( 255, 255 );
+	ofEnableAlphaBlending();
 	for( int i = 0; i < stones.size(); i++ ) {
 		stones.at( i ).draw( 0, 0 );
 	}
 	ofPopStyle();
-
 	buffer.end();
+
+	// not needed anymore, as everything is on the buffer.
+	stones.clear();
 }
 
 void StoneCurtain::setTransparency( float _trans )

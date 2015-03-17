@@ -1,4 +1,5 @@
 #include "Stone.h"
+#include "omp.h"
 
 
 Stone::Stone( )
@@ -28,8 +29,14 @@ Stone::Stone( )
 	settings.width = bufferWidth;
 	settings.height = bufferHeight;
 
+	tDrawStone = true;
+	tDrawBorder = true;
+
 	layer.allocate( settings );
 	underlyingLayer.allocate( settings );
+
+	int threadCount = omp_get_max_threads();
+	omp_set_num_threads( threadCount );
 }
 
 Stone::~Stone()
@@ -54,11 +61,12 @@ void Stone::renderBorder()
 	underlyingLayer.begin();
 	ofPushStyle();
 	ofEnableAlphaBlending();
-	//ofEnableBlendMode( OF_BLENDMODE_ADD );
+	ofEnableBlendMode( OF_BLENDMODE_ADD );
 
 	if( contourPoints.size() > 0 ) {
 		ofFill();
 		
+		TS_START_NIF( "convert1" );
 		std::vector< Point1 > convexPoints( contourPoints.size() );
 #pragma omp parallel for 
 		for( int i = 0; i < contourPoints.size(); i += 1 ) {
@@ -68,19 +76,25 @@ void Stone::renderBorder()
 			p.y = _poi.y;
 			convexPoints.at( i ) = p;
 		}
+		TS_STOP_NIF( "convert1" );
 
+		TS_START_NIF( "convex" );
 		std::vector< Point1 > ps = VoronoiLayer::convex_hull( convexPoints );
+		TS_STOP_NIF( "convex" );
 
 		border.clear();
 		border.setClosed( true );
 	
+		TS_START_NIF( "convert2" );
 		std::vector< ofPoint > finalPoints( ps.size() );
 #pragma omp parallel for 
 		for( int i = 0; i < ps.size(); i++ ) {
 			Point1 from = ps.at( i );
 			finalPoints.at(i ) = ofPoint( from.x, from.y );
 		}
+		TS_STOP_NIF( "convert2" );
 
+		TS_START_NIF( "etc" );
 		border.addVertices( finalPoints );
 		
 		border.setClosed( true );
@@ -89,15 +103,19 @@ void Stone::renderBorder()
 		ofSetColor( 51, 25, 0, 255 );
 		float s = 10;
 		ofSeedRandom( 0 );
+		TS_STOP_NIF( "etc" );
 
-		TS_START( "drawing_b" );
+		TS_START_NIF( "drawing_b" );
 		for( int i = 0; i < border.getVertices().size(); i++ ) {
 			ofPoint p = border.getVertices().at( i );
 			brushes.getRandomBrush().draw( p.x - borderSize / 2.0, p.y - borderSize / 2.0, borderSize, borderSize );
 		}
-		TS_STOP( "drawing_b" );
+		TS_STOP_NIF( "drawing_b" );
 
 		ofSeedRandom();
+	}
+	else {
+		std::cout << "Contour points empty. No border!" << std::endl;
 	}
 
 	ofDisableAlphaBlending();
@@ -108,10 +126,16 @@ void Stone::renderBorder()
 void Stone::draw( float x, float y )
 {
 	ofPushStyle();
-	ofSetColor( 255, transparency );
-	layer.draw( x, y, 1920, 1080 );
-	ofSetColor( 255, borderTransparency );
-	underlyingLayer.draw( x, y, 1920, 1080 );
+	ofEnableAlphaBlending();
+	
+	if( tDrawStone ) {
+		ofSetColor( 255, transparency );
+		layer.draw( x, y, 1920, 1080 );
+	}
+	if( tDrawBorder ) {
+		ofSetColor( 255, borderTransparency );
+		underlyingLayer.draw( x, y, 1920, 1080 );
+	}
 	ofPopStyle();
 }
 
@@ -151,11 +175,9 @@ std::vector< ofPoint > Stone::getContourPoints( float x, float y )
 	return contourPoints;
 }
 
-void Stone::calcBorder()
+void Stone::calcBorder( std::vector< ofPoint > points )
 {
-	if( locationsPointsDrawn.size() > 3 ) {
-		contourPoints = convexHull.getConvexHull( locationsPointsDrawn );
-	}
+	contourPoints = convexHull.getConvexHull( points );
 }
 
 int Stone::getNumberOfStrokes()
@@ -168,9 +190,9 @@ void Stone::setBrushCollection( BrushCollection _b )
 	this->brushes = _b;
 }
 
-void Stone::rerender()
+void Stone::clear()
 {
-	TS_START( "rerender" );
+	TS_START( "stone_indi_clear" );
 	layer.begin();
 	ofClear( 1.0 );
 	layer.end();
@@ -180,27 +202,17 @@ void Stone::rerender()
 	underlyingLayer.end();
 
 	locationsPointsDrawn.clear();
+	contourPoints.clear();
 
-	currentGrowRad = 0.0f;
-
-	//renderStone();
-	calcBorder();
-	renderBorder();
-	
-	
-	TS_STOP( "rerender" );
+	currentGrowRad = 10.0f;
+		
+	TS_STOP( "stone_indi_clear" );
 }
 
 void Stone::grow(ofPolyline line)
 {
 	if( currentGrowRad < maxGrowRad ) {
 		currentGrowRad += 0.5f;
-		calcBorder();
-
-		underlyingLayer.begin();
-		ofClear( 1.0 );
-		underlyingLayer.end();
-		renderBorder();
 
 		layer.begin();
 
@@ -220,9 +232,10 @@ void Stone::grow(ofPolyline line)
 			pointsToDraw.at( i ) = pToSave;
 		}
 
-		ofPolyline lineToCheck = line.getResampledBySpacing( 100 );
-		std::vector< ofVec2f > tempLocationsDrawn( nrToCheck);
+		ofPolyline lineToCheck = line.getResampledBySpacing( 50 );
+		std::vector< ofPoint > tempLocationsDrawn( nrToCheck);
 
+		// checking parallelized for overlapping
 #pragma omp parallel for 
 		for( int i = 0; i < pointsToDraw.size(); i++ ) {
 			ofVec2f p = pointsToDraw.at( i );
@@ -230,11 +243,24 @@ void Stone::grow(ofPolyline line)
 			// first check for bounding box inside as its quicker to compute
 			if( bb.inside( p ) ) {
 				if( lineToCheck.inside( p ) ) {
-					tempLocationsDrawn.at( i ) = ofVec2f( p.x, p.y );
+					tempLocationsDrawn.at( i ) = ofPoint( p.x, p.y );
 				}
 			}
 		}
 
+		// removing vectors at around location 0, 0
+		vector<ofPoint>::iterator it = tempLocationsDrawn.begin();
+		for( ; it != tempLocationsDrawn.end(); ) {
+			ofPoint *_p = &( *it );
+			if( _p->x < 4 || _p->y < 4 ) {
+				it = tempLocationsDrawn.erase( it );
+			}
+			else {
+				++it;
+				locationsPointsDrawn.push_back( *_p );
+			}
+		}
+		
 		for( int i = 0; i < tempLocationsDrawn.size(); i++ ) {
 			ofVec2f p = tempLocationsDrawn.at( i );
 			float s = ofRandom( brushStrokeSizeMin, brushStrokeSizeMax );
@@ -246,6 +272,19 @@ void Stone::grow(ofPolyline line)
 		ofPopStyle();
 
 		layer.end();
+
+		underlyingLayer.begin();
+		ofClear( 1.0 );
+		underlyingLayer.end();
+
+		if( tDrawBorder ) {
+			TS_START( "indi_border_calc" );
+			calcBorder( locationsPointsDrawn );
+			TS_STOP( "indi_border_calc" );
+			TS_START( "indi_border_render" );
+			renderBorder();
+			TS_STOP( "indi_border_render" );
+		}
 	}
 }
 
@@ -253,7 +292,7 @@ void Stone::grow()
 {
 	currentGrowRad += 0.5f;
 	if( currentGrowRad < maxGrowRad ) {
-		calcBorder();
+		calcBorder( locationsPointsDrawn );
 
 		underlyingLayer.begin();
 		ofClear( 1.0 );
@@ -386,4 +425,14 @@ vector<ofVec3f> Stone::resamplePolylineToCount( const ofPolyline& polyline, int 
 float Stone::getTransparency()
 {
 	return this->transparency;
+}
+
+void Stone::toggleDrawBorder( bool _b )
+{
+	this->tDrawBorder = _b;
+}
+
+void Stone::toggleDrawStone( bool _s )
+{
+	this->tDrawStone = _s;
 }

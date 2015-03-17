@@ -19,8 +19,8 @@ public:
 	~Stone();
 	void init( float _x, float _y, ofPolyline line  );
 	void draw( float x, float y );
-	void rerender();
-	void calcBorder();
+	void clear();
+	void calcBorder( std::vector< ofPoint > poi);
 	void renderBorder();
 
 	void grow(ofPolyline line );
@@ -55,6 +55,9 @@ public:
 	void setBrushCollection( BrushCollection _b );
 	void setColorCollection( ColorCollection _c );
 
+	void toggleDrawBorder( bool _b );
+	void toggleDrawStone( bool _s );
+
 
 	std::vector< ofPoint > getContourPoints( float x, float y);
 
@@ -66,6 +69,9 @@ private:
 	float transparency, borderTransparency, saturation;
 	ofVec2f centroid;
 	int borderSize;
+
+	bool tDrawBorder;
+	bool tDrawStone;
 
 	ofPolyline border;
 

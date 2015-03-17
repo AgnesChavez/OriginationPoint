@@ -1,11 +1,12 @@
 #include "testApp.h"
+#include "omp.h"
 
 //--------------------------------------------------------------
 void testApp::setup(){
 	ofSetLogLevel( OF_LOG_ERROR );
 	ofSetVerticalSync( true );
 	ofSetFrameRate( 40 );
-
+	
 	TIME_SAMPLE_SET_FRAMERATE( 40.0f );
 	TIME_SAMPLE_SET_DRAW_LOCATION( TIME_MEASUREMENTS_TOP_RIGHT );
 
@@ -172,9 +173,7 @@ void testApp::draw(){
 	bg.draw( 0, 0 );
 
 	
-	TS_START( "curtain_draw" );
-	stoneCurtain.draw( 0, currentCurtainY );
-	TS_STOP( "curtain_draw" );
+	
 
 	TS_START( "stones_draw" );
 	for( int i = 0; i < stones.size(); i++ ) {
@@ -185,7 +184,7 @@ void testApp::draw(){
 
 	TS_START( "voro_all" );
 	TS_START( "voro_compute" );
-	//voro.compute();
+	voro.compute();
 	TS_STOP( "voro_compute" );
 
 	TS_START( "voro_render" );
@@ -197,15 +196,15 @@ void testApp::draw(){
 	TS_STOP( "voro_draw" );
 	TS_STOP( "voro_all" );
 	
-	
+	TS_START( "curtain_draw" );
+	stoneCurtain.draw( 0, currentCurtainY );
+	TS_STOP( "curtain_draw" );
 
-	
+	barbWire.draw();
 
 	if( displayKinect ) {
 		kinectFbo2.draw( 250, 0 );
 	}
-	
-	barbWire.draw();
 
 	//post.end();
 
@@ -243,7 +242,7 @@ void testApp::keyPressed( int key ){
 		reinit();
 		break;
 	case 'c':
-		stones.at( randomId ).rerender();
+		stones.at( randomId ).clear();
 		break;
 	case 'g':
 		doGrow = !doGrow;
@@ -397,6 +396,12 @@ void testApp::guiEvent( ofxUIEventArgs &e )
 			stones.at( i ).setSaturation( slider->getValue() );
 		}
 	}
+	else if( e.getName() == "Border ON/OFF" ){
+		ofxUIToggle * toggle = e.getToggle();
+		for( int i = 0; i < stones.size(); i++ ) {
+			stones.at( i ).toggleDrawBorder( toggle->getValue() );
+		}
+	}
 }
 
 void testApp::setupGui()
@@ -418,6 +423,9 @@ void testApp::setupGui()
 	gui->addSlider( "StonesTransparency", 0.0f, 255.0, 255.0f );
 	gui->addSlider( "Stones Saturation", 0.0f, 255.0, 255.0f );
 	gui->addSlider( "BorderTransparency", 0.0f, 255.0f, 255.0f );
+	gui->setWidgetPosition( OFX_UI_WIDGET_POSITION_RIGHT );
+	gui->addToggle( "Border ON/OFF", true );
+	gui->setWidgetPosition( OFX_UI_WIDGET_POSITION_DOWN );
 	gui->addSpacer( );
 	gui->addLabel( "Kinect" );
 	gui->addSlider( "KinectDistance", 0.0f, 255.0f, &kinectToStoneDistance );
