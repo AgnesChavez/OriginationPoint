@@ -3,7 +3,7 @@
 #include "VoronoiLayer.h"
 #include "Stone.h"
 #include "Stones.h"
-#include "../NoiseFieldCutter.h"
+#include "NoiseFieldCutter.h"
 #include "NoiseTexture.h"
 #include "ofMain.h"
 

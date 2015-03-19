@@ -14,7 +14,7 @@
 
 #include "StopMotionStones.h"
 
-#include "../NoiseFieldCutter.h"
+#include "NoiseFieldCutter.h"
 #include "Stones.h"
 #include "KinectInteractionManager.h"
 
