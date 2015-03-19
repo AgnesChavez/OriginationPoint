@@ -70,20 +70,17 @@ void testApp::setup(){
 	doGrow = false;
 	currentCurtainY = -1080;
 
-
 	stonesTex.init();
 	cutter.init();
 	for( int j = 0; j < 10; j++ ) {
 		for( int i = 0; i < stones.size(); i++ ) {
-			stones.at( i ).grow( voro.getLine( i ), false, false );
+			stones.at( i ).grow( voro.getLine( i ), false );
 		}
 	}
 
 	for( int i = 0; i < stones.size(); i++ ) {
-		stones.at( i ).grow( voro.getLine( i ), false, true );
+		stones.at( i ).grow( voro.getLine( i ), true );
 	}
-
-	noi.render();
 
 	stopmotion.init();
 
@@ -97,7 +94,7 @@ void testApp::update(){
 	if( doGrow ) {
 		for( int i = 0; i < stones.size(); i++ ) {
 			Stone * s = &stones.at( i );
-			s->grow( voro.getLine( i ), false, true );
+			s->grow( voro.getLine( i ), true );
 		}
 	}
 
@@ -111,31 +108,41 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
+	bg.draw( 0, 0 );
+
 	ofPushMatrix();
 	ofMatrix4x4 mat = warper.getMatrix();
 	ofMultMatrix( mat );
-	
-	bg.draw( 0, 0 );
 
 	voro.compute();
 	voro.render();
 
-
-
+	TS_START_NIF( "noi_render" );
 	noi.render();
+	TS_STOP_NIF( "noi_render" );
+
+	TS_START_NIF( "lines" );
 	std::vector< ofPolyline > lines;
 	for( int i = 0; i < stones.size(); i++ ) {
 		lines.push_back( stones.at( i ).border );
 	}
+	TS_STOP_NIF( "lines" );
+	TS_START( "stonetexrender" );
 	stonesTex.render( lines );
+	TS_STOP( "stonetexrender" );
+
+	TS_START_NIF( "cutout" );
 	ofFbo * buf = cutter.getCutout( noi, stonesTex.getBuffer() );
+	TS_STOP_NIF( "cutout" );
+	TS_START( "draw_wall" );
 	ofPushStyle();
 	ofSetColor( 255, stones.at( 0 ).getTransparency() );
 	int off = 0;
 	post.begin();
-	buf->draw( 0, 0, 1920, 1080 );
+	buf->draw( 0, 0 );
 	post.end();
 	ofPopStyle();
+	TS_STOP( "draw_wall" );
 
 	voro.draw( 0, 0 );
 	
@@ -418,7 +425,7 @@ void testApp::reinit()
 	for( int i = 0; i < voro.pts.size(); i++ ) {
 		ofVec2f * p = &voro.pts.at( i );
 		Stone s;
-		s.init( p->x, p->y, voro.getLine( i ) );
+		s.init( p->x, p->y, *voro.getLine( i ) );
 		stones.push_back( s );
 	}
 	

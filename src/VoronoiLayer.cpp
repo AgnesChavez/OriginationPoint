@@ -59,18 +59,17 @@ void VoronoiLayer::compute()
 		edgePoints = getCellsVertices( *con );
 		std::vector< ofPoint> centroids = getCellsCentroids( *con );
 		for( int k = 0; k < edgePoints.size(); ++k ) {
-			std::vector< ofPoint > selectedPoints = edgePoints.at( k );
+			std::vector< ofPoint > * selectedPoints = &edgePoints.at( k );
 			ofPoint centroid = centroids.at( k );
-			std::vector< Point1 > pppps( selectedPoints.size() );
-			for( int i = 0; i < selectedPoints.size(); ++i ) {
+			std::vector< Point1 > pppps( selectedPoints->size() );
+			for( int i = 0; i < selectedPoints->size(); ++i ) {
 				Point1 p;
-				p.x = selectedPoints.at( i ).x;
-				p.y = selectedPoints.at( i ).y;
-				// optimization for parallelization
+				p.x = selectedPoints->at( i ).x;
+				p.y = selectedPoints->at( i ).y;
 				pppps.at( i ) = p;
-				for( int j = 0; j < selectedPoints.size(); ++j ) {
-					ofPoint p1 = selectedPoints.at( i );
-					ofPoint p2 = selectedPoints.at( j );
+				for( int j = 0; j < selectedPoints->size(); ++j ) {
+					ofPoint p1 = selectedPoints->at( i );
+					ofPoint p2 = selectedPoints->at( j );
 					ofPoint p3 = centroid;
 				}
 			}
@@ -188,9 +187,9 @@ std::vector< ofPolyline > VoronoiLayer::getLines()
 	return lines;
 }
 
-ofPolyline VoronoiLayer::getLine( int id )
+ofPolyline * VoronoiLayer::getLine( int id )
 {
-	return lines.at( id );
+	return &lines.at( id );
 }
 
 bool VoronoiLayer::isInside( int id, float _x, float _y )

@@ -20,9 +20,8 @@ public:
 	void init( float _x, float _y, ofPolyline line  );
 	void clear();
 	void calcBorder( std::vector< ofPoint > poi);
-	void renderBorder();
 
-	void grow(ofPolyline line, bool renderBrushStone, bool calcDirectly );
+	void grow(ofPolyline * line, bool calcDirectly );
 	void grow();
 	
 
@@ -72,7 +71,6 @@ private:
 	std::vector< ofPoint > locationsPointsDrawn;
 	ofxConvexHull convexHull;
 
-	void renderBrushStone( std::vector< ofPoint > points );
 	int bufferWidth, bufferHeight;
 
 

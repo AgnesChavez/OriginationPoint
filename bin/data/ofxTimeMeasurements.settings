@@ -1,2 +1,7 @@
 update()=1|1|1
+draw_wall=1|1|0
 draw()=1|1|1
+noi_render=1|1|0
+lines=1|1|0
+stonetexrender=1|1|0
+cutout=1|1|0

@@ -27,7 +27,7 @@ public:
 	void clear();
 	std::vector< ofVec2f > getPoints();
 	std::vector< ofPolyline > getLines();
-	ofPolyline getLine( int id );
+	ofPolyline * getLine( int id );
 	bool isInside( int id, float _x, float _y );
 	void setLineThickness( float _thick );
 	float getLineThickness();

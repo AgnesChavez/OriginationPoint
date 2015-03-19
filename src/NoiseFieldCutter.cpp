@@ -14,7 +14,7 @@ void NoiseFieldCutter::init()
 {
 	ofFbo::Settings settings;
 	settings.useDepth = true;
-	settings.useStencil = false;
+	settings.useStencil = true;
 	settings.depthStencilAsTexture = true;
 	settings.width = 1920;
 	settings.height = 1080;
@@ -26,7 +26,6 @@ void NoiseFieldCutter::init()
 
 ofFbo * NoiseFieldCutter::getCutout( NoiseTexture nt, ofFbo stoneMask )
 {
-
 	buffer.begin();
 	ofClear( 0 );
 	cutoutShader.begin();
@@ -40,7 +39,6 @@ ofFbo * NoiseFieldCutter::getCutout( NoiseTexture nt, ofFbo stoneMask )
 	glEnd();
 	cutoutShader.end();
 	buffer.end();
-
 
 	return &buffer;
 }

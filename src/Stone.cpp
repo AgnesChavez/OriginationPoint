@@ -45,7 +45,7 @@ void Stone::clear()
 	TS_STOP( "stone_indi_clear" );
 }
 
-void Stone::grow( ofPolyline line, bool renderbrush, bool calcDirectly )
+void Stone::grow( ofPolyline * line, bool calcDirectly )
 {
 	if( currentGrowRad < maxGrowRad ) {
 		currentGrowRad += 0.5f;
@@ -53,18 +53,20 @@ void Stone::grow( ofPolyline line, bool renderbrush, bool calcDirectly )
 		int nrToCheck = ( int ) ( ofMap( currentGrowRad, 10, maxGrowRad, 5, 15 ) );
 		
 		std::vector< ofVec2f > pointsToDraw( nrToCheck );
-		ofVec2f p = line.getCentroid2D();
+		ofVec2f p = line->getCentroid2D();
 		for( int i = 0; i < nrToCheck; i++ ) {
 			float deg = ofRandom( 0, TWO_PI );
 			float _x = currentGrowRad * cos( deg );
 			float _y = currentGrowRad * sin( deg );
 			//int randomId = ofRandom( 0, points.size() );
 			
-			ofVec2f pToSave = p + ofVec2f( _x, _y );
-			pointsToDraw.at( i ) = pToSave;
+			//ofVec2f pToSave = p + ofVec2f( _x, _y );
+			//pointsToDraw.at( i ) = pToSave;
+			pointsToDraw.at( i ).x = p.x + _x;
+			pointsToDraw.at( i ).y = p.y + _y;
 		}
 
-		ofPolyline lineToCheck = line;// .getResampledBySpacing( 5 );
+		ofPolyline lineToCheck = line->getResampledBySpacing( 5 );
 		std::vector< ofPoint > newPointsToDraw( nrToCheck);
 
 		// checking parallelized for overlapping
@@ -92,17 +94,9 @@ void Stone::grow( ofPolyline line, bool renderbrush, bool calcDirectly )
 			}
 		}
 
-		if( renderbrush ) {
-			renderBrushStone( newPointsToDraw );
-		}
 
 		if( calcDirectly ) {
 			calcBorder( locationsPointsDrawn );
-			renderBorder();
-		}
-
-		if( tDrawBorder ) {
-			renderBorder();
 		}
 	}
 }
@@ -111,12 +105,7 @@ void Stone::calcBorder( std::vector< ofPoint > points )
 {
 	if( points.size() > 3 ) {
 		contourPoints = convexHull.getConvexHull( points );
-	}
-}
 
-void Stone::renderBorder()
-{
-	if( contourPoints.size() > 0 ) {
 		ofFill();
 
 		std::vector< Point1 > convexPoints( contourPoints.size() );
@@ -129,6 +118,7 @@ void Stone::renderBorder()
 		}
 		std::vector< Point1 > ps = VoronoiLayer::convex_hull( convexPoints );
 
+
 		border.clear();
 		border.setClosed( true );
 
@@ -138,6 +128,8 @@ void Stone::renderBorder()
 			finalPoints.at( i ) = ofPoint( from.x, from.y );
 		}
 
+		finalPoints = convexHull.getConvexHull( contourPoints );
+
 		border.addVertices( finalPoints );
 
 		border.setClosed( true );
@@ -145,39 +137,12 @@ void Stone::renderBorder()
 	}
 }
 
-void Stone::renderBrushStone( std::vector< ofPoint > points ) {
-	/*
-	layer.begin();
-	ofPushStyle();
-	ofEnableAlphaBlending();
-
-	for( int i = 0; i < points.size(); i++ ) {
-		ofVec2f p = points.at( i );
-		float s = ofRandom( brushStrokeSizeMin, brushStrokeSizeMax );
-		ofSetColor( colors.getRandomColor(), brushStrokeAlpha );
-		brushes.getRandomBrush().draw( p.x - s / 2.0, p.y - s / 2.0, s, s );
-	}
-
-	ofDisableAlphaBlending();
-	ofPopStyle();
-	layer.end();
-	*/
-}
-
 void Stone::grow()
 {
 	currentGrowRad += 0.5f;
 	if( currentGrowRad < maxGrowRad ) {
 		calcBorder( locationsPointsDrawn );
-
-		//underlyingLayer.begin();
-		//ofClear( 1.0 );
-		//underlyingLayer.end();
-
-		renderBorder();
-
-		//layer.begin();
-
+		
 		int nrToCheck = ( int ) ( ofMap( currentGrowRad, 0, maxGrowRad, 5, 15 ) );
 
 		ofPushStyle();
@@ -213,11 +178,6 @@ void Stone::setBorderTransparency( float _trans )
 {
 	this->borderTransparency = _trans;
 }
-
-//ofFbo Stone::getStoneBuffer()
-//{
-//	return layer;
-//}
 
 void Stone::setBorderSize( int _bsize )
 {

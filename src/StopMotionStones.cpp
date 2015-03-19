@@ -30,7 +30,7 @@ void StopMotionStones::init()
 	for( int i = 0; i < voro.pts.size(); i++ ) {
 		ofVec2f * p = &voro.pts.at( i );
 		Stone s;
-		s.init( p->x, p->y, voro.getLine( i ) );
+		s.init( p->x, p->y, *voro.getLine( i ) );
 		stones.push_back( s );
 	}
 
@@ -41,11 +41,11 @@ void StopMotionStones::init()
 	}
 	for( int j = 0; j < 5; j++ ) {
 		for( int i = 0; i < stones.size(); i++ ) {
-			stones.at( i ).grow( voro.getLine( i ), false, false );
+			stones.at( i ).grow( voro.getLine( i ), false );
 		}
 	}
 	for( int i = 0; i < stones.size(); i++ ) {
-		stones.at( i ).grow( voro.getLine( i ), false, true );
+		stones.at( i ).grow( voro.getLine( i ), true );
 	}
 	noi.render();
 

@@ -18,6 +18,8 @@
 #include "Stones.h"
 #include "KinectInteractionManager.h"
 
+#include "StonesOnGround.h"
+
 class testApp : public ofBaseApp{
 public:
 	void setup();
