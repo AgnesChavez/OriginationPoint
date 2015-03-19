@@ -8,7 +8,7 @@ void testApp::setup(){
 	ofSetFrameRate( 60 );
 	ofSetTextureWrap( GL_REPEAT );
 	
-	TIME_SAMPLE_SET_FRAMERATE( 60.0f );
+	TIME_SAMPLE_SET_FRAMERATE( 30.0f );
 	TIME_SAMPLE_SET_DRAW_LOCATION( TIME_MEASUREMENTS_TOP_RIGHT );
 
 	post.init( 1920, 1080 );
@@ -42,7 +42,7 @@ void testApp::setup(){
 	stoneCurtain.setBrushCollection( brushCollection );
 	stoneCurtain.setColorCollection( blackWhiteColor );
 
-	//stoneCurtain.render();
+	stoneCurtain.render();
 
 	barbWire.init();
 
@@ -65,14 +65,6 @@ void testApp::setup(){
 	reinit();
 	setupGui();
 
-	ofFbo::Settings settings;
-	settings.useDepth = true;
-	settings.useStencil = false;
-	settings.depthStencilAsTexture = true;
-	settings.width = 1920;
-	settings.height = 1080;
-	stoneBuffer.allocate( settings );
-
 	doGrow = false;
 	currentCurtainY = -1080;
 
@@ -81,11 +73,11 @@ void testApp::setup(){
 	cutter.init();
 	for( int j = 0; j < 10; j++ ) {
 		for( int i = 0; i < stones.size(); i++ ) {
-			TS_START( "grow_indi" );
 			stones.at( i ).grow( voro.getLine( i ), false );
-			TS_STOP( "grow_indi" );
 		}
 	}
+
+	noi.render();
 
 
 	ofBackground( 0 );
@@ -95,30 +87,17 @@ void testApp::setup(){
 void testApp::update(){
 	currentCurtainY += 1;
 	
-	TS_START( "grow_all" );
 	if( doGrow ) {
 		for( int i = 0; i < stones.size(); i++ ) {
-			TS_START( "grow_indi" );
 			stones.at( i ).grow( voro.getLine( i ), false );
-			TS_STOP( "grow_indi" );
 		}
 	}
-	TS_STOP( "grow_all" );
 
-	TS_START( "kinect_update" );
 	kinect.update();
-	TS_STOP( "kinect_update" );
 
 	nwPass->setFrequency( 1.97 );
 	nwPass->setAmplitude( 0.026 );
 
-	stoneBuffer.begin();
-	TS_START( "stones_draw" );
-	for( int i = 0; i < stones.size(); i++ ) {
-		//stones.at( i ).draw( 0, 0, 1920, 1080 );
-	}
-	TS_STOP( "stones_draw" );
-	stoneBuffer.end();
 }
 
 //--------------------------------------------------------------
@@ -128,38 +107,9 @@ void testApp::draw(){
 	ofMultMatrix( mat );
 	
 	bg.draw( 0, 0 );
-	
-	//stoneBuffer.draw( 0, 0 );
 
-	TS_START( "voro_all" );
-	TS_START( "voro_compute" );
 	voro.compute();
-	TS_STOP( "voro_compute" );
-
-	TS_START( "voro_render" );
 	voro.render();
-	TS_STOP( "voro_render" );
-
-	TS_START( "voro_draw" );
-	voro.draw( 0, 0 );
-	TS_STOP( "voro_draw" );
-	TS_STOP( "voro_all" );
-	
-	TS_START( "curtain_draw" );
-	//stoneCurtain.draw( 0, currentCurtainY );
-	TS_STOP( "curtain_draw" );
-
-	barbWire.draw();
-
-	kinect.draw();
-	TS_START( "noise_render" );
-	noi.render();
-	TS_STOP( "noise_render" );
-	TS_START( "noise_draw" );
-	//post.begin();
-	//noi.draw( 0, 0 );
-	//post.end();
-	TS_STOP( "noise_draw" );
 
 	std::vector< ofPolyline > lines;
 
@@ -168,7 +118,20 @@ void testApp::draw(){
 	}
 	stonesTex.render( lines );
 	ofFbo * buf = cutter.getCutout( noi, stonesTex.getBuffer() );
+	ofPushStyle();
+	ofSetColor( 255, stones.at( 0 ).getTransparency() );
 	buf->draw( 0, 0 );
+	ofPopStyle();
+
+	voro.draw( 0, 0 );
+	
+	stoneCurtain.draw( 0, currentCurtainY );
+
+	barbWire.draw();
+
+	kinect.draw();
+
+	
 	
 	ofPopMatrix();
 	ofPushStyle();

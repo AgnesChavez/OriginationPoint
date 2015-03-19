@@ -23,7 +23,6 @@ public:
 	void draw();
 
 	std::vector< Stone > stones;
-	ofFbo stoneBuffer;
 
 	VoronoiLayer voro;
 	float points;

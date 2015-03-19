@@ -25,8 +25,7 @@ void Stones::init()
 void Stones::render( std::vector< ofPolyline > closedLines )
 {
 	buffer.begin();
-	ofBackground( 0 );
-	ofSetColor( 255, 255 );
+	ofClear( 1.0 );
 	ofFill();
 	for( int i = 0; i < closedLines.size(); i++ ) {
 		ofPolyline line = closedLines.at( i );
