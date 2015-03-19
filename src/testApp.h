@@ -12,6 +12,8 @@
 #include "StoneCurtain.h"
 #include "BarbWire.h"
 
+#include "StopMotionStones.h"
+
 #include "../NoiseFieldCutter.h"
 #include "Stones.h"
 #include "KinectInteractionManager.h"
@@ -60,9 +62,12 @@ public:
 	void setupGui();
 	void guiEvent( ofxUIEventArgs &e );
 
-	NoiseTexture noi;
+	
 	NoiseWarpPass::Ptr nwPass;
 
+	NoiseTexture noi;
 	Stones stonesTex;
 	NoiseFieldCutter cutter;
+
+	StopMotionStones stopmotion;
 };

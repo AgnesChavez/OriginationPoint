@@ -13,7 +13,7 @@ BarbWire::BarbWire()
 
 	hueVal = 0;
 	brightness = 0;
-	transparency = 255;	
+	transparency = 0;	
 }
 
 

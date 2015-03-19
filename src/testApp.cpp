@@ -13,8 +13,8 @@ void testApp::setup(){
 
 	post.init( 1920, 1080 );
 	nwPass = post.createPass<NoiseWarpPass>();
+	nwPass->setEnabled( false );
 	post.createPass<ContrastPass>()->setEnabled( true );
-	post.createPass<ContrastPass>()->setEnabled( false );
 	post.setFlip( false );
 
 	stone8ColorCollection.addColor( 236, 73, 78 );
@@ -42,9 +42,11 @@ void testApp::setup(){
 	stoneCurtain.setBrushCollection( brushCollection );
 	stoneCurtain.setColorCollection( blackWhiteColor );
 
-	stoneCurtain.render();
+	//stoneCurtain.render();
 
 	barbWire.init();
+
+	
 
 	bg.loadImage( "bg_b.png" );
 
@@ -61,7 +63,7 @@ void testApp::setup(){
 	warper.setup();
 	warper.load(); // reload last saved changes.
 
-	points = 60;
+	points = 100;
 	reinit();
 	setupGui();
 
@@ -73,12 +75,17 @@ void testApp::setup(){
 	cutter.init();
 	for( int j = 0; j < 10; j++ ) {
 		for( int i = 0; i < stones.size(); i++ ) {
-			stones.at( i ).grow( voro.getLine( i ), false );
+			stones.at( i ).grow( voro.getLine( i ), false, false );
 		}
+	}
+
+	for( int i = 0; i < stones.size(); i++ ) {
+		stones.at( i ).grow( voro.getLine( i ), false, true );
 	}
 
 	noi.render();
 
+	stopmotion.init();
 
 	ofBackground( 0 );
 }
@@ -89,7 +96,8 @@ void testApp::update(){
 	
 	if( doGrow ) {
 		for( int i = 0; i < stones.size(); i++ ) {
-			stones.at( i ).grow( voro.getLine( i ), false );
+			Stone * s = &stones.at( i );
+			s->grow( voro.getLine( i ), false, true );
 		}
 	}
 
@@ -98,6 +106,7 @@ void testApp::update(){
 	nwPass->setFrequency( 1.97 );
 	nwPass->setAmplitude( 0.026 );
 
+	stopmotion.update();
 }
 
 //--------------------------------------------------------------
@@ -111,8 +120,10 @@ void testApp::draw(){
 	voro.compute();
 	voro.render();
 
-	std::vector< ofPolyline > lines;
 
+
+	noi.render();
+	std::vector< ofPolyline > lines;
 	for( int i = 0; i < stones.size(); i++ ) {
 		lines.push_back( stones.at( i ).border );
 	}
@@ -120,16 +131,21 @@ void testApp::draw(){
 	ofFbo * buf = cutter.getCutout( noi, stonesTex.getBuffer() );
 	ofPushStyle();
 	ofSetColor( 255, stones.at( 0 ).getTransparency() );
-	buf->draw( 0, 0 );
+	int off = 0;
+	post.begin();
+	buf->draw( 0, 0, 1920, 1080 );
+	post.end();
 	ofPopStyle();
 
 	voro.draw( 0, 0 );
 	
-	stoneCurtain.draw( 0, currentCurtainY );
+	//stoneCurtain.draw( 0, currentCurtainY );
 
-	barbWire.draw();
+	//stopmotion.draw();
 
-	kinect.draw();
+	//barbWire.draw();
+
+	//kinect.draw();
 
 	
 	ofPopMatrix();
@@ -161,12 +177,7 @@ void testApp::keyPressed( int key ){
 		ofToggleFullscreen();
 		break;
 	case 'n':
-		//stone.init( ofGetMouseX(), ofGetMouseY()  );
-		//stones.at( ( int ) ( ofRandom( 0, stones.size() ) ) ).init( ofRandomWidth(), ofRandomHeight() );
 		reinit();
-		break;
-	case 'c':
-		stones.at( randomId ).clear();
 		break;
 	case 'g':
 		doGrow = !doGrow;
@@ -347,7 +358,7 @@ void testApp::setupGui()
 	gui->addSlider( "Transparency", 0.0f, 255.0f, 255.0f, 200, 20 );
 	gui->addSpacer();
 	gui->addLabel( "Stone" );
-	gui->addSlider( "Stone Border Size", 0.0, 60.0, testStone.getBorderSize(), 200.0, 20.0 );
+	gui->addSlider( "Stone Border Size", 0.0, 60.0, 0.0, 200.0, 20.0 );
 	gui->addSlider( "StonesTransparency", 0.0f, 255.0, 255.0f );
 	gui->addSlider( "Stones Saturation", 0.0f, 255.0, 255.0f );
 	gui->addSlider( "BorderTransparency", 0.0f, 255.0f, 255.0f );
@@ -379,6 +390,12 @@ void testApp::setupGui()
 	gui->addSlider( "Barbwire Thickness", 0.0f, 10.0, barbWire.getThickness(), 200.0, 20.0 );
 	
 	gui->addButton( "Init", false );
+	gui->addSpacer();
+
+	gui->addSlider( "w1", 0.0, 1.0, &noi.w1 );
+	gui->addSlider( "w2", 0.0, 1.0, &noi.w2 );
+	gui->addSlider( "w3", 0.0, 1.0, &noi.w3 );
+	gui->addSlider( "w4", 0.0, 1.0, &noi.w4 );
 
 	gui->autoSizeToFitWidgets();
 	ofAddListener( gui->newGUIEvent, this, &testApp::guiEvent );
@@ -388,27 +405,23 @@ void testApp::setupGui()
 
 void testApp::reinit()
 {
-	TS_START( "init" );
+	
 	voro.clear();
 	stones.clear();
 	for( int i = 0; i < (int)(points); i++ ) {
-		voro.addPoint( ofRandom( 1920 ), ofRandom( 1080 ) );
+		voro.addRandomPoint();
 	}
 	
 	voro.compute();
 
-	TS_START( "important_stones_init" );
+	
 	for( int i = 0; i < voro.pts.size(); i++ ) {
 		ofVec2f * p = &voro.pts.at( i );
 		Stone s;
-		s.setBrushCollection( brushCollection );
-		s.setColorCollection( blackWhiteColor );
 		s.init( p->x, p->y, voro.getLine( i ) );
-
 		stones.push_back( s );
 	}
-	TS_STOP( "important_stones_init" );
-	TS_STOP( "init" );
+	
 }
 
 void testApp::exit()

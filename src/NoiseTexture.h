@@ -15,10 +15,13 @@ public:
 
 	ofFbo getBuffer();
 
+	float w1, w2, w3, w4;
+
 private:
 	ofShader noise;
 	ofFbo noiseFbo;
 
+	
 	float noiseSpeed, noiseZoom;
 };
 

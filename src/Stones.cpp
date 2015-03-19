@@ -40,16 +40,6 @@ void Stones::render( std::vector< ofPolyline > closedLines )
 	}
 
 	buffer.end();
-
-	
-	/*
-	ofPixels pix;
-	buffer.readToPixels( pix );
-	ofImage im;
-	im.setFromPixels( pix );
-	im.saveImage( "outtest.png" );
-	ofExit( 1 );
-	*/
 }
 
 ofFbo Stones::getBuffer()

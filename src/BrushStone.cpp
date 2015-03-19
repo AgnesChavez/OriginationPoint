@@ -35,8 +35,6 @@ BrushStone::BrushStone()
 	layer.allocate( settings );
 	underlyingLayer.allocate( settings );
 
-	int threadCount = omp_get_max_threads();
-	omp_set_num_threads( threadCount );
 }
 
 BrushStone::~BrushStone()
@@ -278,12 +276,8 @@ void BrushStone::grow( ofPolyline line )
 		underlyingLayer.end();
 
 		if( tDrawBorder ) {
-			TS_START( "indi_border_calc" );
 			calcBorder( locationsPointsDrawn );
-			TS_STOP( "indi_border_calc" );
-			TS_START( "indi_border_render" );
 			renderBorder();
-			TS_STOP( "indi_border_render" );
 		}
 	}
 }

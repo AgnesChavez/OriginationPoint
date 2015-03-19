@@ -1,11 +1,2 @@
-important_stones_init=1|1|0
-init=1|1|1
-convert1=1|1|0
-convex=1|1|0
-convert2=1|1|0
-getverts=1|1|0
-etc=1|1|0
-drawing_b=1|1|0
-addcell=1|1|0
 update()=1|1|1
 draw()=1|1|1

@@ -4,7 +4,7 @@
 VoronoiLayer::VoronoiLayer()
 {
 	count = 0;
-	transparency = 255;
+	transparency = 0;
 	ofFbo::Settings settings;
 	settings.useDepth = true;
 	settings.useStencil = true;
@@ -14,12 +14,14 @@ VoronoiLayer::VoronoiLayer()
 
 	buffer.allocate( settings );
 
-	con = new voro::container( 0, settings.width,
-		0, settings.height,
+	int off = 100;
+
+	con = new voro::container( -off, settings.width + (2 * off ),
+		-off, settings.height + ( 2 * off ),
 		-10, 10,
 		1, 1, 1, true, true, true, 3 );
 
-	smoothAmount = 1;
+	smoothAmount = 5;
 	thickness = 3;
 
 	isDrawn = true;
@@ -32,33 +34,34 @@ VoronoiLayer::~VoronoiLayer()
 
 void VoronoiLayer::addPoint( float x, float y )
 {
-	float _mappedx = ofMap( x, 0, 1920, 0, buffer.getWidth() );
-	float _mappedy = ofMap( y, 0, 1080, 0, buffer.getHeight() );
 	pts.push_back( ofVec2f( x, y ) );
 }
+
+void VoronoiLayer::addRandomPoint()
+{
+	int x = ofRandom( con->ax, con->bx );
+	int y = ofRandom( con->ay, con->by );
+	pts.push_back( ofVec2f( x, y ) );
+}
+
 
 void VoronoiLayer::compute()
 {
 	if( isDrawn ) {
 		con->clear();
-		TS_START( "addcell" );
 		for( int i = 0; i < pts.size(); i++ ) {
 			addCellSeed( *con, ofPoint( pts.at( i ) ), i, false );
 		}
-		TS_STOP( "addcell" );
 
 		lines.clear();
 		edgePoints.clear();
 
-		TS_START( "getverts" );
 		edgePoints = getCellsVertices( *con );
-		TS_STOP( "getverts" );
 		std::vector< ofPoint> centroids = getCellsCentroids( *con );
 		for( int k = 0; k < edgePoints.size(); ++k ) {
 			std::vector< ofPoint > selectedPoints = edgePoints.at( k );
 			ofPoint centroid = centroids.at( k );
 			std::vector< Point1 > pppps( selectedPoints.size() );
-#pragma omp parallel for 
 			for( int i = 0; i < selectedPoints.size(); ++i ) {
 				Point1 p;
 				p.x = selectedPoints.at( i ).x;
@@ -219,3 +222,4 @@ void VoronoiLayer::toggleRender()
 {
 	isDrawn = !isDrawn;
 }
+

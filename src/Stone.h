@@ -18,14 +18,12 @@ public:
 	Stone();
 	~Stone();
 	void init( float _x, float _y, ofPolyline line  );
-	void draw( float x, float y, float w, float h );
 	void clear();
 	void calcBorder( std::vector< ofPoint > poi);
 	void renderBorder();
 
-	void grow(ofPolyline line, bool renderBrushStone );
+	void grow(ofPolyline line, bool renderBrushStone, bool calcDirectly );
 	void grow();
-
 	
 
 	void setRadius( float rad );
@@ -42,22 +40,11 @@ public:
 	void setSaturation( float _sat );
 	float getSaturation();
 
-	ofFbo getStoneBuffer();
-
-	void setBrushStrokeCount( int count );
-	int getBrushStrokeCount();
-	void setBrushStrokeSizeMin( float min );
-	float getBrushStrokeSizeMin();
-	void setBrushStrokeSizeMax( float max );
-	float getBrushStrokeSizeMax();
-	void setBrushStrokeAlpha( float alpha );
-	float getBrushStrokeAlpha();
-
-	void setBrushCollection( BrushCollection _b );
-	void setColorCollection( ColorCollection _c );
 
 	void toggleRenderBorder( bool _b );
 	void toggleDrawStone( bool _s );
+
+	float currentGrowRad;
 
 
 	std::vector< ofPoint > getContourPoints( float x, float y);
@@ -77,7 +64,7 @@ private:
 
 	
 
-	float currentGrowRad;
+	
 	float maxGrowRad;
 
 	int getNumberOfStrokes();
@@ -87,15 +74,8 @@ private:
 
 	void renderBrushStone( std::vector< ofPoint > points );
 	int bufferWidth, bufferHeight;
-	ofFbo layer;
-	//underlyingLayer;
-	BrushCollection brushes;
-	ColorCollection colors;
-	int brushStokeCount;
-	float brushStrokeSizeMin, brushStrokeSizeMax;
-	float brushStrokeAlpha;
 
-	ofFbo tempFbo;
+
 	ofxCv::ContourFinder contourFinder;
 	std::vector< ofPoint > contourPoints;
 };

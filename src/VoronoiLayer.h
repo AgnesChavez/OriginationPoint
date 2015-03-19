@@ -20,6 +20,7 @@ public:
 	~VoronoiLayer();
 
 	void addPoint( float x, float y );
+	void addRandomPoint();
 	void compute();
 	void render();
 	void draw( float x, float y );

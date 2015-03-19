@@ -16,6 +16,11 @@ NoiseTexture::NoiseTexture()
 	settings.height = 1080;
 
 	noiseFbo.allocate( settings );
+
+	w1 = 0.5;
+	w2 = 0.25;
+	w3 = 0.125;
+	w4 = 0.075;
 }
 
 
@@ -38,6 +43,10 @@ void NoiseTexture::render()
 	noise.begin();
 	noise.setUniform2f( "resolution", 1920.0, 1080.0 );
 	noise.setUniform1f( "time", ofGetElapsedTimef()*noiseSpeed );
+	noise.setUniform1f( "w1", w1 );
+	noise.setUniform1f( "w2", w2 );
+	noise.setUniform1f( "w3", w3 );
+	noise.setUniform1f( "w4", w4 );
 	noise.setUniform1f( "zPos", noiseZoom );
 	noise.setUniform1f( "normalization", 1.0f );
 	noise.setUniform1i( "octaves", 4 );
