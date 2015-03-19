@@ -50,7 +50,7 @@ void StoneCurtain::render()
 	int yStoneCount = 4;
 	for( int y = 0; y < yStoneCount; y++ ) {
 		for( int x = 0; x < xStoneCount; x++ ) {
-			Stone s;
+			BrushStone s;
 			s.setBrushCollection( brushes );
 			s.setColorCollection( colors );
 			float xpos = ( 1980 / xStoneCount * x ) + ( 1920 / xStoneCount / 2.0 );

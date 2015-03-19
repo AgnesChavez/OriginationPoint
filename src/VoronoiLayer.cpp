@@ -84,12 +84,16 @@ void VoronoiLayer::compute()
 				else {
 					to = ps.at( i + 1 );
 				}
-				line.addVertex( from.x, from.y );
+				for( float j = 0; j < 1.0; j += 0.1 ) {
+					float _x = ofLerp( from.x, to.x, j );
+					float _y = ofLerp( from.y, to.y, j );
+					line.addVertex( _x, _y );
+				}
 			}
 
 			line.setClosed( true );
 			line = line.getSmoothed( smoothAmount );
-			//line = line.getResampledBySpacing( 20 );
+			line = line.getResampledBySpacing( 10 );
 			lines.push_back( line );
 		}
 

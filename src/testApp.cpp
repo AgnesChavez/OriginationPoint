@@ -132,7 +132,6 @@ void testApp::draw(){
 	kinect.draw();
 
 	
-	
 	ofPopMatrix();
 	ofPushStyle();
 

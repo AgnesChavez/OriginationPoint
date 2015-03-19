@@ -2,7 +2,7 @@
 
 #include "ColorCollection.h"
 #include "BrushCollection.h"
-#include "Stone.h"
+#include "BrushStone.h"
 
 class StoneCurtain 
 {
@@ -18,7 +18,7 @@ public:
 
 	void setTransparency( float _trans );
 
-	std::vector< Stone > stones;
+	std::vector< BrushStone > stones;
 
 protected:
 	ofFbo buffer;
