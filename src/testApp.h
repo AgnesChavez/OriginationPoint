@@ -9,9 +9,12 @@
 #include "ofxQuadWarp.h"
 #include "ofxPostProcessing.h"
 
-#include "KinectWrapper.h"
 #include "StoneCurtain.h"
 #include "BarbWire.h"
+
+#include "../NoiseFieldCutter.h"
+#include "Stones.h"
+#include "KinectInteractionManager.h"
 
 class testApp : public ofBaseApp{
 public:
@@ -20,6 +23,8 @@ public:
 	void draw();
 
 	std::vector< Stone > stones;
+	ofFbo stoneBuffer;
+
 	VoronoiLayer voro;
 	float points;
 
@@ -34,11 +39,7 @@ public:
 	void gotMessage( ofMessage msg );
 	void exit();
 
-	KinectWrapper wrapper;
-	bool displayKinect;
-	float kinectToStoneDistance;
-	ofShader kinectShader;
-	ofFbo kinectFbo, kinectFbo2;
+	KinectInteractionManager kinect;
 
 	ofxQuadWarp warper;
 
@@ -47,7 +48,7 @@ public:
 	bool doGrow;
 
 	BrushCollection brushCollection;
-	ColorCollection stone8ColorCollection, brightYellowColorCollection, brownColorCollection;
+	ColorCollection stone8ColorCollection, brightYellowColorCollection, brownColorCollection, blackWhiteColor;
 
 	StoneCurtain stoneCurtain;
 	int currentCurtainY;
@@ -59,4 +60,10 @@ public:
 	ofxUISuperCanvas *gui;
 	void setupGui();
 	void guiEvent( ofxUIEventArgs &e );
+
+	NoiseTexture noi;
+	NoiseWarpPass::Ptr nwPass;
+
+	Stones stonesTex;
+	NoiseFieldCutter cutter;
 };

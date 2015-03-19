@@ -14,12 +14,12 @@ VoronoiLayer::VoronoiLayer()
 
 	buffer.allocate( settings );
 
-	con = new voro::container( -0, 1920,
-		-0, 1080,
+	con = new voro::container( 0, settings.width,
+		0, settings.height,
 		-10, 10,
-		1, 1, 1, 1, 1, 1, 8 );
+		1, 1, 1, true, true, true, 3 );
 
-	smoothAmount = 15;
+	smoothAmount = 1;
 	thickness = 3;
 
 	isDrawn = true;
@@ -32,6 +32,8 @@ VoronoiLayer::~VoronoiLayer()
 
 void VoronoiLayer::addPoint( float x, float y )
 {
+	float _mappedx = ofMap( x, 0, 1920, 0, buffer.getWidth() );
+	float _mappedy = ofMap( y, 0, 1080, 0, buffer.getHeight() );
 	pts.push_back( ofVec2f( x, y ) );
 }
 
@@ -39,19 +41,22 @@ void VoronoiLayer::compute()
 {
 	if( isDrawn ) {
 		con->clear();
-
+		TS_START( "addcell" );
 		for( int i = 0; i < pts.size(); i++ ) {
 			addCellSeed( *con, ofPoint( pts.at( i ) ), i, false );
 		}
+		TS_STOP( "addcell" );
 
 		lines.clear();
 		edgePoints.clear();
 
+		TS_START( "getverts" );
 		edgePoints = getCellsVertices( *con );
-
+		TS_STOP( "getverts" );
+		std::vector< ofPoint> centroids = getCellsCentroids( *con );
 		for( int k = 0; k < edgePoints.size(); ++k ) {
 			std::vector< ofPoint > selectedPoints = edgePoints.at( k );
-			ofPoint centroid = getCellsCentroids( *con ).at( k );
+			ofPoint centroid = centroids.at( k );
 			std::vector< Point1 > pppps( selectedPoints.size() );
 #pragma omp parallel for 
 			for( int i = 0; i < selectedPoints.size(); ++i ) {
@@ -79,19 +84,16 @@ void VoronoiLayer::compute()
 				else {
 					to = ps.at( i + 1 );
 				}
-
-				for( float j = 0; j < 1.0; j += 0.1 ) {
-					float _x = ofLerp( from.x, to.x, j );
-					float _y = ofLerp( from.y, to.y, j );
-					line.addVertex( _x, _y );
-				}
+				line.addVertex( from.x, from.y );
 			}
 
 			line.setClosed( true );
 			line = line.getSmoothed( smoothAmount );
-			line = line.getResampledBySpacing( 10 );
+			//line = line.getResampledBySpacing( 20 );
 			lines.push_back( line );
 		}
+
+		int hey = 0;
 	}
 }
 

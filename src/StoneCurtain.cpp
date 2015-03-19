@@ -73,7 +73,7 @@ void StoneCurtain::render()
 	//ofSetColor( 255, 255 );
 	ofEnableAlphaBlending();
 	for( int i = 0; i < stones.size(); i++ ) {
-		stones.at( i ).draw( 0, 0 );
+		stones.at( i ).draw( 0, 0, buffer.getWidth(), buffer.getHeight() );
 	}
 	ofPopStyle();
 	buffer.end();

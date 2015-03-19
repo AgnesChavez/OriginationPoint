@@ -10,7 +10,7 @@
 #include "BrushCollection.h"
 #include "ColorCollection.h"
 #include "VoronoiLayer.h"
-
+#include "NoiseTexture.h"
 
 class Stone
 {
@@ -18,14 +18,15 @@ public:
 	Stone();
 	~Stone();
 	void init( float _x, float _y, ofPolyline line  );
-	void draw( float x, float y );
+	void draw( float x, float y, float w, float h );
 	void clear();
 	void calcBorder( std::vector< ofPoint > poi);
 	void renderBorder();
 
-	void grow(ofPolyline line );
+	void grow(ofPolyline line, bool renderBrushStone );
 	void grow();
 
+	
 
 	void setRadius( float rad );
 	void setFuzzy( float fuzzy );
@@ -62,6 +63,7 @@ public:
 	std::vector< ofPoint > getContourPoints( float x, float y);
 
 	static vector<ofVec3f> resamplePolylineToCount( const ofPolyline& polyline, int n );
+	ofPolyline border;
 
 private:
 	float radius, fuzzy;
@@ -73,7 +75,7 @@ private:
 	bool tDrawBorder;
 	bool tDrawStone;
 
-	ofPolyline border;
+	
 
 	float currentGrowRad;
 	float maxGrowRad;
@@ -83,8 +85,10 @@ private:
 	std::vector< ofPoint > locationsPointsDrawn;
 	ofxConvexHull convexHull;
 
+	void renderBrushStone( std::vector< ofPoint > points );
 	int bufferWidth, bufferHeight;
-	ofFbo layer, underlyingLayer;
+	ofFbo layer;
+	//underlyingLayer;
 	BrushCollection brushes;
 	ColorCollection colors;
 	int brushStokeCount;
