@@ -30,6 +30,7 @@ VoronoiLayer::VoronoiLayer()
 
 VoronoiLayer::~VoronoiLayer()
 {
+	delete con;
 }
 
 void VoronoiLayer::addPoint( float x, float y )
@@ -43,7 +44,6 @@ void VoronoiLayer::addRandomPoint()
 	int y = ofRandom( con->ay, con->by );
 	pts.push_back( ofVec2f( x, y ) );
 }
-
 
 void VoronoiLayer::compute()
 {
@@ -99,7 +99,6 @@ void VoronoiLayer::compute()
 			lines.push_back( line );
 		}
 
-		int hey = 0;
 	}
 }
 

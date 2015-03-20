@@ -7,6 +7,8 @@
 #include "NoiseTexture.h"
 #include "ofMain.h"
 
+#include <algorithm>
+
 class StopMotionStones
 {
 public:
@@ -17,8 +19,11 @@ public:
 	void update();
 	void draw();
 
+	void moveRandom( float str );
+	void setGrowing( bool gr );
+
 private:
-	VoronoiLayer voro;
+	VoronoiLayer * voro;
 	std::vector< Stone > stones;
 	int currentStone;
 	ofFbo buffer;
@@ -26,5 +31,7 @@ private:
 	NoiseTexture noi;
 	Stones stonesTex;
 	NoiseFieldCutter cutter;
+
+	bool doGrow;
 };
 

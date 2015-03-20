@@ -138,9 +138,9 @@ void testApp::draw(){
 	ofPushStyle();
 	ofSetColor( 255, stones.at( 0 ).getTransparency() );
 	int off = 0;
-	post.begin();
+	//post.begin();
 	buf->draw( 0, 0 );
-	post.end();
+	//post.end();
 	ofPopStyle();
 	TS_STOP( "draw_wall" );
 
@@ -148,7 +148,7 @@ void testApp::draw(){
 	
 	//stoneCurtain.draw( 0, currentCurtainY );
 
-	//stopmotion.draw();
+	stopmotion.draw();
 
 	//barbWire.draw();
 
@@ -193,6 +193,12 @@ void testApp::keyPressed( int key ){
 		gui->toggleVisible();
 		kinect.displayKinect = !kinect.displayKinect;
 		warper.toggleShow();
+		break;
+	case 'm':
+		stopmotion.moveRandom( 3 );
+		break;
+	case 'k':
+		stopmotion.setGrowing( true );
 		break;
 	}
 
@@ -412,7 +418,6 @@ void testApp::setupGui()
 
 void testApp::reinit()
 {
-	
 	voro.clear();
 	stones.clear();
 	for( int i = 0; i < (int)(points); i++ ) {
@@ -420,7 +425,6 @@ void testApp::reinit()
 	}
 	
 	voro.compute();
-
 	
 	for( int i = 0; i < voro.pts.size(); i++ ) {
 		ofVec2f * p = &voro.pts.at( i );
@@ -428,7 +432,6 @@ void testApp::reinit()
 		s.init( p->x, p->y, *voro.getLine( i ) );
 		stones.push_back( s );
 	}
-	
 }
 
 void testApp::exit()
