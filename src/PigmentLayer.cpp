@@ -1,9 +1,8 @@
-
 #include "PigmentLayer.h"
 
 PigmentLayer::PigmentLayer() {
     fbo = new ofFbo();
-    fbo->allocate(1280, 720, GL_RGBA32F);
+    fbo->allocate(1920, 1080, GL_RGBA32F);
     fbo->begin();
     ofClear(0.f, 0.f, 0.f, 255.f);
     fbo->end();

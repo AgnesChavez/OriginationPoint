@@ -8,7 +8,8 @@ class WaterColorCanvas {
 public:
     WaterColorCanvas();
     void update();
-    void draw();
+	void render();
+    void draw( int x, int y );
     void addPigment(ofColor color);
     void beginPigmentDraw(int i);
     void endPigmentDraw();
@@ -25,11 +26,9 @@ private:
     void clearFbo(ofFbo *fbo, int r, int g, int b);
     
     ofColor color;
-    ofShader noiseShader, waterBleedingShader, waterRenderShader, pigmentFixShader, pigmentRenderShader, blurShader, pigmentShader;;
+	ofShader noiseShader, waterBleedingShader, waterRenderShader, pigmentFixShader, pigmentRenderShader, blurShader, pigmentShader, invertShader;
     ofFbo *tempFbo, *noiseFbo, *waterFbo, *paperFbo;
-
-	
-    
+	ofFbo * finalFbo;
     int currentPigment;
     
     ofPoint pos, prev, vec, adj;

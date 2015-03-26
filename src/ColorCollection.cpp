@@ -29,3 +29,8 @@ ofColor ColorCollection::getColorById( int id )
 {
 	return colors.at( id );
 }
+
+int ColorCollection::size()
+{
+	return colors.size();
+}

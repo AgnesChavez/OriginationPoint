@@ -16,9 +16,7 @@ BrushStone::BrushStone()
 	saturation = 255;
 
 	borderSize = 30;
-
-	currentGrowRad = 10;
-	maxGrowRad = 600;
+		
 
 	bufferWidth = 1920;
 	bufferHeight = 1080;
@@ -52,73 +50,9 @@ void BrushStone::init( float _x, float _y, ofPolyline line )
 	underlyingLayer.end();
 
 	centroid = ofPoint( _x, _y );
-}
 
-void BrushStone::renderBorder()
-{
-	underlyingLayer.begin();
-	ofPushStyle();
-	ofEnableAlphaBlending();
-	ofEnableBlendMode( OF_BLENDMODE_ADD );
-
-	if( contourPoints.size() > 0 ) {
-		ofFill();
-
-		TS_START_NIF( "convert1" );
-		std::vector< Point1 > convexPoints( contourPoints.size() );
-#pragma omp parallel for 
-		for( int i = 0; i < contourPoints.size(); i += 1 ) {
-			ofPoint _poi = contourPoints.at( i );
-			Point1 p;
-			p.x = _poi.x;
-			p.y = _poi.y;
-			convexPoints.at( i ) = p;
-		}
-		TS_STOP_NIF( "convert1" );
-
-		TS_START_NIF( "convex" );
-		std::vector< Point1 > ps = VoronoiLayer::convex_hull( convexPoints );
-		TS_STOP_NIF( "convex" );
-
-		border.clear();
-		border.setClosed( true );
-
-		TS_START_NIF( "convert2" );
-		std::vector< ofPoint > finalPoints( ps.size() );
-#pragma omp parallel for 
-		for( int i = 0; i < ps.size(); i++ ) {
-			Point1 from = ps.at( i );
-			finalPoints.at( i ) = ofPoint( from.x, from.y );
-		}
-		TS_STOP_NIF( "convert2" );
-
-		TS_START_NIF( "etc" );
-		border.addVertices( finalPoints );
-
-		border.setClosed( true );
-		border = border.getResampledBySpacing( 20 );
-
-		ofSetColor( 51, 25, 0, 255 );
-		float s = 10;
-		ofSeedRandom( 0 );
-		TS_STOP_NIF( "etc" );
-
-		TS_START_NIF( "drawing_b" );
-		for( int i = 0; i < border.getVertices().size(); i++ ) {
-			ofPoint p = border.getVertices().at( i );
-			brushes.getRandomBrush().draw( p.x - borderSize / 2.0, p.y - borderSize / 2.0, borderSize, borderSize );
-		}
-		TS_STOP_NIF( "drawing_b" );
-
-		ofSeedRandom();
-	}
-	else {
-		std::cout << "Contour points empty. No border!" << std::endl;
-	}
-
-	ofDisableAlphaBlending();
-	ofPopStyle();
-	underlyingLayer.end();
+	currentGrowRad = 10;
+	maxGrowRad = 400;
 }
 
 void BrushStone::draw( float x, float y, float w, float h )
@@ -135,76 +69,6 @@ void BrushStone::draw( float x, float y, float w, float h )
 		underlyingLayer.draw( x, y, w, h );
 	}
 	ofPopStyle();
-}
-
-void BrushStone::setFuzzy( float fuzzy )
-{
-	this->fuzzy = fuzzy;
-}
-
-void BrushStone::setRadius( float rad )
-{
-	this->radius = rad;
-}
-
-float BrushStone::getRadius()
-{
-	return this->radius;
-}
-
-float BrushStone::getFuzzy()
-{
-	return this->fuzzy;
-}
-
-void BrushStone::setSize( int size )
-{
-	this->size = size;
-}
-
-int BrushStone::getNumberOfCircles()
-{
-	return this->size;
-}
-
-
-std::vector< ofPoint > BrushStone::getContourPoints( float x, float y )
-{
-	return contourPoints;
-}
-
-void BrushStone::calcBorder( std::vector< ofPoint > points )
-{
-	contourPoints = convexHull.getConvexHull( points );
-}
-
-int BrushStone::getNumberOfStrokes()
-{
-	return getNumberOfCircles();
-}
-
-void BrushStone::setBrushCollection( BrushCollection _b )
-{
-	this->brushes = _b;
-}
-
-void BrushStone::clear()
-{
-	TS_START( "stone_indi_clear" );
-	layer.begin();
-	ofClear( 1.0 );
-	layer.end();
-
-	underlyingLayer.begin();
-	ofClear( 1.0 );
-	underlyingLayer.end();
-
-	locationsPointsDrawn.clear();
-	contourPoints.clear();
-
-	currentGrowRad = 10.0f;
-
-	TS_STOP( "stone_indi_clear" );
 }
 
 void BrushStone::grow( ofPolyline line )
@@ -284,16 +148,110 @@ void BrushStone::grow( ofPolyline line )
 
 void BrushStone::grow()
 {
-	currentGrowRad += 0.5f;
+	currentGrowRad =  currentGrowRad + 1.0f;
 	if( currentGrowRad < maxGrowRad ) {
-		calcBorder( locationsPointsDrawn );
+
+		//calcBorder( locationsPointsDrawn );
 
 		underlyingLayer.begin();
 		ofClear( 1.0 );
 		underlyingLayer.end();
 
-		renderBorder();
+		//renderBorder();
 
+		layer.begin();
+
+		int nrToCheck = ( int ) ( ofMap( currentGrowRad, 0, maxGrowRad, 5, 15 ) );
+
+		ofPushStyle();
+		//ofEnableAlphaBlending();
+		ofEnableBlendMode( OF_BLENDMODE_ADD );
+		for( int i = 0; i < nrToCheck; i++ ) {
+			float deg = ofRandom( 0, TWO_PI );
+			float _x = currentGrowRad * cos( deg );
+			float _y = currentGrowRad * sin( deg );
+			float s = ofRandom( brushStrokeSizeMin, brushStrokeSizeMax );
+			//int randomId = ofRandom( 0, points.size() );
+
+			ofVec2f p( centroid );
+			//ofVec2f p = getCenterById( randomId );
+			p += ofVec2f( _x, _y );
+
+			ofSetColor( colors.getRandomColor(), brushStrokeAlpha );
+			locationsPointsDrawn.push_back( ofVec2f( p.x, p.y ) );
+			brushes.getRandomBrush().draw( p.x - s / 2.0, p.y - s / 2.0, s, s );
+
+		}
+		ofDisableBlendMode();
+		//ofDisableAlphaBlending();
+		ofPopStyle();
+
+		layer.end();
+
+
+	}
+}
+
+bool BrushStone::grow( float rad )
+{
+	if( rad < maxGrowRad ) {
+
+		//calcBorder( locationsPointsDrawn );
+
+		underlyingLayer.begin();
+		ofClear( 1.0 );
+		underlyingLayer.end();
+
+		//renderBorder();
+
+		// experimenting with drawing on water color canvas. if it failed, reuse this layer
+		//layer.begin();
+
+		int nrToCheck = ( int ) ( ofMap( rad, 0, maxGrowRad, 5, 15 ) );
+
+		ofPushStyle();
+		ofEnableAlphaBlending();
+		for( int i = 0; i < nrToCheck; i++ ) {
+			float deg = ofRandom( 0, TWO_PI );
+			float _x = rad * cos( deg );
+			float _y = rad * sin( deg );
+			float s = ofRandom( brushStrokeSizeMin, brushStrokeSizeMax );
+			//int randomId = ofRandom( 0, points.size() );
+
+			ofVec2f p( centroid );
+			//ofVec2f p = getCenterById( randomId );
+			p += ofVec2f( _x, _y );
+
+			ofSetColor( colors.getRandomColor(), brushStrokeAlpha );
+			locationsPointsDrawn.push_back( ofVec2f( p.x, p.y ) );
+			brushes.getRandomBrush().draw( p.x - s / 2.0, p.y - s / 2.0, s, s );
+
+		}
+		ofDisableAlphaBlending();
+		ofPopStyle();
+
+		//layer.end();
+
+		return true;
+	}
+	return false;
+}
+
+
+void BrushStone::growPlain()
+{
+	currentGrowRad += 1.0f;
+	if( currentGrowRad < maxGrowRad ) {
+
+		//calcBorder( locationsPointsDrawn );
+
+		underlyingLayer.begin();
+		ofClear( 1.0 );
+		underlyingLayer.end();
+
+		//renderBorder();
+
+		// experimenting with drawing on water color canvas. if it failed, reuse this layer
 		layer.begin();
 
 		int nrToCheck = ( int ) ( ofMap( currentGrowRad, 0, maxGrowRad, 5, 15 ) );
@@ -320,9 +278,144 @@ void BrushStone::grow()
 		ofPopStyle();
 
 		layer.end();
+
 	}
 }
 
+void BrushStone::setFuzzy( float fuzzy )
+{
+	this->fuzzy = fuzzy;
+}
+
+void BrushStone::setRadius( float rad )
+{
+	this->radius = rad;
+}
+
+float BrushStone::getRadius()
+{
+	return this->radius;
+}
+
+float BrushStone::getFuzzy()
+{
+	return this->fuzzy;
+}
+
+void BrushStone::setSize( int size )
+{
+	this->size = size;
+}
+
+int BrushStone::getNumberOfCircles()
+{
+	return this->size;
+}
+
+
+std::vector< ofPoint > BrushStone::getContourPoints( float x, float y )
+{
+	return contourPoints;
+}
+
+void BrushStone::calcBorder( std::vector< ofPoint > points )
+{
+	contourPoints = convexHull.getConvexHull( points );
+}
+
+int BrushStone::getNumberOfStrokes()
+{
+	return getNumberOfCircles();
+}
+
+void BrushStone::setBrushCollection( BrushCollection _b )
+{
+	this->brushes = _b;
+}
+
+void BrushStone::clear()
+{
+	layer.begin();
+	ofClear( 1.0 );
+	layer.end();
+
+	underlyingLayer.begin();
+	ofClear( 1.0 );
+	underlyingLayer.end();
+
+	locationsPointsDrawn.clear();
+	contourPoints.clear();
+
+	currentGrowRad = 10.0f;
+}
+
+
+void BrushStone::renderBorder()
+{
+	underlyingLayer.begin();
+	ofPushStyle();
+	ofEnableAlphaBlending();
+	ofEnableBlendMode( OF_BLENDMODE_ADD );
+
+	if( contourPoints.size() > 0 ) {
+		ofFill();
+
+		TS_START_NIF( "convert1" );
+		std::vector< Point1 > convexPoints( contourPoints.size() );
+#pragma omp parallel for 
+		for( int i = 0; i < contourPoints.size(); i += 1 ) {
+			ofPoint _poi = contourPoints.at( i );
+			Point1 p;
+			p.x = _poi.x;
+			p.y = _poi.y;
+			convexPoints.at( i ) = p;
+		}
+		TS_STOP_NIF( "convert1" );
+
+		TS_START_NIF( "convex" );
+		std::vector< Point1 > ps = VoronoiLayer::convex_hull( convexPoints );
+		TS_STOP_NIF( "convex" );
+
+		border.clear();
+		border.setClosed( true );
+
+		TS_START_NIF( "convert2" );
+		std::vector< ofPoint > finalPoints( ps.size() );
+#pragma omp parallel for 
+		for( int i = 0; i < ps.size(); i++ ) {
+			Point1 from = ps.at( i );
+			finalPoints.at( i ) = ofPoint( from.x, from.y );
+		}
+		TS_STOP_NIF( "convert2" );
+
+		TS_START_NIF( "etc" );
+		border.addVertices( finalPoints );
+
+		border.setClosed( true );
+		border = border.getResampledBySpacing( 20 );
+
+		ofSetColor( 51, 25, 0, 255 );
+		float s = 10;
+		ofSeedRandom( 0 );
+		TS_STOP_NIF( "etc" );
+
+		TS_START_NIF( "drawing_b" );
+		for( int i = 0; i < border.getVertices().size(); i++ ) {
+			ofPoint p = border.getVertices().at( i );
+			brushes.getRandomBrush().draw( p.x - borderSize / 2.0, p.y - borderSize / 2.0, borderSize, borderSize );
+		}
+		TS_STOP_NIF( "drawing_b" );
+
+		ofSeedRandom();
+	}
+	else {
+		std::cout << "Contour points empty. No border!" << std::endl;
+	}
+
+	ofDisableAlphaBlending();
+	ofPopStyle();
+	underlyingLayer.end();
+}
 
 
 void BrushStone::setColorCollection( ColorCollection _c )

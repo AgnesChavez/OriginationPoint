@@ -15,6 +15,8 @@ public:
 	ofColor getRandomColor();
 	ofColor getColorById( int id );
 
+	int size();
+
 private:
 	std::vector< ofColor > colors;
 };

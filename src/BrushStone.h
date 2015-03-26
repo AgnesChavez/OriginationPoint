@@ -25,6 +25,8 @@ public:
 
 	void grow( ofPolyline line );
 	void grow();
+	bool grow( float rad );
+	void growPlain();
 
 
 	void setRadius( float rad );
@@ -62,6 +64,7 @@ public:
 	std::vector< ofPoint > getContourPoints( float x, float y );
 
 	static vector<ofVec3f> resamplePolylineToCount( const ofPolyline& polyline, int n );
+	float currentGrowRad;
 
 private:
 	float radius, fuzzy;
@@ -75,7 +78,7 @@ private:
 
 	ofPolyline border;
 
-	float currentGrowRad;
+	
 	float maxGrowRad;
 
 	int getNumberOfStrokes();

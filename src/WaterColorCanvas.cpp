@@ -8,12 +8,15 @@ WaterColorCanvas::WaterColorCanvas() {
     pigmentRenderShader.load("shader.vert", "pigmentRender.frag");
     blurShader.load("shader.vert", "blur.frag");
     pigmentShader.load("shader.vert", "pigmentBleeding.frag");
+	invertShader.load( "shader.vert", "invert.frag" );
 
-	int w = 1280;
-	int h = 720;
+	int w = 1920;
+	int h = 1080;
     
     tempFbo = new ofFbo();
     tempFbo->allocate(w, h, GL_RGBA32F); //temporary buffer
+	finalFbo = new ofFbo();
+	finalFbo->allocate( w, h, GL_RGBA ); //final output buffer
     noiseFbo = new ofFbo();
 	noiseFbo->allocate( w, h, GL_RGBA32F ); //noise
     waterFbo = new ofFbo();
@@ -22,6 +25,7 @@ WaterColorCanvas::WaterColorCanvas() {
 	paperFbo->allocate( w, h, GL_RGBA32F ); //fixed color
 	waterColorCanvas.allocate( w, h, GL_RGBA32F );
     clearLayers();
+
 }
 
 //--------------------------------------------------------------
@@ -38,24 +42,41 @@ void WaterColorCanvas::update() {
 }
 
 //--------------------------------------------------------------
-void WaterColorCanvas::draw() {
-	//waterColorCanvas.begin();
-    //glBlendFunc(GL_ONE, GL_ONE);
-    waterRenderShader.begin();
-    waterFbo->draw(0, 0);
-    waterRenderShader.end();
-    
-    //glBlendFunc(GL_ONE, GL_SRC_COLOR);
-    paperFbo->draw(0, 0);
-    glBlendFunc(GL_ONE, GL_ONE);
-    
-    for (int i = 0; i < pigments.size(); i ++)  {
-        tempFbo = applyShader(pigmentRenderShader, pigments[i].fbo, SHADING_TYPE_PIGMENT_RENDER, i);
-        glBlendFunc(GL_ZERO, GL_SRC_COLOR);
-        tempFbo->draw(0,0);
-        glBlendFunc(GL_ONE, GL_ONE);
-    }
-	//waterColorCanvas.end();
+void WaterColorCanvas::draw( int x, int y ) {
+	
+	finalFbo->draw( x, y );
+}
+
+void WaterColorCanvas::render()
+{
+	waterColorCanvas.begin();
+	//glBlendFunc(GL_ONE, GL_ONE);
+	waterRenderShader.begin();
+	waterFbo->draw( 0, 0 );
+	waterRenderShader.end();
+
+	//glBlendFunc(GL_ONE, GL_SRC_COLOR);
+	paperFbo->draw( 0, 0 );
+	glBlendFunc( GL_ONE, GL_ONE );
+
+	for( int i = 0; i < pigments.size(); i++ )  {
+		tempFbo = applyShader( pigmentRenderShader, pigments[ i ].fbo, SHADING_TYPE_PIGMENT_RENDER, i );
+		glBlendFunc( GL_ZERO, GL_SRC_COLOR );
+		tempFbo->draw( 0, 0 );
+		glBlendFunc( GL_ONE, GL_ONE );
+	}
+
+	waterColorCanvas.end();
+
+
+	finalFbo->begin();
+	ofClear( 0.f, 0.f, 0.f, 1.f );
+	invertShader.begin();
+	waterColorCanvas.draw( 0, 0 );
+
+	invertShader.end();
+
+	finalFbo->end();
 }
 
 //--------------------------------------------------------------
@@ -126,7 +147,8 @@ void WaterColorCanvas::endWaterDraw() {
 //--------------------------------------------------------------
 void WaterColorCanvas::clearLayers() {
     clearFbo(waterFbo, 0, 0, 0);
-    clearFbo(paperFbo, 255, 255, 255);
+    // 255, 255, 255 is origin
+	clearFbo(paperFbo, 255, 255, 255 );
     
     for (int i = 0; i < pigments.size(); i ++) {
         clearFbo(pigments[i].fbo, 0, 0, 0);
@@ -141,8 +163,8 @@ void WaterColorCanvas::clearFbo(ofFbo *fbo, int r, int g, int b) {
 }
 
 //--------------------------------------------------------------
-void WaterColorCanvas::addPigment(ofColor color) {
-    PigmentLayer p;
-    p.color = color;
-    pigments.push_back(p);
+void WaterColorCanvas::addPigment( ofColor color ) {
+	PigmentLayer p;
+	p.color = color;
+	pigments.push_back( p );
 }
