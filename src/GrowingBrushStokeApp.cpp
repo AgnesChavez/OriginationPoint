@@ -7,22 +7,16 @@ void GrowingBrushStokeApp::setup() {
 	ofSetFrameRate( 60 );
 	
 	ofBackground( 0 );
-	stone8ColorCollection.addColor( 236, 73, 78 );
-	stone8ColorCollection.addColor( 197, 153, 72 );
-	stone8ColorCollection.addColor( 211, 182, 60 );
-	stone8ColorCollection.addColor( 197, 190, 51 );
-	stone8ColorCollection.addColor( 202, 120, 78 );
-	stone8ColorCollection.addColor( 152, 103, 100 );
-
-	brightYellowColorCollection.addColor( 195, 189, 75 );
-	brightYellowColorCollection.addColor( 150, 144, 70 );
-	brightYellowColorCollection.addColor( 73, 78, 46 );
-	brightYellowColorCollection.addColor( 201, 198, 85 );
-	brightYellowColorCollection.addColor( 209, 202, 95 );
-
-	brownColorCollection.addColor( 102, 51, 0 );
-	brownColorCollection.addColor( 153, 102, 51 );
-	brownColorCollection.addColor( 187, 153, 102 );
+	agnesColorSelection.addColor( 232, 151, 44 );
+	agnesColorSelection.addColor( 84, 18, 0 );
+	agnesColorSelection.addColor( 152, 194, 45 );
+	agnesColorSelection.addColor( 43, 74, 12 );
+	agnesColorSelection.addColor( 46, 31, 1 );
+	agnesColorSelection.addColor( 237, 69, 69 );
+	agnesColorSelection.addColor( 128, 51, 0 );
+	agnesColorSelection.addColor( 110, 18, 0 );
+	agnesColorSelection.addColor( 163, 87, 52 );
+	agnesColorSelection.addColor( 71, 209, 108 );
 
 	blackWhiteColor.addColor( 90, 90, 90 );
 	blackWhiteColor.addColor( 255, 255, 255 );
@@ -35,7 +29,7 @@ void GrowingBrushStokeApp::setup() {
 	line.addVertex( 1920, 1080 );
 	line.setClosed( true );
 
-	plainStone.setColorCollection( blackWhiteColor );
+	plainStone.setColorCollection( agnesColorSelection );
 	plainStone.setBrushCollection( brushCollection );
 	plainStone.setBrushStrokeAlpha( 255 );
 	plainStone.init( 1920 / 4 * 3, 1080 / 2, line );
@@ -61,14 +55,16 @@ void GrowingBrushStokeApp::draw() {
 
 	float x = ofMap( ofGetMouseX(), 0, 1920, -1080, 1080 );
 
-	//ofBackground( 0 );
 	ofPushStyle();
-	ofSetColor( 255, 255, 255, ofMap( ofGetMouseY(), 0, 1080, 0, 255 ) );
+	ofSetColor( 255, ofMap( ofGetMouseY(), 0, 1080, 0, 255 ) );
 	waterColorStone.draw( - x, 0 );
 	ofPopStyle();
 
+	ofPushStyle();
+	plainStone.setSelectedColor( ofColor( 255, 255, 255 ) );
 	plainStone.setTransparency( 255 - ofMap( ofGetMouseY(), 0, 1080, 0, 255 ) );
 	plainStone.draw( x, 0, 1920, 1080 );
+	ofPopStyle();
 }
 
 void GrowingBrushStokeApp::keyPressed( int key )

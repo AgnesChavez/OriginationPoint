@@ -143,7 +143,6 @@ void WaterColorCanvas::endWaterDraw() {
     waterFbo->end();
 }
 
-
 //--------------------------------------------------------------
 void WaterColorCanvas::clearLayers() {
     clearFbo(waterFbo, 0, 0, 0);
@@ -167,4 +166,9 @@ void WaterColorCanvas::addPigment( ofColor color ) {
 	PigmentLayer p;
 	p.color = color;
 	pigments.push_back( p );
+}
+
+int WaterColorCanvas::getRandomPigmentId()
+{
+	return ( int ) ( ofRandom( 0, pigments.size() )  );
 }

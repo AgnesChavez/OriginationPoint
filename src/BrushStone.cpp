@@ -16,6 +16,8 @@ BrushStone::BrushStone()
 	saturation = 255;
 
 	borderSize = 30;
+
+	selectedColor = ofColor( 255, 255, 255 );
 		
 
 	bufferWidth = 1920;
@@ -61,11 +63,11 @@ void BrushStone::draw( float x, float y, float w, float h )
 	ofEnableAlphaBlending();
 
 	if( tDrawStone ) {
-		ofSetColor( 255, transparency );
+		ofSetColor( selectedColor, transparency );
 		layer.draw( x, y, w, h );
 	}
 	if( tDrawBorder ) {
-		ofSetColor( 255, borderTransparency );
+		ofSetColor( selectedColor, borderTransparency );
 		underlyingLayer.draw( x, y, w, h );
 	}
 	ofPopStyle();
@@ -522,4 +524,9 @@ void BrushStone::toggleRenderBorder( bool _b )
 void BrushStone::toggleDrawStone( bool _s )
 {
 	this->tDrawStone = _s;
+}
+
+void BrushStone::setSelectedColor( ofColor col )
+{
+	this->selectedColor = col;
 }

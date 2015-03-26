@@ -32,7 +32,7 @@ private:
 	ColorCollection colors;
 
 	BrushCollection brushCollection;
-	ColorCollection stone8ColorCollection, brightYellowColorCollection, brownColorCollection, blackWhiteColor;
+	ColorCollection agnesColorSelection, blackWhiteColor;
 
 	WaterColorCanvas canvas;
 };

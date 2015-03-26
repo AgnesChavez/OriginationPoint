@@ -14,28 +14,22 @@ GrowingBrushStokesLayer::GrowingBrushStokesLayer()
 
 	growRad = 10;
 
-	stone8ColorCollection.addColor( 236, 73, 78 );
-	stone8ColorCollection.addColor( 197, 153, 72 );
-	stone8ColorCollection.addColor( 211, 182, 60 );
-	stone8ColorCollection.addColor( 197, 190, 51 );
-	stone8ColorCollection.addColor( 202, 120, 78 );
-	stone8ColorCollection.addColor( 152, 103, 100 );
-
-	brightYellowColorCollection.addColor( 195, 189, 75 );
-	brightYellowColorCollection.addColor( 150, 144, 70 );
-	brightYellowColorCollection.addColor( 73, 78, 46 );
-	brightYellowColorCollection.addColor( 201, 198, 85 );
-	brightYellowColorCollection.addColor( 209, 202, 95 );
-
-	brownColorCollection.addColor( 102, 51, 0 );
-	brownColorCollection.addColor( 153, 102, 51 );
-	brownColorCollection.addColor( 187, 153, 102 );
-
 	blackWhiteColor.addColor( 90, 90, 90 );
 	blackWhiteColor.addColor( 255, 255, 255 );
 
+	agnesColorSelection.addColor( 232, 151, 44 );
+	agnesColorSelection.addColor( 84, 18, 0 );
+	agnesColorSelection.addColor( 152, 194, 45 );
+	agnesColorSelection.addColor( 43, 74, 12 );
+	agnesColorSelection.addColor( 46, 31, 1 );
+	agnesColorSelection.addColor( 237, 69, 69 );
+	agnesColorSelection.addColor( 128, 51, 0 );
+	agnesColorSelection.addColor( 110, 18, 0 );
+	agnesColorSelection.addColor( 163, 87, 52 );
+	agnesColorSelection.addColor( 71, 209, 108 );
+
 	setBrushCollection( brushCollection );
-	setColorCollection( blackWhiteColor );
+	setColorCollection( agnesColorSelection );
 
 	
 	add( 1920 / 4, 1080 / 2 );
@@ -62,7 +56,7 @@ void GrowingBrushStokesLayer::growAll()
 
 	canvas.endWaterDraw();
 
-	canvas.beginPigmentDraw( 0 );
+	canvas.beginPigmentDraw( canvas.getRandomPigmentId() );
 
 	for( int i = 0; i < stones.size(); i++ ) {
 		BrushStone s = stones.at( i );
@@ -109,6 +103,8 @@ void GrowingBrushStokesLayer::setColorCollection( ColorCollection _c )
 {
 	this->colors = _c;
 	for( int i = 0; i < _c.size(); i++ ) {
-		canvas.addPigment( _c.getColorById( i ) );
+		ofColor selected = _c.getColorById( i );
+		ofColor inverted = ofColor( 255 - selected.r, 255 - selected.g, 255 - selected.b );
+		canvas.addPigment( inverted );
 	}
 }

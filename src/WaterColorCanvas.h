@@ -18,6 +18,8 @@ public:
     void clearLayers();
     vector<PigmentLayer> pigments;
 
+	int getRandomPigmentId();
+
 	ofFbo waterColorCanvas;
 
     

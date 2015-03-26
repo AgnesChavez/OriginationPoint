@@ -54,6 +54,8 @@ public:
 	void setBrushStrokeAlpha( float alpha );
 	float getBrushStrokeAlpha();
 
+	void setSelectedColor( ofColor col );
+
 	void setBrushCollection( BrushCollection _b );
 	void setColorCollection( ColorCollection _c );
 
@@ -75,6 +77,7 @@ private:
 
 	bool tDrawBorder;
 	bool tDrawStone;
+	ofColor selectedColor;
 
 	ofPolyline border;
 

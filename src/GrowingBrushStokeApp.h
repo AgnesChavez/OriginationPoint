@@ -16,5 +16,5 @@ public:
 	ofFbo brushStoneBuffer;
 	BrushStone plainStone;
 	BrushCollection brushCollection;
-	ColorCollection stone8ColorCollection, brightYellowColorCollection, brownColorCollection, blackWhiteColor;
+	ColorCollection agnesColorSelection, blackWhiteColor;
 };
