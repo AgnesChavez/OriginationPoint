@@ -25,7 +25,7 @@ public:
 
 	void grow( ofPolyline line );
 	void grow();
-	bool grow( float rad );
+	bool growForWaterColor( float rad );
 	void growPlain();
 
 

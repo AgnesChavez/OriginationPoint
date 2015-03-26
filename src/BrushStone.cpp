@@ -194,7 +194,7 @@ void BrushStone::grow()
 	}
 }
 
-bool BrushStone::grow( float rad )
+bool BrushStone::growForWaterColor( float rad )
 {
 	if( rad < maxGrowRad ) {
 

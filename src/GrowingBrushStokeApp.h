@@ -3,6 +3,8 @@
 #include "ofMain.h"
 #include "GrowingBrushStokesLayer.h"
 
+#include "ofxPostProcessing.h"
+
 class GrowingBrushStokeApp : public ofBaseApp{
 
 public:
@@ -13,8 +15,13 @@ public:
 
 	GrowingBrushStokesLayer waterColorStone;
 
+	ofImage bgImage;
+	ofFbo backgroundBuffer;
+
 	ofFbo brushStoneBuffer;
 	BrushStone plainStone;
 	BrushCollection brushCollection;
 	ColorCollection agnesColorSelection, blackWhiteColor;
+
+	ofxPostProcessing post;
 };

@@ -29,7 +29,7 @@ GrowingBrushStokesLayer::GrowingBrushStokesLayer()
 	agnesColorSelection.addColor( 71, 209, 108 );
 
 	setBrushCollection( brushCollection );
-	setColorCollection( agnesColorSelection );
+	setColorCollection( blackWhiteColor );
 
 	
 	add( 1920 / 4, 1080 / 2 );
@@ -51,7 +51,7 @@ void GrowingBrushStokesLayer::growAll()
 
 	for( int i = 0; i < stones.size(); i++ ) {
 		BrushStone s = stones.at( i );
-		s.grow( growRad );
+		s.growForWaterColor( growRad );
 	}
 
 	canvas.endWaterDraw();
@@ -60,7 +60,7 @@ void GrowingBrushStokesLayer::growAll()
 
 	for( int i = 0; i < stones.size(); i++ ) {
 		BrushStone s = stones.at( i );
-		s.grow( growRad );
+		s.growForWaterColor( growRad );
 	}
 
 	canvas.endPigmentDraw();

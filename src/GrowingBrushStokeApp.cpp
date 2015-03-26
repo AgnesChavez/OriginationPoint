@@ -5,6 +5,16 @@ void GrowingBrushStokeApp::setup() {
 	ofSetLogLevel( OF_LOG_ERROR );
 	ofSetVerticalSync( true );
 	ofSetFrameRate( 60 );
+
+	bgImage.loadImage( "lines_3_bw.jpg" );
+
+	backgroundBuffer.allocate( 1920, 1080 );
+	backgroundBuffer.begin();
+	bgImage.draw( 0, 0, 1920, 1080 );
+	backgroundBuffer.end();
+
+	post.createPass< NoiseWarpPass >()->setEnabled( true );
+	post.setFlip( false );
 	
 	ofBackground( 0 );
 	agnesColorSelection.addColor( 232, 151, 44 );
@@ -29,18 +39,11 @@ void GrowingBrushStokeApp::setup() {
 	line.addVertex( 1920, 1080 );
 	line.setClosed( true );
 
-	plainStone.setColorCollection( agnesColorSelection );
+	plainStone.setColorCollection( blackWhiteColor );
 	plainStone.setBrushCollection( brushCollection );
 	plainStone.setBrushStrokeAlpha( 255 );
 	plainStone.init( 1920 / 4 * 3, 1080 / 2, line );
 
-	ofFbo::Settings settings;
-	settings.useDepth = true;
-	settings.useStencil = false;
-	settings.depthStencilAsTexture = true;
-	settings.width = 1920;
-	settings.height = 1080;
-	brushStoneBuffer.allocate( settings );
 }
 
 
@@ -53,18 +56,21 @@ void GrowingBrushStokeApp::update() {
 
 void GrowingBrushStokeApp::draw() {
 
+	backgroundBuffer.draw( 0, 0 );
+
 	float x = ofMap( ofGetMouseX(), 0, 1920, -1080, 1080 );
 
 	ofPushStyle();
-	ofSetColor( 255, ofMap( ofGetMouseY(), 0, 1080, 0, 255 ) );
+	ofSetColor( 232, 151, 44, ofMap( ofGetMouseY(), 0, 1080, 0, 255 ) );
 	waterColorStone.draw( - x, 0 );
 	ofPopStyle();
 
 	ofPushStyle();
-	plainStone.setSelectedColor( ofColor( 255, 255, 255 ) );
+	plainStone.setSelectedColor( ofColor( 84, 18, 0 ) );
 	plainStone.setTransparency( 255 - ofMap( ofGetMouseY(), 0, 1080, 0, 255 ) );
 	plainStone.draw( x, 0, 1920, 1080 );
 	ofPopStyle();
+
 }
 
 void GrowingBrushStokeApp::keyPressed( int key )
