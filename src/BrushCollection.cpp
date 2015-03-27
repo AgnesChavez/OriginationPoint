@@ -26,8 +26,6 @@ BrushCollection::BrushCollection()
 
 	circleBrush.loadImage( "brush.png" );
 	ownBrush1.loadImage( "own_brush_2.png" );
-
-
 }
 
 
@@ -37,7 +35,6 @@ BrushCollection::~BrushCollection()
 
 ofFbo BrushCollection::getRandomBrush()
 {
-	//return brushes.at( ofRandom( 0, brushes.size() ) );
 	return fboBrushes.at( ofRandom( 0, brushes.size() ) );
 }
 
@@ -49,4 +46,9 @@ ofImage BrushCollection::getCircleBrush()
 ofImage BrushCollection::getOwnBrush1()
 {
 	return ownBrush1;
+}
+
+ofFbo BrushCollection::getBrushById( int id )
+{
+	return fboBrushes.at( id );
 }

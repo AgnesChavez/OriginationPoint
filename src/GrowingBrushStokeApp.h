@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "GrowingBrushStokesLayer.h"
+#include "StoneCurtain.h"
 
 #include "ofxPostProcessing.h"
 
@@ -15,13 +16,26 @@ public:
 
 	GrowingBrushStokesLayer waterColorStone;
 
-	ofImage bgImage;
-	ofFbo backgroundBuffer;
-
 	ofFbo brushStoneBuffer;
 	BrushStone plainStone;
 	BrushCollection brushCollection;
 	ColorCollection agnesColorSelection, blackWhiteColor;
 
-	ofxPostProcessing post;
+	ofxPostProcessing post, postWarp;
+
+	bool doJiggle;
+	float noiseVal;
+	int growBrushIndex;
+
+	ofImage background;
+
+	ofFbo tintBuffer;
+	ofFbo stoneCurtainBuffer;
+	int curtainX;
+
+	StoneCurtain stoneCurtain;
+
+	EdgePass::Ptr edgePass;
+	NoiseWarpPass::Ptr noiseWarp;
+	ConvolutionPass::Ptr convPass;
 };

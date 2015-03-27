@@ -16,28 +16,10 @@ void testApp::setup(){
 	nwPass->setEnabled( false );
 	post.createPass<ContrastPass>()->setEnabled( true );
 	post.setFlip( false );
-
-	stone8ColorCollection.addColor( 236, 73, 78 );
-	stone8ColorCollection.addColor( 197, 153, 72 );
-	stone8ColorCollection.addColor( 211, 182, 60 );
-	stone8ColorCollection.addColor( 197, 190, 51 );
-	stone8ColorCollection.addColor( 202, 120, 78 );
-	stone8ColorCollection.addColor( 152, 103, 100 );
-
-	brightYellowColorCollection.addColor( 195, 189, 75 );
-	brightYellowColorCollection.addColor( 150, 144, 70 );
-	brightYellowColorCollection.addColor( 73, 78, 46 );
-	brightYellowColorCollection.addColor( 201, 198, 85 );
-	brightYellowColorCollection.addColor( 209, 202, 95 );
-
-	brownColorCollection.addColor( 102, 51, 0 );
-	brownColorCollection.addColor( 153, 102, 51 );
-	brownColorCollection.addColor( 187, 153, 102 );
-
+	
 	blackWhiteColor.addColor( 255, 255, 255 );
 
 	kinect.init();
-
 
 	stoneCurtain.setBrushCollection( brushCollection );
 	stoneCurtain.setColorCollection( blackWhiteColor );
@@ -45,10 +27,6 @@ void testApp::setup(){
 	//stoneCurtain.render();
 
 	barbWire.init();
-
-	
-
-	bg.loadImage( "bg_b.png" );
 
 	int x = 0;
 	int y = 0;
@@ -63,7 +41,7 @@ void testApp::setup(){
 	warper.setup();
 	warper.load(); // reload last saved changes.
 
-	points = 100;
+	points = 350;
 	reinit();
 	setupGui();
 
@@ -82,7 +60,7 @@ void testApp::setup(){
 		stones.at( i ).grow( voro.getLine( i ), true );
 	}
 
-	stopmotion.init();
+	//stopmotion.init();
 
 	ofBackground( 0 );
 }
@@ -103,12 +81,12 @@ void testApp::update(){
 	nwPass->setFrequency( 1.97 );
 	nwPass->setAmplitude( 0.026 );
 
-	stopmotion.update();
+	//stopmotion.update();
 }
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	bg.draw( 0, 0 );
+	ofBackground( 0 );
 
 	ofPushMatrix();
 	ofMatrix4x4 mat = warper.getMatrix();
@@ -148,7 +126,7 @@ void testApp::draw(){
 	
 	//stoneCurtain.draw( 0, currentCurtainY );
 
-	stopmotion.draw();
+	//stopmotion.draw();
 
 	//barbWire.draw();
 

@@ -1,6 +1,7 @@
 #include "ofMain.h"
 #include "testApp.h"
 #include "GrowingBrushStokeApp.h"
+#include "StopMotionStonesApp.h"
 
 
 //========================================================================
@@ -14,4 +15,5 @@ int main(){
 	// pass in width and height too:
 	//ofRunApp( new testApp() );
 	ofRunApp( new GrowingBrushStokeApp() );
+	//ofRunApp( new StopMotionStonesApp() );
 }

@@ -240,7 +240,7 @@ bool BrushStone::growForWaterColor( float rad )
 }
 
 
-void BrushStone::growPlain()
+void BrushStone::growPlain( int brushId )
 {
 	currentGrowRad += 1.0f;
 	if( currentGrowRad < maxGrowRad ) {
@@ -270,10 +270,17 @@ void BrushStone::growPlain()
 			ofVec2f p( centroid );
 			//ofVec2f p = getCenterById( randomId );
 			p += ofVec2f( _x, _y );
-
 			ofSetColor( colors.getRandomColor(), brushStrokeAlpha );
 			locationsPointsDrawn.push_back( ofVec2f( p.x, p.y ) );
-			brushes.getRandomBrush().draw( p.x - s / 2.0, p.y - s / 2.0, s, s );
+			if( brushId == 0 ) {
+				brushes.getRandomBrush().draw( p.x - s / 2.0, p.y - s / 2.0, s, s );
+			}
+			else if( brushId == 1 ) {
+				brushes.getCircleBrush().draw( p.x - s / 2.0, p.y - s / 2.0, s, s );
+
+			} else {
+				brushes.getBrushById(brushId).draw( p.x - s / 2.0, p.y - s / 2.0, s, s );
+			}
 
 		}
 		ofDisableAlphaBlending();

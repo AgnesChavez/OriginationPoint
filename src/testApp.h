@@ -46,12 +46,11 @@ public:
 
 	ofxQuadWarp warper;
 
-	ofImage bg;
 	void reinit();
 	bool doGrow;
 
 	BrushCollection brushCollection;
-	ColorCollection stone8ColorCollection, brightYellowColorCollection, brownColorCollection, blackWhiteColor;
+	ColorCollection blackWhiteColor;
 
 	StoneCurtain stoneCurtain;
 	int currentCurtainY;

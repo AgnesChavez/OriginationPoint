@@ -50,7 +50,7 @@ void Stone::grow( ofPolyline * line, bool calcDirectly )
 	if( currentGrowRad < maxGrowRad ) {
 		currentGrowRad += 0.5f;
 
-		int nrToCheck = ( int ) ( ofMap( currentGrowRad, 10, maxGrowRad, 5, 15 ) );
+		int nrToCheck = ( int ) ( ofMap( currentGrowRad, 0, maxGrowRad, 5, 15 ) );
 		
 		std::vector< ofVec2f > pointsToDraw( nrToCheck );
 		ofVec2f p = line->getCentroid2D();

@@ -4,7 +4,7 @@
 VoronoiLayer::VoronoiLayer()
 {
 	count = 0;
-	transparency = 0;
+	transparency = 255;
 	ofFbo::Settings settings;
 	settings.useDepth = true;
 	settings.useStencil = true;

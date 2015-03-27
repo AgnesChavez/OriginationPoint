@@ -6,15 +6,28 @@ void GrowingBrushStokeApp::setup() {
 	ofSetVerticalSync( true );
 	ofSetFrameRate( 60 );
 
-	bgImage.loadImage( "lines_3_bw.jpg" );
+	post.init( 1920, 1080 );
 
-	backgroundBuffer.allocate( 1920, 1080 );
-	backgroundBuffer.begin();
-	bgImage.draw( 0, 0, 1920, 1080 );
-	backgroundBuffer.end();
+	postWarp.init( 1920, 1080 );
+	noiseWarp = postWarp.createPass<NoiseWarpPass>();
+	noiseWarp->setEnabled( true );
 
-	post.createPass< NoiseWarpPass >()->setEnabled( true );
+	edgePass = post.createPass< EdgePass >();
+	edgePass->setEnabled( true );
+	//noiseWarp = post.createPass<NoiseWarpPass>();
+	//noiseWarp->setEnabled( false );
+
+	convPass = post.createPass<ConvolutionPass>();
+	convPass->setEnabled( false );
+
 	post.setFlip( false );
+
+	background.loadImage( "lines_3_bw.jpg" );
+
+	doJiggle = false;
+	noiseVal = 0.0f;
+	growBrushIndex = 0;
+	curtainX = -1920;
 	
 	ofBackground( 0 );
 	agnesColorSelection.addColor( 232, 151, 44 );
@@ -31,6 +44,11 @@ void GrowingBrushStokeApp::setup() {
 	blackWhiteColor.addColor( 90, 90, 90 );
 	blackWhiteColor.addColor( 255, 255, 255 );
 
+	stoneCurtain.setBrushCollection( brushCollection );
+	stoneCurtain.setColorCollection( agnesColorSelection );
+
+	stoneCurtain.render();
+
 
 	ofPolyline line;
 	line.addVertex( 0, 0 );
@@ -42,38 +60,97 @@ void GrowingBrushStokeApp::setup() {
 	plainStone.setColorCollection( blackWhiteColor );
 	plainStone.setBrushCollection( brushCollection );
 	plainStone.setBrushStrokeAlpha( 255 );
-	plainStone.init( 1920 / 4 * 3, 1080 / 2, line );
+	plainStone.init( 1920 / 2, 1080 / 2, line );
 
+	tintBuffer.allocate( 1920, 1080 );
+	stoneCurtainBuffer.allocate( 1920, 1080 );
 }
 
 
 void GrowingBrushStokeApp::update() {
+
+	noiseVal += 0.01f;
+
+	curtainX++;
+
 	if( ofGetFrameNum() % 5 == 0 ) {
-		waterColorStone.growAll();
-		plainStone.growPlain();
+		//waterColorStone.growAll();
+		//plainStone.growPlain();
 	}
+
+	noiseWarp->setAmplitude( ofMap( ofGetMouseX(), 0, 1920, 0, 1 ) );
+	noiseWarp->setFrequency( ofMap( ofGetMouseY(), 0, 1080, 0, 1 ) );
+
 }
 
 void GrowingBrushStokeApp::draw() {
 
-	backgroundBuffer.draw( 0, 0 );
+	//ofBackground( 0 );
+	postWarp.begin();
+	background.draw( 0, 0, 1920, 1080 );
+	postWarp.end();
+	//float x = ofMap( ofGetMouseX(), 0, 1920, -1080, 1080 );
 
-	float x = ofMap( ofGetMouseX(), 0, 1920, -1080, 1080 );
-
+	/*
 	ofPushStyle();
-	ofSetColor( 232, 151, 44, ofMap( ofGetMouseY(), 0, 1080, 0, 255 ) );
+	ofSetColor( 255, 255, 255, ofMap( ofGetMouseY(), 0, 1080, 0, 255 ) );
 	waterColorStone.draw( - x, 0 );
 	ofPopStyle();
+	*/
+
+	tintBuffer.begin();
+	post.begin();
+	ofPushStyle();
+	ofPushMatrix();
+	ofTranslate( 1920 / 2, 1080 / 2, 0 );
+	if( doJiggle ) {
+		ofScale( ofNoise( noiseVal ), ofNoise( noiseVal ));
+		ofRotateZ( ofNoise(noiseVal) * 50 );
+	}
+
+	plainStone.setSelectedColor( ofColor( 255 ) );
+	plainStone.setTransparency( 127 );
+	plainStone.draw( -1920 / 2, -1080/2, 1920, 1080);
+
+	ofPopMatrix();
+	
+	ofPopStyle();
+	post.end();
+	tintBuffer.end();
 
 	ofPushStyle();
-	plainStone.setSelectedColor( ofColor( 84, 18, 0 ) );
-	plainStone.setTransparency( 255 - ofMap( ofGetMouseY(), 0, 1080, 0, 255 ) );
-	plainStone.draw( x, 0, 1920, 1080 );
+	ofSetColor( 255, 200, 0, 120 );
+	tintBuffer.draw( 0, 0 );
 	ofPopStyle();
 
+	stoneCurtainBuffer.begin();
+	post.begin();
+	stoneCurtain.draw( 0, 0 );
+	post.end();
+	stoneCurtainBuffer.end();
+
+	ofPushStyle();
+	ofSetColor( 163, 87, 52, 120 );
+	stoneCurtainBuffer.draw( curtainX, 0 );
+	ofPopStyle();
 }
 
 void GrowingBrushStokeApp::keyPressed( int key )
 {
-	ofToggleFullscreen();
+	if( key == 'g' ) {
+		// 0 means random brush
+		plainStone.growPlain( growBrushIndex );
+	}
+	else if( key == 'f' ) {
+		ofToggleFullscreen();
+	}
+	else if( key == 'j' ) {
+		doJiggle = !doJiggle;
+	}
+	else if( key == 'q' ) {
+		growBrushIndex++;
+	}
+	else if( key == 'w' ) {
+		growBrushIndex--;
+	}
 }
