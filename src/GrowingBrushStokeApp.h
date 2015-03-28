@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "GrowingBrushStokesLayer.h"
 #include "StoneCurtain.h"
+#include "VoronoiLayer.h"
 
 #include "ofxPostProcessing.h"
 
@@ -21,7 +22,7 @@ public:
 	BrushCollection brushCollection;
 	ColorCollection agnesColorSelection, blackWhiteColor;
 
-	ofxPostProcessing post, postWarp, slowWarp;
+	ofxPostProcessing edgeDetectionPostProcessing, postWarp, slowWarp;
 
 	bool doJiggle;
 	float noiseVal;
@@ -38,4 +39,6 @@ public:
 	EdgePass::Ptr edgePass;
 	NoiseWarpPass::Ptr noiseWarp, slowWarpPass;
 	ConvolutionPass::Ptr convPass;
+
+	VoronoiLayer voro;
 };

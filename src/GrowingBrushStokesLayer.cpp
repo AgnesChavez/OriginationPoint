@@ -80,7 +80,7 @@ void GrowingBrushStokesLayer::add( float x, float y )
 	BrushStone s;
 	s.setColorCollection( colors );
 	s.setBrushCollection( brushes );
-	s.init( x, y, line );
+	s.init( x, y );
 	stones.push_back( s );
 }
 

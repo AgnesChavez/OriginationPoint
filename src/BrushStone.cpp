@@ -41,7 +41,7 @@ BrushStone::~BrushStone()
 {
 }
 
-void BrushStone::init( float _x, float _y, ofPolyline line )
+void BrushStone::init( float _x, float _y )
 {
 	layer.begin();
 	ofClear( 0.0 );
@@ -54,7 +54,7 @@ void BrushStone::init( float _x, float _y, ofPolyline line )
 	centroid = ofPoint( _x, _y );
 
 	currentGrowRad = 10;
-	maxGrowRad = 400;
+	maxGrowRad = 700;
 }
 
 void BrushStone::draw( float x, float y, float w, float h )
@@ -84,7 +84,8 @@ void BrushStone::grow( ofPolyline line )
 		ofPushStyle();
 		ofEnableAlphaBlending();
 		std::vector< ofVec2f > pointsToDraw( nrToCheck );
-		ofVec2f p = line.getCentroid2D();
+		// decide here weather to grow the stone from the centroid of the outline, or from the actual voronoi cell core
+		ofVec2f p = centroid;// line.getCentroid2D();
 #pragma omp parallel for 
 		for( int i = 0; i < nrToCheck; i++ ) {
 			float deg = ofRandom( 0, TWO_PI );

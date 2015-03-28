@@ -56,7 +56,7 @@ void StoneCurtain::render()
 			float xpos = ( 1980 / xStoneCount * x ) + ( 1920 / xStoneCount / 2.0 );
 			float ypos = ( 1080 / yStoneCount * y ) + ( 1080 / yStoneCount / 2.0 );
 			
-			s.init( xpos, ypos, pl );
+			s.init( xpos, ypos );
 			stones.push_back( s );
 		}
 	}

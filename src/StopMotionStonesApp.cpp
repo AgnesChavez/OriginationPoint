@@ -4,7 +4,7 @@ void StopMotionStonesApp::setup()
 {
 	ofSetLogLevel( OF_LOG_ERROR );
 	ofSetVerticalSync( true );
-	ofSetFrameRate( 60 );
+	ofSetFrameRate( 30 );
 	ofSetTextureWrap( GL_REPEAT );
 	stones.init();
 

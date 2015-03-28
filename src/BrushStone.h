@@ -17,7 +17,7 @@ class BrushStone
 public:
 	BrushStone();
 	~BrushStone();
-	void init( float _x, float _y, ofPolyline line );
+	void init( float _x, float _y );
 	void draw( float x, float y, float w, float h );
 	void clear();
 	void calcBorder( std::vector< ofPoint > poi );
