@@ -24,7 +24,9 @@ public:
 	bool isGrowing();
 
 private:
-	VoronoiLayer * voro, *secondVoro;
+	VoronoiLayer * voro;
+	void drawCustomVoronoi();
+
 	std::vector< Stone > stones;
 	int currentStone;
 	ofFbo buffer;
@@ -36,11 +38,13 @@ private:
 	NoiseFieldCutter cutter;
 
 	bool doGrow;
-	int x, y;
+	int x, y, xSpacing, ySpacing;
 	int lastMove;
 
 	ofPoint get2DFromIndex( int index );
 	int getIndexFrom2D( ofPoint d );
+
+	std::vector< ofPolyline > selectedLines;
 
 	void removeOuterEdges();
 };
