@@ -74,8 +74,7 @@ void StopMotionStones::update()
 	long millisStopMotionPart2 = 10000;
 	long millisBrownianMotionPart1 = 15000;
 	long millisBrownianMotionPart2 = 20000;
-	long millisStartGrowAll = 25000;
-	long millisStartFadeAllOut = 30000;
+	long millisStartFadeAllOut = 25000;
 
 	if( isStarted ) {
 		
@@ -110,7 +109,7 @@ void StopMotionStones::update()
 			if( isWithinMillis( millisBrownianMotionPart1, millisBrownianMotionPart2 ) ) {
 				currentStone = doBrownianMotion( currentStone );
 			}
-			if( isWithinMillis( millisStartGrowAll, millisStartFadeAllOut ) ) {
+			if( isWithinMillis( millisBrownianMotionPart2, millisStartFadeAllOut ) ) {
 				for( int i = 0; i < 20; i++ ) {
 					int rand = static_cast< int >( ofRandom( x * y ) );
 					toDrawStone.insert( rand );
@@ -119,7 +118,7 @@ void StopMotionStones::update()
 			if( isPastMillis( millisStartFadeAllOut ) ) {
 				for( int i = 0; i < 60; i++ ) {
 					int rand = ( int ) ( ofRandom( x * y ) );
-					if( rand != x * y / 2 ) {
+					if( rand != (x * y / 2 ) - 37 ) {
 						transparencies.at( rand ) -= 2;
 					}
 				}
