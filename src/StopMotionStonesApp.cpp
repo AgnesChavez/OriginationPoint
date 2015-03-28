@@ -13,6 +13,8 @@ void StopMotionStonesApp::setup()
 	}
 
 	stones.setGrowing( true );
+
+	stones.start();
 }
 
 void StopMotionStonesApp::update()

@@ -10,6 +10,6 @@ void main( void ) {
     if( color.r < 0.01 ) {
         gl_FragColor = vec4( 0, 0, 0, 0 );
     } else {
-        gl_FragColor = vec4( noicol.rgb, 1 );
+        gl_FragColor = vec4( noicol.rgb, color.a );
     }
 }

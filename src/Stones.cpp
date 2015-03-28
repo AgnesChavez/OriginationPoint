@@ -22,7 +22,7 @@ void Stones::init()
 	buffer.allocate( settings );
 }
 
-void Stones::render( std::vector< ofPolyline > closedLines )
+void Stones::render( std::vector< ofPolyline > closedLines, std::vector< float > transparencies )
 {
 	buffer.begin();
 	ofClear( 1.0 );
@@ -30,7 +30,7 @@ void Stones::render( std::vector< ofPolyline > closedLines )
 	for( int i = 0; i < closedLines.size(); i++ ) {
 		ofPolyline line = closedLines.at( i );
 		line.setClosed( true );
-		
+		ofSetColor( 255, transparencies.at( i ) );
 		ofBeginShape();
 		std::vector<ofPoint>& vertices = line.getVertices();
 		for( int j = 0; j < vertices.size(); j++ ) {

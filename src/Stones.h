@@ -9,7 +9,7 @@ public:
 	~Stones();
 
 	void init();
-	void render( std::vector< ofPolyline > closedLines );
+	void render( std::vector< ofPolyline > closedLines, std::vector< float > transparencies );
 	ofFbo getBuffer();
 
 private:

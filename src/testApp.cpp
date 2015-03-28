@@ -101,12 +101,14 @@ void testApp::draw(){
 
 	TS_START_NIF( "lines" );
 	std::vector< ofPolyline > lines;
+	std::vector< float > transparencies;
 	for( int i = 0; i < stones.size(); i++ ) {
 		lines.push_back( stones.at( i ).border );
+		transparencies.push_back( 255 );
 	}
 	TS_STOP_NIF( "lines" );
 	TS_START( "stonetexrender" );
-	stonesTex.render( lines );
+	stonesTex.render( lines, transparencies );
 	TS_STOP( "stonetexrender" );
 
 	TS_START_NIF( "cutout" );

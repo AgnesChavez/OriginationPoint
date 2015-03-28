@@ -19,11 +19,17 @@ public:
 	void update();
 	void draw();
 
+	void start();
+
 	void moveRandom( float str );
 	void setGrowing( bool gr );
 	bool isGrowing();
 
 private:
+
+	bool isStarted;
+	unsigned long long startedMillis;
+
 	VoronoiLayer * voro;
 	void drawCustomVoronoi();
 
@@ -45,7 +51,12 @@ private:
 	int getIndexFrom2D( ofPoint d );
 
 	std::vector< ofPolyline > selectedLines;
+	std::vector< float > transparencies;
+
 
 	void removeOuterEdges();
+	bool isWithinMillis( unsigned long long start, unsigned long long end );
+	bool isPastMillis( unsigned long long mill );
+	int doBrownianMotion( int currStone );
 };
 

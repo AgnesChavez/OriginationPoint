@@ -2,10 +2,10 @@
 
 
 StopMotionStones::StopMotionStones() :
-x( 30 ),
-y( 20 ),
-xSpacing( 1920 / x ),
-ySpacing( 1080 / y )
+	x( 30 ),
+	y( 20 ),
+	xSpacing( 1920 / x ),
+	ySpacing( 1080 / y )
 {
 	
 }
@@ -55,81 +55,84 @@ void StopMotionStones::init()
 	}
 
 	noi.render();
+
+	for( int i = 0; i < x*y; i++ ) {
+		transparencies.push_back( 255 );
+	}
+
+}
+
+void StopMotionStones::start()
+{
+	isStarted = true;
+	startedMillis = ofGetElapsedTimeMillis();
 }
 
 void StopMotionStones::update()
 {
-	/* Doing random jumping */
-	if( ofGetFrameNum() < 200 ) {
-		currentStone += 1;
-		if( currentStone >= stones.size() ) {
-			currentStone = 0;
-		}
-		toDrawStone.clear();
-	}
-	else if( ofGetFrameNum() > 200 && ofGetFrameNum() < 400 ) {
-		toDrawStone.clear();
+	long millisStopMotionPart1 = 5000;
+	long millisStopMotionPart2 = 10000;
+	long millisBrownianMotionPart1 = 15000;
+	long millisBrownianMotionPart2 = 20000;
+	long millisStartGrowAll = 25000;
+	long millisStartFadeAllOut = 30000;
 
-		currentStone += 2;
-		ofPoint index2d = get2DFromIndex( currentStone );
+	if( isStarted ) {
 		
-		int _xIndex = index2d.x;
-		int _yIndx = index2d.y;
-		float rand = ofRandom( -1, 1 );
-		if( rand > 0.95f ) {
-			_yIndx++;
-		}
-		else if( rand < -0.95f ) {
-			_yIndx--;
-		}
-		currentStone = getIndexFrom2D( ofPoint(_xIndex, _yIndx ) );
-		if( currentStone >= stones.size() ) {
-			currentStone = 0;
+
+		if( ofGetElapsedTimeMillis() - startedMillis > 0 ) {
+			if( isWithinMillis( 0, millisStopMotionPart1 ) ) {
+				toDrawStone.clear();
+
+				currentStone += 1;
+			}
+			if( isWithinMillis( millisStopMotionPart1, millisStopMotionPart2 ) ) {
+				toDrawStone.clear();
+
+				currentStone += 2;
+				ofPoint index2d = get2DFromIndex( currentStone );
+
+				int _xIndex = index2d.x;
+				int _yIndx = index2d.y;
+				float rand = ofRandom( -1, 1 );
+				if( rand > 0.95f ) {
+					_yIndx++;
+				}
+				else if( rand < -0.95f ) {
+					_yIndx--;
+				}
+				currentStone = getIndexFrom2D( ofPoint( _xIndex, _yIndx ) );
+			}
+			if( isWithinMillis( millisStopMotionPart2, millisBrownianMotionPart1 ) ) {
+				toDrawStone.clear();
+				currentStone = doBrownianMotion( currentStone );
+			}
+			if( isWithinMillis( millisBrownianMotionPart1, millisBrownianMotionPart2 ) ) {
+				currentStone = doBrownianMotion( currentStone );
+			}
+			if( isWithinMillis( millisStartGrowAll, millisStartFadeAllOut ) ) {
+				for( int i = 0; i < 20; i++ ) {
+					int rand = static_cast< int >( ofRandom( x * y ) );
+					toDrawStone.insert( rand );
+				}
+			}
+			if( isPastMillis( millisStartFadeAllOut ) ) {
+				for( int i = 0; i < 60; i++ ) {
+					int rand = ( int ) ( ofRandom( x * y ) );
+					if( rand != x * y / 2 ) {
+						transparencies.at( rand ) -= 2;
+					}
+				}
+			}
 		}
 	}
-	else if( ofGetFrameNum() > 400  ) {
-		//toDrawStone.clear();
-		float rand = ofRandom( 4 );
-		ofPoint index2d = get2DFromIndex( currentStone );
-		if( rand > 0 && rand < 1 && lastMove != 2 ) {
-			index2d.x += 1;
-			lastMove = 1;
-		}
-		else if( rand > 1 && rand < 2 && lastMove != 1 ) {
-			index2d.x -= 1;
-			lastMove = 2;
-		}
-		else if( rand > 2 && rand < 3 && lastMove != 4 ) {
-			index2d.y -= 1;
-			lastMove = 3;
-		}
-		else if( rand > 3 && rand < 4 && lastMove != 3 ) {
-			index2d.y += 1;
-			lastMove = 4;
-		}
 
-		int ind = getIndexFrom2D( index2d );
-		
-		currentStone = ind;
-		if( currentStone >= stones.size() ) {
-			currentStone = 0;
-		}
-	}
-
-	if( ofGetFrameNum() > 600 ) {
-		toDrawStone.insert( currentStone );
-	}
-
-	if( ofGetFrameNum() > 1500 ) {
-		for( int i = 0; i < 2; i++ ) {
-			int rand = static_cast<int>(ofRandom( x * y ) );
-			toDrawStone.insert( rand );
-		}
+	if( currentStone >= stones.size() ) {
+		currentStone = 0;
 	}
 
 	toDrawStone.insert( currentStone );
 	removeOuterEdges();
-	
 
 	selectedLines.clear();
 
@@ -139,12 +142,12 @@ void StopMotionStones::update()
 		selectedLines.push_back( stones.at( inde ).border );
 	}
 
-	stonesTex.render( selectedLines );
+	
+	stonesTex.render( selectedLines, transparencies );
 }
 
 void StopMotionStones::draw()
 {
-	
 	ofFbo * buf = cutter.getCutout( noi, stonesTex.getBuffer() );
 	ofPushStyle();
 	ofSetColor( 255, 255 );
@@ -152,10 +155,7 @@ void StopMotionStones::draw()
 	ofPopStyle();
 
 	ofPushStyle();
-	voro->setLineThickness( 0.1 );
 	ofSetColor( 255, 0, 0 );
-	//voro->render();
-	//voro->draw( 0, 0 );
 	drawCustomVoronoi();
 	ofPopStyle();
 }
@@ -167,6 +167,7 @@ void StopMotionStones::drawCustomVoronoi()
 	for( unsigned int i = 0; i < pts.size(); ++i ) {
 		int _x = i % x;
 		int _y = ( i - _x ) / x;
+		// excludes cell centers at the edges
 		if( pts[ i ].x > 95 && pts[i].x < 1860 && pts[i].y > 68 && pts[i].y < 1037 ) {
 			ofCircle( pts[ i ].x, pts[ i ].y, 4 );
 		}
@@ -285,4 +286,43 @@ void StopMotionStones::removeOuterEdges()
 		}
 	}
 }
+
+bool StopMotionStones::isWithinMillis( unsigned long long start, unsigned long long end )
+{
+	unsigned long long currentMillis = ofGetElapsedTimeMillis();
+	return currentMillis - startedMillis > start && currentMillis - startedMillis < end;
+}
+
+int StopMotionStones::doBrownianMotion( int currStone )
+{
+	float rand = ofRandom( 4 );
+	ofPoint index2d = get2DFromIndex( currentStone );
+	if( rand > 0 && rand < 1 && lastMove != 2 ) {
+		index2d.x += 1;
+		lastMove = 1;
+	}
+	else if( rand > 1 && rand < 2 && lastMove != 1 ) {
+		index2d.x -= 1;
+		lastMove = 2;
+	}
+	else if( rand > 2 && rand < 3 && lastMove != 4 ) {
+		index2d.y -= 1;
+		lastMove = 3;
+	}
+	else if( rand > 3 && rand < 4 && lastMove != 3 ) {
+		index2d.y += 1;
+		lastMove = 4;
+	}
+
+	int ind = getIndexFrom2D( index2d );
+
+	return ind;
+}
+
+bool StopMotionStones::isPastMillis( unsigned long long mill )
+{
+	unsigned long long currentMillis = ofGetElapsedTimeMillis();
+	return currentMillis - startedMillis > mill;
+}
+
 
