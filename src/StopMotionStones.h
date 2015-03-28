@@ -41,5 +41,7 @@ private:
 
 	ofPoint get2DFromIndex( int index );
 	int getIndexFrom2D( ofPoint d );
+
+	void removeOuterEdges();
 };
 

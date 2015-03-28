@@ -77,8 +77,11 @@ void StopMotionStones::update()
 		if( currentStone >= stones.size() ) {
 			currentStone = 0;
 		}
+		toDrawStone.clear();
 	}
 	else if( ofGetFrameNum() > 200 && ofGetFrameNum() < 400 ) {
+		toDrawStone.clear();
+
 		currentStone += 2;
 		ofPoint index2d = get2DFromIndex( currentStone );
 		
@@ -97,6 +100,7 @@ void StopMotionStones::update()
 		}
 	}
 	else if( ofGetFrameNum() > 400  ) {
+		//toDrawStone.clear();
 		float rand = ofRandom( 4 );
 		ofPoint index2d = get2DFromIndex( currentStone );
 		if( rand > 0 && rand < 1 && lastMove != 2 ) {
@@ -128,27 +132,6 @@ void StopMotionStones::update()
 		toDrawStone.insert( currentStone );
 	}
 
-	if( doGrow && ofGetFrameNum() % 3 == 0 ) {
-		for( std::set<int>::iterator it = toDrawStone.begin(); it != toDrawStone.end(); ++it ) {
-			Stone * s = &stones.at( *it );
-			s->grow( voro->getLine( *it ), true );
-			int ind = *it;
-			ofPoint p = get2DFromIndex( ind );
-			if( p.x == 0 ) {
-				toDrawStone.erase( it );
-			}
-			else if( p.x == x - 1 ) {
-				toDrawStone.erase( it );
-			}
-			else if( p.y == 0 ) {
-				toDrawStone.erase( it );
-			}
-			else if( p.y == y - 1 ) {
-				toDrawStone.erase( it );
-			}
-		}
-	}
-
 	if( ofGetFrameNum() > 1500 ) {
 		for( int i = 0; i < 2; i++ ) {
 			int rand = static_cast<int>(ofRandom( x * y ) );
@@ -156,9 +139,11 @@ void StopMotionStones::update()
 		}
 	}
 
-	std::vector< ofPolyline > lines;
+	toDrawStone.insert( currentStone );
+	removeOuterEdges();
+	
 
-	lines.push_back( stones.at( currentStone ).border );
+	std::vector< ofPolyline > lines;
 
 	// select lines to be rendered
 	for( std::set<int>::iterator it = toDrawStone.begin(); it != toDrawStone.end(); ++it ) {
@@ -265,4 +250,26 @@ int StopMotionStones::getIndexFrom2D( ofPoint d )
 bool StopMotionStones::isGrowing()
 {
 	return doGrow;
+}
+
+void StopMotionStones::removeOuterEdges()
+{
+	for( std::set<int>::iterator it = toDrawStone.begin(); it != toDrawStone.end(); ++it ) {
+		Stone * s = &stones.at( *it );
+		s->grow( voro->getLine( *it ), true );
+		int ind = *it;
+		ofPoint p = get2DFromIndex( ind );
+		if( p.x == 0 ) {
+			toDrawStone.erase( it );
+		}
+		else if( p.x == x - 1 ) {
+			toDrawStone.erase( it );
+		}
+		else if( p.y == 0 ) {
+			toDrawStone.erase( it );
+		}
+		else if( p.y == y - 1 ) {
+			toDrawStone.erase( it );
+		}
+	}
 }

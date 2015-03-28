@@ -11,6 +11,8 @@ void StopMotionStonesApp::setup()
 	for( int i = 0; i < 10; i++ ) {
 		stones.moveRandom( 6 );
 	}
+
+	stones.setGrowing( true );
 }
 
 void StopMotionStonesApp::update()

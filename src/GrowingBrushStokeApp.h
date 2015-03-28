@@ -21,7 +21,7 @@ public:
 	BrushCollection brushCollection;
 	ColorCollection agnesColorSelection, blackWhiteColor;
 
-	ofxPostProcessing post, postWarp;
+	ofxPostProcessing post, postWarp, slowWarp;
 
 	bool doJiggle;
 	float noiseVal;
@@ -36,6 +36,6 @@ public:
 	StoneCurtain stoneCurtain;
 
 	EdgePass::Ptr edgePass;
-	NoiseWarpPass::Ptr noiseWarp;
+	NoiseWarpPass::Ptr noiseWarp, slowWarpPass;
 	ConvolutionPass::Ptr convPass;
 };

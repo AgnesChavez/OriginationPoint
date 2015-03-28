@@ -14,6 +14,10 @@ void GrowingBrushStokeApp::setup() {
 
 	edgePass = post.createPass< EdgePass >();
 	edgePass->setEnabled( true );
+
+	slowWarp.init( 1920, 1080 );
+	slowWarpPass = slowWarp.createPass<NoiseWarpPass>();
+	slowWarpPass->setEnabled( true );
 	//noiseWarp = post.createPass<NoiseWarpPass>();
 	//noiseWarp->setEnabled( false );
 
@@ -97,8 +101,10 @@ void GrowingBrushStokeApp::draw() {
 	waterColorStone.draw( - x, 0 );
 	ofPopStyle();
 	*/
+	slowWarp.begin();
 
 	tintBuffer.begin();
+	ofClear( 0, 0, 0, 0 );
 	post.begin();
 	ofPushStyle();
 	ofPushMatrix();
@@ -120,7 +126,7 @@ void GrowingBrushStokeApp::draw() {
 
 	ofPushStyle();
 	ofSetColor( 255, 200, 0, 120 );
-	tintBuffer.draw( 0, 0 );
+	tintBuffer.draw( -100, 0 );
 	ofPopStyle();
 
 	stoneCurtainBuffer.begin();
@@ -133,6 +139,8 @@ void GrowingBrushStokeApp::draw() {
 	ofSetColor( 163, 87, 52, 120 );
 	stoneCurtainBuffer.draw( curtainX, 0 );
 	ofPopStyle();
+
+	slowWarp.end();
 }
 
 void GrowingBrushStokeApp::keyPressed( int key )
