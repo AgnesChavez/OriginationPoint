@@ -1,8 +1,8 @@
 #include "ofMain.h"
 #include "testApp.h"
-#include "GrowingBrushStokeApp.h"
-#include "StopMotionStonesApp.h"
-
+#include "GrowingBrushStokeAct.h"
+#include "StopMotionStonesAct.h"
+#include "ActSequencer.h"
 
 //========================================================================
 int main(){
@@ -18,5 +18,8 @@ int main(){
 	//ofRunApp( new StopMotionStonesApp() );
 
 	// act 2
-	ofRunApp( new GrowingBrushStokeApp() );
+	//ofRunApp( new GrowingBrushStokeApp() );
+
+	// sequencer
+	ofRunApp( new ActSequencer() );
 }

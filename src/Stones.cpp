@@ -32,7 +32,7 @@ void Stones::render( std::vector< ofPolyline > closedLines, std::vector< float >
 		line.setClosed( true );
 		ofSetColor( 255, transparencies.at( i ) );
 		ofBeginShape();
-		std::vector<ofPoint>& vertices = line.getVertices();
+		std::vector< ofPoint >& vertices = line.getVertices();
 		for( int j = 0; j < vertices.size(); j++ ) {
 			ofVertex( vertices[ j ] );
 		}

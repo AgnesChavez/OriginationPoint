@@ -5,7 +5,8 @@ StopMotionStones::StopMotionStones() :
 	x( 30 ),
 	y( 20 ),
 	xSpacing( 1920 / x ),
-	ySpacing( 1080 / y )
+	ySpacing( 1080 / y ),
+	transparency( 255 )
 {
 	
 }
@@ -59,6 +60,7 @@ void StopMotionStones::init()
 	for( int i = 0; i < x*y; i++ ) {
 		transparencies.push_back( 255 );
 	}
+
 
 }
 
@@ -141,7 +143,6 @@ void StopMotionStones::update()
 		selectedLines.push_back( stones.at( inde ).border );
 	}
 
-	
 	stonesTex.render( selectedLines, transparencies );
 }
 
@@ -149,12 +150,12 @@ void StopMotionStones::draw()
 {
 	ofFbo * buf = cutter.getCutout( noi, stonesTex.getBuffer() );
 	ofPushStyle();
-	ofSetColor( 255, 255 );
+	ofSetColor( 255, transparency );
 	buf->draw( 0, 0 );
 	ofPopStyle();
 
 	ofPushStyle();
-	ofSetColor( 255, 0, 0 );
+	//ofSetColor( 255, 0, 0, transparency );
 	drawCustomVoronoi();
 	ofPopStyle();
 }
@@ -162,6 +163,7 @@ void StopMotionStones::draw()
 void StopMotionStones::drawCustomVoronoi()
 {
 	ofPushStyle();
+	ofSetColor( 255, 0, 0, transparency );
 	std::vector< ofVec2f > pts = voro->getPoints();
 	for( unsigned int i = 0; i < pts.size(); ++i ) {
 		int _x = i % x;
@@ -172,7 +174,7 @@ void StopMotionStones::drawCustomVoronoi()
 		}
 	}
 
-	ofSetColor( 255, 0, 0, 30 );
+	ofSetColor( 255, 0, 0, std::max( transparency - 170, 0.0f ) );
 	glLineWidth( 0.1 );
 
 	std::vector< ofPolyline > lines = voro->getLines();

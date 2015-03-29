@@ -25,6 +25,10 @@ public:
 	void setGrowing( bool gr );
 	bool isGrowing();
 
+	float transparency;
+	ofPoint centerStone;
+
+
 private:
 
 	bool isStarted;
@@ -52,6 +56,7 @@ private:
 
 	std::vector< ofPolyline > selectedLines;
 	std::vector< float > transparencies;
+
 
 
 	void removeOuterEdges();

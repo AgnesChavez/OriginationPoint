@@ -67,12 +67,12 @@ public:
 
 	static vector<ofVec3f> resamplePolylineToCount( const ofPolyline& polyline, int n );
 	float currentGrowRad;
+	ofVec2f centroid;
 
 private:
 	float radius, fuzzy;
 	int size;
 	float transparency, borderTransparency, saturation;
-	ofVec2f centroid;
 	int borderSize;
 
 	bool tDrawBorder;

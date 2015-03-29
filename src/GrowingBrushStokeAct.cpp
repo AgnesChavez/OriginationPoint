@@ -1,10 +1,23 @@
-#include "GrowingBrushStokeApp.h"
+#include "GrowingBrushStokeAct.h"
 
-void GrowingBrushStokeApp::setup() {
+GrowingBrushStokeAct::GrowingBrushStokeAct() :
+transparency( 255 )
+{
+	setup();
 
-	ofSetLogLevel( OF_LOG_ERROR );
-	ofSetVerticalSync( true );
-	ofSetFrameRate( 30 );
+}
+
+GrowingBrushStokeAct::~GrowingBrushStokeAct()
+{
+
+}
+
+
+void GrowingBrushStokeAct::setup() {
+
+	//ofSetLogLevel( OF_LOG_ERROR );
+	//ofSetVerticalSync( true );
+	//ofSetFrameRate( 30 );
 
 	edgeDetectionPostProcessing.init( 1920, 1080 );
 
@@ -15,7 +28,8 @@ void GrowingBrushStokeApp::setup() {
 	background.loadImage( "lines_3_bw.jpg" );
 
 	doJiggle = true;
-	noiseVal = 0.0f;
+	scaleNoiseVal = 0.0f;
+	rotateNoiseVal = 0.0f;
 	growBrushIndex = 0;
 	curtainX = -1920;
 	
@@ -46,16 +60,27 @@ void GrowingBrushStokeApp::setup() {
 	line.addVertex( 1920, 1080 );
 	line.setClosed( true );
 
-	plainStone.setColorCollection( blackWhiteColor );
-	plainStone.setBrushCollection( brushCollection );
-	plainStone.setBrushStrokeAlpha( 255 );
-	plainStone.init( 1920 / 2, 1080 / 2 );
-	for( int i = 0; i < 3; i++ ) {
-		plainStone.growPlain( growBrushIndex );
-	}
+	
 
 	tintBuffer.allocate( 1920, 1080 );
 	stoneCurtainBuffer.allocate( 1920, 1080 );
+
+	addCustomVoronoiPoints();
+}
+
+void GrowingBrushStokeAct::createStone( ofPoint centerStone )
+{
+	plainStone.setColorCollection( blackWhiteColor );
+	plainStone.setBrushCollection( brushCollection );
+	plainStone.setBrushStrokeAlpha( 255 );
+	std::cout << "createstone: " << centerStone.x << " " << centerStone.y << std::endl;
+	plainStone.init( centerStone.x, centerStone.y );
+	for( int i = 0; i < 1; i++ ) {
+		plainStone.growPlain( growBrushIndex );
+	}
+}
+
+void GrowingBrushStokeAct::addCustomVoronoiPoints() {
 
 	voro.clear();
 
@@ -83,20 +108,23 @@ void GrowingBrushStokeApp::setup() {
 }
 
 
-void GrowingBrushStokeApp::update() {
-
+void GrowingBrushStokeAct::update() {
 	if( ofGetFrameNum() % 2 == 0 ) {
 		plainStone.grow( *voro.getLine( 0 ) );
 	}
 
-	noiseVal += 0.01f;
-
 	curtainX++;
 }
 
-void GrowingBrushStokeApp::draw() {
+void GrowingBrushStokeAct::updateJiggle()
+{
+	scaleNoiseVal += 0.05f;
+	rotateNoiseVal += 0.01f;
+}
 
-	ofBackground( 0 );
+void GrowingBrushStokeAct::draw() {
+
+	//ofBackground( 0 );
 
 	//postWarp.begin();
 	//background.draw( 0, 0, 1920, 1080 );
@@ -118,8 +146,9 @@ void GrowingBrushStokeApp::draw() {
 	ofPushMatrix();
 	ofTranslate( 1920 / 2, 1080 / 2, 0 );
 	if( doJiggle ) {
-		ofScale( ofNoise( noiseVal ) + 0.5, ofNoise( noiseVal ) + 0.5);
-		ofRotateZ( ( ofNoise(noiseVal) * 2 - 1 ) * 20 );
+		float scale = ( ofNoise( scaleNoiseVal ) + 0.5 );
+		ofScale( scale, scale );
+		ofRotateZ( ( ofNoise(rotateNoiseVal) * 2 - 1 ) * 20 );
 	}
 
 	plainStone.setSelectedColor( ofColor( 255 ) );
@@ -133,7 +162,8 @@ void GrowingBrushStokeApp::draw() {
 	tintBuffer.end();
 
 	ofPushStyle();
-	ofSetColor( 255, 200, 0, 120 );
+	ofSetColor( 255, transparency );
+	//ofSetColor( 255, 200, 0, 120 );
 	tintBuffer.draw( 0, 0 );
 	ofPopStyle();
 
@@ -144,17 +174,17 @@ void GrowingBrushStokeApp::draw() {
 	// post.end();
 	// stoneCurtainBuffer.end();
 
-	ofPushStyle();
-	ofSetColor( 163, 87, 52, 120 );
-	stoneCurtainBuffer.draw( curtainX, 0 );
-	ofPopStyle();
+	//ofPushStyle();
+	//ofSetColor( 163, 87, 52, 120 );
+	//stoneCurtainBuffer.draw( curtainX, 0 );
+	//ofPopStyle();
 
 	//voro.draw( 0, 0 );
 
 	//slowWarp.end();
 }
 
-void GrowingBrushStokeApp::keyPressed( int key )
+void GrowingBrushStokeAct::keyPressed( int key )
 {
 	if( key == 'g' ) {
 		// 0 means random brush
@@ -177,3 +207,4 @@ void GrowingBrushStokeApp::keyPressed( int key )
 		
 	}
 }
+

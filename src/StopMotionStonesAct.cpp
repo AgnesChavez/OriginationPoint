@@ -1,6 +1,17 @@
-#include "StopMotionStonesApp.h"
+#include "StopMotionStonesAct.h"
 
-void StopMotionStonesApp::setup()
+StopMotionStonesAct::StopMotionStonesAct() :
+transparency( 255 )
+{
+	setup();
+}
+
+StopMotionStonesAct::~StopMotionStonesAct()
+{
+
+}
+
+void StopMotionStonesAct::setup()
 {
 	ofSetLogLevel( OF_LOG_ERROR );
 	ofSetVerticalSync( true );
@@ -17,18 +28,18 @@ void StopMotionStonesApp::setup()
 	stones.start();
 }
 
-void StopMotionStonesApp::update()
+void StopMotionStonesAct::update()
 {
+	stones.transparency = transparency;
 	stones.update();
 }
 
-void StopMotionStonesApp::draw()
+void StopMotionStonesAct::draw()
 {
-	ofBackground( 0, 40 );
 	stones.draw();
 }
 
-void StopMotionStonesApp::keyPressed( int key )
+void StopMotionStonesAct::keyPressed( int key )
 {
 	if( key == 'g' ) {
 		stones.setGrowing( !stones.isGrowing() );
@@ -40,3 +51,4 @@ void StopMotionStonesApp::keyPressed( int key )
 		ofToggleFullscreen();
 	}
 }
+

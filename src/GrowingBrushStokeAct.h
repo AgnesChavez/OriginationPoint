@@ -4,16 +4,23 @@
 #include "GrowingBrushStokesLayer.h"
 #include "StoneCurtain.h"
 #include "VoronoiLayer.h"
+#include "Stone.h"
 
 #include "ofxPostProcessing.h"
 
-class GrowingBrushStokeApp : public ofBaseApp{
+class GrowingBrushStokeAct {
 
 public:
+	GrowingBrushStokeAct();
+	~GrowingBrushStokeAct();
+
 	void setup();
+	void updateJiggle();
 	void update();
 	void draw();
 	void keyPressed( int key );
+
+	void createStone( ofPoint centerStone );
 
 	GrowingBrushStokesLayer waterColorStone;
 
@@ -25,7 +32,7 @@ public:
 	ofxPostProcessing edgeDetectionPostProcessing, postWarp, slowWarp;
 
 	bool doJiggle;
-	float noiseVal;
+	float scaleNoiseVal, rotateNoiseVal;
 	int growBrushIndex;
 
 	ofImage background;
@@ -41,4 +48,7 @@ public:
 	ConvolutionPass::Ptr convPass;
 
 	VoronoiLayer voro;
+	void addCustomVoronoiPoints();
+	
+	float transparency;
 };
