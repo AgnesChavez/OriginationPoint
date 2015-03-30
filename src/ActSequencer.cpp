@@ -4,8 +4,9 @@
 void ActSequencer::setup()
 {
 	ofSetLogLevel( OF_LOG_ERROR );
-	ofSetVerticalSync( false );
+	ofSetVerticalSync( true );
 	ofSetFrameRate( 30 );
+	//ofEnableSmoothing();
 
 	TIME_SAMPLE_SET_FRAMERATE( 30.0f );
 	TIME_SAMPLE_SET_DRAW_LOCATION( TIME_MEASUREMENTS_TOP_RIGHT );
@@ -24,20 +25,27 @@ void ActSequencer::setup()
 
 	act3 = new ManyLayersAct();
 	act3->transparency = 0;
+
+	stoneCurtainXpos = 0;
 }
 
 void ActSequencer::update()
 {
 	unsigned long long act2Time = 270000;// 250000;
+	unsigned long long act2UpdateStart = 290000;
+	unsigned long long act3UpdateStart = 430000;
+	unsigned long long act3MoveStoneCurtainStart = 470000;
+	unsigned long long act3FourStonesMoveStart = 500000;
 	
+	unsigned long long currentMillis = ofGetElapsedTimeMillis();
 
-	if( ofGetElapsedTimeMillis() > act2Time) {
+	if( currentMillis > act2Time ) {
 		act2Transparency++;
 		act2->transparency = act2Transparency;
 		act1->transparency = 255 - act2Transparency;
 	}
 
-	if( ofGetElapsedTimeMillis() > act2Time + 20000 ) {
+	if( currentMillis > act2UpdateStart ) {
 		TS_START( "act2_update" );
 		act2->update();
 		TS_STOP( "act2_update" );
@@ -49,19 +57,27 @@ void ActSequencer::update()
 		TS_STOP( "act1_update" );
 	}
 
-	if( ofGetElapsedTimeMillis() > act2Time + 140000 ) {
+	if( currentMillis > act3UpdateStart ) {
 		act2Ypos++;
 		if( act2Ypos >= 1080 ) {
 			act2Ypos = 0;
 		}
 
+		act2->transparency = -1;
+
 		TS_START( "act3_update" );
 		act3->update();
-		act3->stoneCurtainTransparency = std::min( 90.0, act3->stoneCurtainTransparency + 1.0 );
-
-		act2->transparency = -1;
-		TS_STOP( "act_3update" );
 		act3->transparency = std::min(120.0, act3->transparency + 1.0);
+		act3->stoneCurtainTransparency = std::min( 90.0, act3->stoneCurtainTransparency + 1.0 );
+		TS_STOP( "act_3update" );
+	}
+
+	if( currentMillis > act3MoveStoneCurtainStart ) {
+		act3->updateStoneCurtainPos();
+	}
+
+	if( currentMillis > act3FourStonesMoveStart ) {
+		act3->updateFourStonesPos();
 	}
 }
 
@@ -89,6 +105,7 @@ void ActSequencer::draw()
 		act2->tintBuffer.draw( 0, act2Ypos );
 		act2->tintBuffer.draw( 0, act2Ypos - 1080 );
 		ofPopStyle();
+		
 	}
 	TS_STOP( "act3_draw" );
 }

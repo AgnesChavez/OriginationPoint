@@ -44,7 +44,7 @@ GrowingBrushStokesLayer::~GrowingBrushStokesLayer()
 void GrowingBrushStokesLayer::growAll()
 {
 	growRad = growRad + 1.0f;
-
+	
 	canvas.update();
 
 	canvas.beginWaterDraw();
@@ -66,6 +66,7 @@ void GrowingBrushStokesLayer::growAll()
 	canvas.endPigmentDraw();
 	
 	canvas.render();
+	
 }
 
 void GrowingBrushStokesLayer::add( float x, float y )

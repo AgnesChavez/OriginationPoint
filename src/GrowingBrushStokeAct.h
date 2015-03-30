@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
-#include "GrowingBrushStokesLayer.h"
+//#include "GrowingBrushStokesLayer.h"
 #include "StoneCurtain.h"
 #include "VoronoiLayer.h"
 #include "Stone.h"
@@ -23,7 +23,7 @@ public:
 
 	void createStone( ofPoint centerStone );
 
-	GrowingBrushStokesLayer waterColorStone;
+	//GrowingBrushStokesLayer waterColorStone;
 
 	ofFbo brushStoneBuffer;
 	BrushStone plainStone;

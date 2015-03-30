@@ -24,7 +24,7 @@ BrushStone::BrushStone()
 	bufferHeight = 1080;
 	ofFbo::Settings settings;
 	settings.useDepth = true;
-	settings.useStencil = false;
+	settings.useStencil = true;
 	settings.depthStencilAsTexture = true;
 	settings.width = bufferWidth;
 	settings.height = bufferHeight;

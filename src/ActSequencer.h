@@ -21,6 +21,7 @@ public:
 	GrowingBrushStokeAct * act2;
 	float act2Transparency;
 	int act2Ypos;
+	int stoneCurtainXpos;
 
 	ManyLayersAct * act3;
 };

@@ -18,10 +18,14 @@ public:
 	void update();
 	void draw();
 
+
+	void updateStoneCurtainPos();
+	void updateFourStonesPos();
+
 	std::vector< BrushStone > fourStonesLayer;
 	VoronoiLayer voroFor4Stones;
 
-	ofxPostProcessing edgeDetectionPostProcessing;
+	ofxPostProcessing edgeDetectionPostProcessing, stoneCurtainEdgeDetectionBuffer;
 	EdgePass::Ptr edgePass;
 
 	ofxPostProcessing waterPostProcessing;
@@ -34,8 +38,11 @@ public:
 
 	ofImage background, gridImage;
 
-	ofFbo stoneCurtainBuffer;
+	ofFbo stoneCurtainBuffer, fourStonesBuffer;
 	StoneCurtain stoneCurtain;
-	int curtainX;
+	int stoneCurtainXpos;
+	int fourStonesPos;
+
+	bool doLoop4Stones;	
 };
 
