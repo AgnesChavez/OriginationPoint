@@ -24,7 +24,7 @@ void ManyLayersAct::setup()
 
 	waterPostProcessing.init( 1920, 1080 );
 	waterPass = waterPostProcessing.createPass<NoiseWarpPass>();
-	waterPass->setEnabled( false );
+	waterPass->setEnabled( true );
 	waterPostProcessing.setFlip( false );
 
 	waterPass->setAmplitude( 0.009 );
@@ -106,17 +106,29 @@ void ManyLayersAct::setup()
 	stoneCurtain.setColorCollection( agnesColorSelection );
 	stoneCurtain.render();
 
-	stoneCurtainBuffer.allocate( 1920, 1080 );
+	ofFbo::Settings settings;
+	settings.useDepth = true;
+	settings.useStencil = false;
+	settings.depthStencilAsTexture = true;
+	settings.width = 1920;
+	settings.height = 1080;
+
+	stoneCurtainBuffer.allocate( settings );
 
 	curtainX = -1920;
+	stoneCurtainTransparency = 0;
 }
 
 void ManyLayersAct::update()
 {
-	int inde = ofGetFrameNum() % 4;
-	fourStonesLayer.at( inde ).grow( *voroFor4Stones.getLine( inde ) );
+	for( int i = 0; i < fourStonesLayer.size(); i++ ) {
+		fourStonesLayer.at( i ).grow( *voroFor4Stones.getLine( i ) );
+	}
 
 	curtainX += 3;
+	if( curtainX >= 0 ) {
+		curtainX = -1920;
+	}
 }
 
 void ManyLayersAct::draw()
@@ -144,7 +156,8 @@ void ManyLayersAct::draw()
 	stoneCurtainBuffer.end();
 
 	ofPushStyle();
-	ofSetColor( 152, 194, 45, 90 );
+	ofSetColor( 152, 194, 45, stoneCurtainTransparency );
+	stoneCurtainBuffer.draw( curtainX + 1920, 0 );
 	stoneCurtainBuffer.draw( curtainX, 0 );
 	ofPopStyle();
 }

@@ -134,7 +134,7 @@ void StopMotionStones::update()
 
 			if( isPastMillis( millisStartFadeAllOut ) ) {
 				
-				for( int i = 0; i < 25; i++ ) {
+				for( int i = 0; i < 35; i++ ) {
 					int rand = ( int ) ( ofRandom( x * y ) );
 					transparencies.at( rand ) -= 1;
 				}

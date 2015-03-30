@@ -39,7 +39,14 @@ void GrowingBrushStokeAct::setup() {
 	line.addVertex( 1920, 1080 );
 	line.setClosed( true );
 
-	tintBuffer.allocate( 1920, 1080 );
+	ofFbo::Settings settings;
+	settings.useDepth = true;
+	settings.useStencil = false;
+	settings.depthStencilAsTexture = true;
+	settings.width = 1920;
+	settings.height = 1080;
+
+	tintBuffer.allocate( settings );
 	
 
 	addCustomVoronoiPoints();
@@ -122,7 +129,7 @@ void GrowingBrushStokeAct::draw() {
 	}
 
 	plainStone.setSelectedColor( ofColor( 255 ) );
-	plainStone.setTransparency( 127 );
+	plainStone.setTransparency( 200 );
 	plainStone.draw( -1920 / 2, -1080/2, 1920, 1080);
 
 	ofPopMatrix();
@@ -144,12 +151,6 @@ void GrowingBrushStokeAct::draw() {
 	//slowWarp.draw();
 	//ofPopStyle();
 
-	
-
-	//ofPushStyle();
-	//ofSetColor( 163, 87, 52, 120 );
-	//stoneCurtainBuffer.draw( curtainX, 0 );
-	//ofPopStyle();
 
 	//voro.draw( 0, 0 );
 }

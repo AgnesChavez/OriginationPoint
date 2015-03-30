@@ -28,9 +28,7 @@ void ActSequencer::setup()
 
 void ActSequencer::update()
 {
-	ofSetWindowTitle( ofToString( ofGetFrameRate() ) );
-
-	unsigned long long act2Time = 250000;// 250000;
+	unsigned long long act2Time = 270000;// 250000;
 	
 
 	if( ofGetElapsedTimeMillis() > act2Time) {
@@ -53,10 +51,17 @@ void ActSequencer::update()
 
 	if( ofGetElapsedTimeMillis() > act2Time + 140000 ) {
 		act2Ypos++;
+		if( act2Ypos >= 1080 ) {
+			act2Ypos = 0;
+		}
+
 		TS_START( "act3_update" );
 		act3->update();
+		act3->stoneCurtainTransparency = std::min( 90.0, act3->stoneCurtainTransparency + 1.0 );
+
+		act2->transparency = -1;
 		TS_STOP( "act_3update" );
-		act3->transparency = 120;
+		act3->transparency = std::min(120.0, act3->transparency + 1.0);
 	}
 }
 
@@ -65,18 +70,26 @@ void ActSequencer::draw()
 	ofBackground( 0, 40 );
 
 	TS_START( "act1_draw" );
-	act1->draw();
+	if( act1->transparency > 0 ) {
+		act1->draw();
+	}
 	TS_STOP( "act1_draw" );
 
 	TS_START( "act2_draw" );
-	ofPushMatrix();
-	ofTranslate( 0, act2Ypos );
-	act2->draw();
-	ofPopMatrix();
+	if( act2->transparency > 0 ) {
+		act2->draw();
+	}
 	TS_STOP( "act2_draw" );
 
 	TS_START( "act3_draw" );
-	act3->draw();
+	if( act3->transparency > 0 ) {
+		act3->draw();
+		ofPushStyle();
+		ofSetColor( 255, 200, 0, 90 );
+		act2->tintBuffer.draw( 0, act2Ypos );
+		act2->tintBuffer.draw( 0, act2Ypos - 1080 );
+		ofPopStyle();
+	}
 	TS_STOP( "act3_draw" );
 }
 

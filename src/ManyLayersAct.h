@@ -27,7 +27,7 @@ public:
 	ofxPostProcessing waterPostProcessing;
 	NoiseWarpPass::Ptr waterPass;
 
-	float transparency;
+	float transparency, stoneCurtainTransparency;
 
 	BrushCollection brushCollection;
 	ColorCollection blackWhiteColor, agnesColorSelection;
