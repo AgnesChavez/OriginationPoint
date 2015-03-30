@@ -51,6 +51,8 @@ public:
 	static vector<ofVec3f> resamplePolylineToCount( const ofPolyline& polyline, int n );
 	ofPolyline border;
 	ofVec2f centroid;
+	float maxGrowRad;
+
 private:
 	float radius, fuzzy;
 	int size;
@@ -64,7 +66,6 @@ private:
 	
 
 	
-	float maxGrowRad;
 
 	int getNumberOfStrokes();
 

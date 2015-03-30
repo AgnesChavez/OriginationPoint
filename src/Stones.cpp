@@ -22,7 +22,7 @@ void Stones::init()
 	buffer.allocate( settings );
 }
 
-void Stones::render( std::vector< ofPolyline > closedLines, std::vector< float > transparencies )
+void Stones::render( std::vector< ofPolyline > closedLines, std::vector< float > transparencies, ofPoint centered )
 {
 	buffer.begin();
 	ofClear( 1.0 );
@@ -31,6 +31,9 @@ void Stones::render( std::vector< ofPolyline > closedLines, std::vector< float >
 		ofPolyline line = closedLines.at( i );
 		line.setClosed( true );
 		ofSetColor( 255, transparencies.at( i ) );
+		if( ofDist( line.getCentroid2D().x, line.getCentroid2D().y, centered.x, centered.y ) < 10 ) {
+			ofSetColor( 255, 255 );
+		}
 		ofBeginShape();
 		std::vector< ofPoint >& vertices = line.getVertices();
 		for( int j = 0; j < vertices.size(); j++ ) {

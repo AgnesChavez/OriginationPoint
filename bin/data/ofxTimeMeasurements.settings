@@ -1,7 +1,8 @@
-update()=1|1|1
-draw_wall=1|1|0
-draw()=1|1|1
-noi_render=1|1|0
-lines=1|1|0
-stonetexrender=1|1|0
-cutout=1|1|0
+update()=1|1|0
+act1_update=1|1|1
+draw()=1|1|0
+act1_draw=1|1|1
+act2_draw=1|1|1
+act3_draw=1|1|1
+act2_update=1|1|0
+act3_update=1|1|0

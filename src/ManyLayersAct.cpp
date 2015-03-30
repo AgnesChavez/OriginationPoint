@@ -24,7 +24,7 @@ void ManyLayersAct::setup()
 
 	waterPostProcessing.init( 1920, 1080 );
 	waterPass = waterPostProcessing.createPass<NoiseWarpPass>();
-	waterPass->setEnabled( true );
+	waterPass->setEnabled( false );
 	waterPostProcessing.setFlip( false );
 
 	waterPass->setAmplitude( 0.009 );

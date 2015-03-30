@@ -6,6 +6,8 @@
 #include "GrowingBrushStokeAct.h"
 #include "ManyLayersAct.h"
 
+#include "ofxTimeMeasurements.h"
+
 class ActSequencer : public ofBaseApp
 {
 public:

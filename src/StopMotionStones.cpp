@@ -21,6 +21,7 @@ void StopMotionStones::init()
 	lastMove = 0;
 	currentStone = 0;
 	doGrow = false;
+	currentScaleLeftOverStone = 3.0f;
 
 	/* Creates grid aligned voronoi diagram */
 
@@ -55,6 +56,8 @@ void StopMotionStones::init()
 		}
 	}
 
+	centered = getMostCenteredVoronoiCellCenter();
+
 	noi.render();
 
 	for( int i = 0; i < x*y; i++ ) {
@@ -77,6 +80,8 @@ void StopMotionStones::update()
 	long millisBrownianMotionPart1 = 15000;// 110000;
 	long millisBrownianMotionPart2 = 20000;// 150000;
 	long millisStartFadeAllOut = 25000;// 180000;
+	long millisStartGrowLeftOverStone = 28000;
+	long millisStopGrowLeftOverStone = 40000;
 
 	if( isStarted ) {
 		
@@ -117,12 +122,18 @@ void StopMotionStones::update()
 					toDrawStone.insert( rand );
 				}
 			}
+
+			if( isWithinMillis( millisStartGrowLeftOverStone, millisStopGrowLeftOverStone ) ) {
+				currentScaleLeftOverStone += 0.2;
+				//int mostCenteredStoneIndex = getMostCenteredVoronoiStoneIndex();
+				//stones.at( mostCenteredStoneIndex ).border.scaleAboutPoint( currentScaleLeftOverStone, stones.at( mostCenteredStoneIndex ).border.getCentroid2D() );
+			}
+
 			if( isPastMillis( millisStartFadeAllOut ) ) {
-				for( int i = 0; i < 25; i++ ) {
+				
+				for( int i = 0; i < 125; i++ ) {
 					int rand = ( int ) ( ofRandom( x * y ) );
-					if( rand != (x * y / 2 ) - 34 ) {
-						transparencies.at( rand ) -= 1;
-					}
+					transparencies.at( rand ) -= 1;
 				}
 			}
 		}
@@ -143,7 +154,7 @@ void StopMotionStones::update()
 		selectedLines.push_back( stones.at( inde ).border );
 	}
 
-	stonesTex.render( selectedLines, transparencies );
+	stonesTex.render( selectedLines, transparencies, centered );
 }
 
 void StopMotionStones::draw()
@@ -195,49 +206,6 @@ void StopMotionStones::moveRandom( float str )
 	}
 
 	voro->compute();
-
-	/*
-	stones.clear();
-	std::vector< ofPoint > cents;
-
-	for( int i = 0; i < voro->pts.size(); i++ ) {
-		ofPoint transp( ofRandom( -str, str ), ofRandom( -str, str ) );
-		voro->pts.at( i ).x += transp.x;
-		voro->pts.at( i ).y += transp.y;
-		transp += voro->pts.at( i );
-		cents.push_back( transp );
-	}
-
-	voro->clear();
-
-	for( int i = 0; i < cents.size(); i++ ) {
-		voro->addPoint( cents.at( i ).x, cents.at( i ).y );
-	}
-
-	voro->compute();
-	for( int i = 0; i < voro->pts.size(); i++ ) {
-		ofVec2f * p = &voro->pts.at( i );
-		Stone s;
-		s.init( p->x, p->y, *voro->getLine( i ) );
-		stones.push_back( s );
-	}
-	
-	for( int i = 0; i < stones.size(); i++ ) {
-		stones.at( i ).currentGrowRad = 25;
-	}
-
-	int timesss = ( int ) ( ofMap( ofGetFrameNum(), 0, 1000, 5, 100 ) );
-	timesss = std::min( 100, timesss );
-	std::cout << timesss << std::endl;
-	for( int j = 0; j < timesss; j++ ) {
-		for( int i = 0; i < stones.size(); i++ ) {
-			stones.at( i ).grow( voro->getLine( i ), false );
-		}
-	}
-	for( int i = 0; i < stones.size(); i++ ) {
-		stones.at( i ).grow( voro->getLine( i ), true );
-	}
-	*/
 }
 
 void StopMotionStones::setGrowing( bool gr )
@@ -270,6 +238,7 @@ void StopMotionStones::removeOuterEdges()
 {
 	for( std::set<int>::iterator it = toDrawStone.begin(); it != toDrawStone.end(); ++it ) {
 		Stone * s = &stones.at( *it );
+		s->maxGrowRad = 150;
 		s->grow( voro->getLine( *it ), true );
 		int ind = *it;
 		ofPoint p = get2DFromIndex( ind );
@@ -324,6 +293,38 @@ bool StopMotionStones::isPastMillis( unsigned long long mill )
 {
 	unsigned long long currentMillis = ofGetElapsedTimeMillis();
 	return currentMillis - startedMillis > mill;
+}
+
+ofPoint StopMotionStones::getMostCenteredVoronoiCellCenter()
+{
+	float distance = 1000;
+	ofPoint selectedVoronoiCenter;
+	for( int i = 0; i < stones.size(); i++ ) {
+		ofPoint cent = stones.at( i ).border.getCentroid2D();
+		float d = ofDist( 1920 / 2, 1080 / 2, cent.x, cent.y );
+		if( d < distance ) {
+			distance = d;
+			selectedVoronoiCenter = cent;
+		}
+	}
+
+	return selectedVoronoiCenter;
+}
+
+int StopMotionStones::getMostCenteredVoronoiStoneIndex()
+{
+	float distance = 1000;
+	int index = 0;
+	for( int i = 0; i < stones.size(); i++ ) {
+		ofPoint cent = stones.at( i ).border.getCentroid2D();
+		float d = ofDist( 1920 / 2, 1080 / 2, cent.x, cent.y );
+		if( d < distance ) {
+			distance = d;
+			index = i;
+		}
+	}
+
+	return index;
 }
 
 

@@ -26,7 +26,7 @@ public:
 	bool isGrowing();
 
 	float transparency;
-	ofPoint centerStone;
+	ofPoint centered;
 
 
 private:
@@ -57,7 +57,10 @@ private:
 	std::vector< ofPolyline > selectedLines;
 	std::vector< float > transparencies;
 
+	ofPoint getMostCenteredVoronoiCellCenter();
+	int getMostCenteredVoronoiStoneIndex();
 
+	float currentScaleLeftOverStone;
 
 	void removeOuterEdges();
 	bool isWithinMillis( unsigned long long start, unsigned long long end );

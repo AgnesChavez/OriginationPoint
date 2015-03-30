@@ -108,7 +108,7 @@ void testApp::draw(){
 	}
 	TS_STOP_NIF( "lines" );
 	TS_START( "stonetexrender" );
-	stonesTex.render( lines, transparencies );
+	stonesTex.render( lines, transparencies, ofPoint(1920/2, 1080/2) );
 	TS_STOP( "stonetexrender" );
 
 	TS_START_NIF( "cutout" );
