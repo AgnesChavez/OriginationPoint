@@ -62,7 +62,7 @@ void StoneCurtain::render()
 	}
 
 	for( int i = 0; i < stones.size(); i++ ) {
-		for( int k = 0; k < 100; k++ ) {
+		for( int k = 0; k < 50; k++ ) {
 			stones.at( i ).grow();
 		}
 	}

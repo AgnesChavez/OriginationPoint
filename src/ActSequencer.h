@@ -4,6 +4,7 @@
 
 #include "StopMotionStonesAct.h"
 #include "GrowingBrushStokeAct.h"
+#include "ManyLayersAct.h"
 
 class ActSequencer : public ofBaseApp
 {
@@ -17,5 +18,8 @@ public:
 
 	GrowingBrushStokeAct * act2;
 	float act2Transparency;
+	int act2Ypos;
+
+	ManyLayersAct * act3;
 };
 

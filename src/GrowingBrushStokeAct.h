@@ -17,6 +17,7 @@ public:
 	void setup();
 	void updateJiggle();
 	void update();
+	void updateFourStones();
 	void draw();
 	void keyPressed( int key );
 
@@ -29,7 +30,7 @@ public:
 	BrushCollection brushCollection;
 	ColorCollection agnesColorSelection, blackWhiteColor;
 
-	ofxPostProcessing edgeDetectionPostProcessing, postWarp, slowWarp;
+	ofxPostProcessing edgeDetectionPostProcessing, slowWarp;
 
 	bool doJiggle;
 	float scaleNoiseVal, rotateNoiseVal;
@@ -38,10 +39,8 @@ public:
 	ofImage background;
 
 	ofFbo tintBuffer;
-	ofFbo stoneCurtainBuffer;
-	int curtainX;
 
-	StoneCurtain stoneCurtain;
+	
 
 	EdgePass::Ptr edgePass;
 	NoiseWarpPass::Ptr noiseWarp, slowWarpPass;
@@ -49,6 +48,7 @@ public:
 
 	VoronoiLayer voro;
 	void addCustomVoronoiPoints();
+
 	
 	float transparency;
 };

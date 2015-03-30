@@ -72,11 +72,11 @@ void StopMotionStones::start()
 
 void StopMotionStones::update()
 {
-	long millisStopMotionPart1 = 30000;
-	long millisStopMotionPart2 = 70000;
-	long millisBrownianMotionPart1 = 110000;
-	long millisBrownianMotionPart2 = 150000;
-	long millisStartFadeAllOut = 180000;
+	long millisStopMotionPart1 = 5000;// 30000;
+	long millisStopMotionPart2 = 10000;// 70000;
+	long millisBrownianMotionPart1 = 15000;// 110000;
+	long millisBrownianMotionPart2 = 20000;// 150000;
+	long millisStartFadeAllOut = 25000;// 180000;
 
 	if( isStarted ) {
 		
@@ -112,7 +112,7 @@ void StopMotionStones::update()
 				currentStone = doBrownianMotion( currentStone );
 			}
 			if( isWithinMillis( millisBrownianMotionPart2, millisStartFadeAllOut ) ) {
-				for( int i = 0; i < 3; i++ ) {
+				for( int i = 0; i < 30; i++ ) {
 					int rand = static_cast< int >( ofRandom( x * y ) );
 					toDrawStone.insert( rand );
 				}
@@ -156,7 +156,7 @@ void StopMotionStones::draw()
 
 	ofPushStyle();
 	//ofSetColor( 255, 0, 0, transparency );
-	drawCustomVoronoi();
+	//drawCustomVoronoi();
 	ofPopStyle();
 }
 
