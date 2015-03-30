@@ -161,7 +161,7 @@ void StopMotionStones::draw()
 {
 	ofFbo * buf = cutter.getCutout( noi, stonesTex.getBuffer() );
 	ofPushStyle();
-	ofSetColor( 255, transparency );
+	ofSetColor( 251, 186, 106, transparency );
 	buf->draw( 0, 0 );
 	ofPopStyle();
 
