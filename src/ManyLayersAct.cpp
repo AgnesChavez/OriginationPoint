@@ -115,6 +115,13 @@ void ManyLayersAct::setup()
 
 	stoneCurtainBuffer.allocate( settings );
 
+	// drawing stone curtain
+	stoneCurtainBuffer.begin();
+	edgeDetectionPostProcessing.begin();
+	stoneCurtain.draw( 0, 0 );
+	edgeDetectionPostProcessing.end();
+	stoneCurtainBuffer.end();
+
 	curtainX = -1920;
 	stoneCurtainTransparency = 0;
 }
@@ -139,7 +146,7 @@ void ManyLayersAct::draw()
 	}
 	edgeDetectionPostProcessing.end( false );
 
-	ofSetColor( 255, transparency );
+	ofSetColor( 128, 51, 0, transparency );
 	
 	waterPostProcessing.begin();
 	background.draw( 0, 0, 1920, 1080 );
@@ -147,13 +154,6 @@ void ManyLayersAct::draw()
 	waterPostProcessing.end();
 
 	edgeDetectionPostProcessing.draw();
-
-	// drawing stone curtain
-	stoneCurtainBuffer.begin();
-	edgeDetectionPostProcessing.begin();
-	stoneCurtain.draw( 0, 0 );
-	edgeDetectionPostProcessing.end();
-	stoneCurtainBuffer.end();
 
 	ofPushStyle();
 	ofSetColor( 152, 194, 45, stoneCurtainTransparency );
