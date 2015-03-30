@@ -32,7 +32,7 @@ void Stones::render( std::vector< ofPolyline > closedLines, std::vector< float >
 		line.setClosed( true );
 		ofSetColor( 255, transparencies.at( i ) );
 		float distance = ofDist( line.getCentroid2D().x, line.getCentroid2D().y, centered.x, centered.y );
-		std::cout << distance << std::endl;
+		//std::cout << distance << std::endl;
 		if( distance < 15 ) {
 			ofSetColor( 255, 255 );
 		}

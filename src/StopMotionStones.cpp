@@ -50,6 +50,7 @@ void StopMotionStones::init()
 		ofVec2f * p = &voro->pts.at( i );
 		Stone s;
 		s.init( p->x, p->y, *voro->getLine( i ) );
+		s.maxGrowRad = 150;
 		stones.push_back( s );
 	}
 
@@ -119,7 +120,7 @@ void StopMotionStones::update()
 				secondCurrentStone = doBrownianMotion( secondCurrentStone );
 			}
 			if( isWithinMillis( millisBrownianMotionPart2, millisStartFadeAllOut ) ) {
-				for( int i = 0; i < 30; i++ ) {
+				for( int i = 0; i < 15; i++ ) {
 					int rand = static_cast< int >( ofRandom( x * y ) );
 					toDrawStone.insert( rand );
 				}
@@ -254,7 +255,6 @@ void StopMotionStones::removeOuterEdges()
 {
 	for( std::set<int>::iterator it = toDrawStone.begin(); it != toDrawStone.end(); ++it ) {
 		Stone * s = &stones.at( *it );
-		s->maxGrowRad = 150;
 		s->grow( voro->getLine( *it ), true );
 		int ind = *it;
 		ofPoint p = get2DFromIndex( ind );
