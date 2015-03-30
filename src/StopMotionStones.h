@@ -38,7 +38,7 @@ private:
 	void drawCustomVoronoi();
 
 	std::vector< Stone > stones;
-	int currentStone;
+	int currentStone, secondCurrentStone;
 	ofFbo buffer;
 
 	std::set< int > toDrawStone;

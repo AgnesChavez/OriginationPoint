@@ -20,6 +20,7 @@ void StopMotionStones::init()
 {
 	lastMove = 0;
 	currentStone = 0;
+	secondCurrentStone = 0;
 	doGrow = false;
 	currentScaleLeftOverStone = 3.0f;
 
@@ -75,13 +76,13 @@ void StopMotionStones::start()
 
 void StopMotionStones::update()
 {
-	long millisStopMotionPart1 = 5000;// 30000;
-	long millisStopMotionPart2 = 10000;// 70000;
-	long millisBrownianMotionPart1 = 15000;// 110000;
-	long millisBrownianMotionPart2 = 20000;// 150000;
-	long millisStartFadeAllOut = 25000;// 180000;
-	long millisStartGrowLeftOverStone = 28000;
-	long millisStopGrowLeftOverStone = 40000;
+	long millisStopMotionPart1 = 30000;
+	long millisStopMotionPart2 = 70000;
+	long millisBrownianMotionPart1 = 110000;
+	long millisBrownianMotionPart2 = 150000;
+	long millisStartFadeAllOut = 180000;
+	long millisStartGrowLeftOverStone = 200000;
+	long millisStopGrowLeftOverStone = 201000;
 
 	if( isStarted ) {
 		
@@ -94,7 +95,7 @@ void StopMotionStones::update()
 			}
 			if( isWithinMillis( millisStopMotionPart1, millisStopMotionPart2 ) ) {
 				toDrawStone.clear();
-
+				secondCurrentStone += 1;
 				currentStone += 2;
 				ofPoint index2d = get2DFromIndex( currentStone );
 
@@ -112,9 +113,11 @@ void StopMotionStones::update()
 			if( isWithinMillis( millisStopMotionPart2, millisBrownianMotionPart1 ) ) {
 				toDrawStone.clear();
 				currentStone = doBrownianMotion( currentStone );
+				secondCurrentStone = doBrownianMotion( secondCurrentStone );
 			}
 			if( isWithinMillis( millisBrownianMotionPart1, millisBrownianMotionPart2 ) ) {
 				currentStone = doBrownianMotion( currentStone );
+				secondCurrentStone = doBrownianMotion( secondCurrentStone );
 			}
 			if( isWithinMillis( millisBrownianMotionPart2, millisStartFadeAllOut ) ) {
 				for( int i = 0; i < 30; i++ ) {
@@ -142,8 +145,12 @@ void StopMotionStones::update()
 	if( currentStone >= stones.size() ) {
 		currentStone = 0;
 	}
+	if( secondCurrentStone >= stones.size() ) {
+		secondCurrentStone = 0;
+	}
 
 	toDrawStone.insert( currentStone );
+	toDrawStone.insert( secondCurrentStone );
 	removeOuterEdges();
 
 	selectedLines.clear();
