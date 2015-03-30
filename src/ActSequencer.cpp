@@ -11,6 +11,8 @@ void ActSequencer::setup()
 	TIME_SAMPLE_SET_DRAW_LOCATION( TIME_MEASUREMENTS_TOP_RIGHT );
 
 	act1 = new StopMotionStonesAct();
+	act1->stones.start();
+
 	act2 = new GrowingBrushStokeAct();
 
 	act2->createStone( act1->stones.centered );
@@ -28,7 +30,7 @@ void ActSequencer::update()
 {
 	ofSetWindowTitle( ofToString( ofGetFrameRate() ) );
 
-	unsigned long long act2Time = 40000;// 250000;
+	unsigned long long act2Time = 250000;// 250000;
 	
 
 	if( ofGetElapsedTimeMillis() > act2Time) {
