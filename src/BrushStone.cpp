@@ -53,7 +53,7 @@ void BrushStone::init( float _x, float _y )
 
 	centroid = ofPoint( _x, _y );
 
-	currentGrowRad = 10;
+	currentGrowRad = 5;
 	maxGrowRad = 700;
 }
 

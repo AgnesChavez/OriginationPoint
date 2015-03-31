@@ -32,6 +32,7 @@ void ActSequencer::setup()
 void ActSequencer::update()
 {
 	unsigned long long act2Time = 270000;// 250000;
+	unsigned long long act2FadeInTime = 280000;
 	unsigned long long act2UpdateStart = 290000;
 	unsigned long long act3UpdateStart = 430000;
 	unsigned long long act3MoveStoneCurtainStart = 470000;
@@ -41,15 +42,18 @@ void ActSequencer::update()
 
 	if( currentMillis > act2Time ) {
 		act2Transparency++;
-		act2->transparency = act2Transparency;
 		act1->transparency = 255 - act2Transparency;
+	}
+
+	if( currentMillis > act2FadeInTime ) {
+		act2->transparency = act2Transparency;
 	}
 
 	if( currentMillis > act2UpdateStart ) {
 		TS_START( "act2_update" );
 		act2->update();
 		TS_STOP( "act2_update" );
-		act2->transparency = 150;
+		act2->transparency = 255;
 	}
 	else {
 		TS_START( "act1_update" );
