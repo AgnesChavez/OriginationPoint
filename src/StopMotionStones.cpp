@@ -188,28 +188,25 @@ void StopMotionStones::drawCustomVoronoi()
 		int _x = inde % x;
 		int _y = ( inde - _x ) / x;
 		// excludes cell centers at the edges
-		if( pts[ inde ].x > 95 && pts[ inde ].x < 1860 && pts[ inde ].y > 68 && pts[ inde ].y < 1037 ) {
-			ofCircle( pts[ inde ].x, pts[ inde ].y, 4 );
+		ofVec2f pt = pts[ inde ];
+		if( pt.x > 95 && pt.x < 1860 && pt.y > 68 && pt.y < 1037 ) {
+			float dist = ofDist( pt.x, pt.y, centered.x, centered.y );
+			if( dist > 15 ) {
+				ofSetColor( 0, transparencies.at( inde ) );
+				ofCircle( pts[ inde ].x, pts[ inde ].y, 4 );
+			}
 		}
 	}
+
 	/*
-	for( unsigned int i = 0; i < pts.size(); ++i ) {
-		int _x = i % x;
-		int _y = ( i - _x ) / x;
-		// excludes cell centers at the edges
-		if( pts[ i ].x > 95 && pts[i].x < 1860 && pts[i].y > 68 && pts[i].y < 1037 ) {
-			ofCircle( pts[ i ].x, pts[ i ].y, 4 );
-		}
-	}
-	*/
 	ofSetColor( 255, 0, 0, std::max( transparency - 170, 0.0f ) );
 	glLineWidth( 0.1 );
 
 	std::vector< ofPolyline > lines = voro->getLines();
 	for( int i = 0; i < lines.size(); i++ ) {
-		//lines.at( i ).draw();
+		lines.at( i ).draw();
 	}
-
+	*/
 	ofPopStyle();
 }
 

@@ -166,14 +166,14 @@ void ManyLayersAct::draw()
 	fourStonesBuffer.end();
 
 	ofPushStyle();
-	ofSetColor( 128, 51, 0, transparency );
+	ofSetColor( 255, transparency );
 	fourStonesBuffer.draw( fourStonesPos, 0  );
 	fourStonesBuffer.draw( fourStonesPos - 1920, 0 );
 	ofPopStyle();
 
 	// draw stone curtain
 	ofPushStyle();
-	ofSetColor( 152, 194, 45, stoneCurtainTransparency );
+	ofSetColor( 255, stoneCurtainTransparency );
 	stoneCurtainBuffer.draw( stoneCurtainXpos, 0 );
 	stoneCurtainBuffer.draw( stoneCurtainXpos + 1920, 0 );
 	ofPopStyle();

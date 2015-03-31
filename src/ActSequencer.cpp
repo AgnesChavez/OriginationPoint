@@ -67,8 +67,8 @@ void ActSequencer::update()
 
 		TS_START( "act3_update" );
 		act3->update();
-		act3->transparency = std::min(120.0, act3->transparency + 1.0);
-		act3->stoneCurtainTransparency = std::min( 90.0, act3->stoneCurtainTransparency + 1.0 );
+		act3->transparency = std::min(255.0, act3->transparency + 1.0);
+		act3->stoneCurtainTransparency = std::min( 255.0, act3->stoneCurtainTransparency + 1.0 );
 		TS_STOP( "act_3update" );
 	}
 
@@ -83,7 +83,7 @@ void ActSequencer::update()
 
 void ActSequencer::draw()
 {
-	ofBackground( 0, 40 );
+	ofBackground( 0 );
 
 	TS_START( "act1_draw" );
 	if( act1->transparency > 0 ) {
@@ -101,7 +101,7 @@ void ActSequencer::draw()
 	if( act3->transparency > 0 ) {
 		act3->draw();
 		ofPushStyle();
-		ofSetColor( 255, 200, 0, 90 );
+		ofSetColor( 255, 255 );
 		act2->tintBuffer.draw( 0, act2Ypos );
 		act2->tintBuffer.draw( 0, act2Ypos - 1080 );
 		ofPopStyle();
