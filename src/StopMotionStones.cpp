@@ -205,11 +205,8 @@ void StopMotionStones::drawCustomVoronoi()
 		// excludes cell centers at the edges
 		ofVec2f pt = pts[ inde ];
 		if( pt.x > 95 && pt.x < 1860 && pt.y > 68 && pt.y < 1037 ) {
-			float dist = ofDist( pt.x, pt.y, centered.x, centered.y );
-			if( dist > 15 ) {
 				ofSetColor( 0, transparencies.at( inde ) );
 				ofCircle( pts[ inde ].x, pts[ inde ].y, 4 );
-			}
 		}
 	}
 

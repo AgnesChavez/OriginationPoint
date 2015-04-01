@@ -62,19 +62,18 @@ void ActSequencer::update()
 	unsigned long long currentMillis = ofGetElapsedTimeMillis();
 
 	if( currentMillis > act2Time ) {
-		act2Transparency++;
-		act1->transparency = 255 - act2Transparency;
+		act1->transparency--;
 	}
 
 	if( currentMillis > act2FadeInTime ) {
-		act2->transparency = act2Transparency;
+		act2->transparency++;
 	}
 
 	if( currentMillis > act2UpdateStart ) {
 		TS_START( "act2_update" );
 		act2->update();
 		TS_STOP( "act2_update" );
-		act2->transparency = 255;
+		act2->transparency++;
 		if( currentMillis > act2UpdateSixStonesStart ) {
 			act2->sixRocks.update();
 			act2->sixRocks.transparency++;
