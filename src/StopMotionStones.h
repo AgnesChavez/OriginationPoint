@@ -38,7 +38,7 @@ private:
 	void drawCustomVoronoi();
 
 	std::vector< Stone > stones;
-	int currentStone, secondCurrentStone;
+	int currentStone, secondCurrentStone, thirdCurrentStone;
 	ofFbo buffer;
 
 	std::set< int > toDrawStone;
@@ -49,7 +49,7 @@ private:
 
 	bool doGrow;
 	int x, y, xSpacing, ySpacing;
-	int lastMove;
+	int lastMove1, lastMove2, lastMove3;
 
 	ofPoint get2DFromIndex( int index );
 	int getIndexFrom2D( ofPoint d );
@@ -65,6 +65,6 @@ private:
 	void removeOuterEdges();
 	bool isWithinMillis( unsigned long long start, unsigned long long end );
 	bool isPastMillis( unsigned long long mill );
-	int doBrownianMotion( int currStone );
+	int doBrownianMotion( int currStone, int which );
 };
 

@@ -23,9 +23,10 @@ StopMotionStones::~StopMotionStones()
 
 void StopMotionStones::init()
 {
-	lastMove = 0;
+	lastMove1 = lastMove2 = lastMove3 = 0;
 	currentStone = 0;
 	secondCurrentStone = 0;
+	thirdCurrentStone = 0;
 	doGrow = false;
 	currentScaleLeftOverStone = 3.0f;
 	transparency = 255;
@@ -77,6 +78,7 @@ void StopMotionStones::start()
 void StopMotionStones::update()
 {
 	long millisStopMotionPart1 = 30000;
+	long millisStopMotionPart1AndAHalf = 40000;
 	long millisStopMotionPart2 = 70000;
 	long millisBrownianMotionPart1 = 110000;
 	long millisBrownianMotionPart2 = 150000;
@@ -93,10 +95,17 @@ void StopMotionStones::update()
 
 				currentStone += 1;
 			}
-			if( isWithinMillis( millisStopMotionPart1, millisStopMotionPart2 ) ) {
+			if( isWithinMillis( millisStopMotionPart1, millisStopMotionPart1AndAHalf ) ) {
+				toDrawStone.clear();
+				currentStone += 1;
+				secondCurrentStone += 2;
+			}
+			if( isWithinMillis( millisStopMotionPart1AndAHalf, millisStopMotionPart2 ) ) {
 				toDrawStone.clear();
 				secondCurrentStone += 1;
 				currentStone += 2;
+				thirdCurrentStone += 4;
+
 				ofPoint index2d = get2DFromIndex( currentStone );
 
 				int _xIndex = index2d.x;
@@ -112,12 +121,14 @@ void StopMotionStones::update()
 			}
 			if( isWithinMillis( millisStopMotionPart2, millisBrownianMotionPart1 ) ) {
 				toDrawStone.clear();
-				currentStone = doBrownianMotion( currentStone );
-				secondCurrentStone = doBrownianMotion( secondCurrentStone );
+				currentStone = doBrownianMotion( currentStone, 0 );
+				secondCurrentStone = doBrownianMotion( secondCurrentStone, 1 );
+				thirdCurrentStone = doBrownianMotion( thirdCurrentStone, 2 );
 			}
 			if( isWithinMillis( millisBrownianMotionPart1, millisBrownianMotionPart2 ) ) {
-				currentStone = doBrownianMotion( currentStone );
-				secondCurrentStone = doBrownianMotion( secondCurrentStone );
+				currentStone = doBrownianMotion( currentStone, 0 );
+				secondCurrentStone = doBrownianMotion( secondCurrentStone, 1 );
+				thirdCurrentStone = doBrownianMotion( thirdCurrentStone, 2 );
 			}
 			if( isWithinMillis( millisBrownianMotionPart2, millisStartFadeAllOut ) ) {
 				for( int i = 0; i < 15; i++ ) {
@@ -148,9 +159,13 @@ void StopMotionStones::update()
 	if( secondCurrentStone >= stones.size() ) {
 		secondCurrentStone = 0;
 	}
+	if( thirdCurrentStone >= stones.size() ) {
+		thirdCurrentStone = 0;
+	}
 
 	toDrawStone.insert( currentStone );
 	toDrawStone.insert( secondCurrentStone );
+	toDrawStone.insert( thirdCurrentStone );
 	removeOuterEdges();
 
 	selectedLines.clear();
@@ -276,8 +291,19 @@ bool StopMotionStones::isWithinMillis( unsigned long long start, unsigned long l
 	return currentMillis - startedMillis > start && currentMillis - startedMillis < end;
 }
 
-int StopMotionStones::doBrownianMotion( int currStone )
+int StopMotionStones::doBrownianMotion( int currStone, int which )
 {
+	int lastMove = 0;
+	if( which == 0 ) {
+		lastMove = lastMove1;
+	}
+	else if( which == 1 ) {
+		lastMove = lastMove2;
+	}
+	else if( which == 2 ) {
+		lastMove = lastMove3;
+	}
+
 	float rand = ofRandom( 4 );
 	ofPoint index2d = get2DFromIndex( currentStone );
 	if( rand > 0 && rand < 1 && lastMove != 2 ) {
@@ -295,6 +321,16 @@ int StopMotionStones::doBrownianMotion( int currStone )
 	else if( rand > 3 && rand < 4 && lastMove != 3 ) {
 		index2d.y += 1;
 		lastMove = 4;
+	}
+
+	if( which == 0 ) {
+		lastMove1 = lastMove;
+	}
+	else if( which == 1 ) {
+		lastMove2 = lastMove;
+	}
+	else if( which == 2 ) {
+		lastMove3 = lastMove;
 	}
 
 	int ind = getIndexFrom2D( index2d );
