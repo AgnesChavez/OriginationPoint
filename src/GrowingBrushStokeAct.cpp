@@ -100,11 +100,8 @@ void GrowingBrushStokeAct::update() {
 		plainStone.grow( *voro.getLine( 0 ) );
 
 	}
-
 	// slowWarpPass->setAmplitude( 0.004 );
 	// slowWarpPass->setFrequency( 0.976 );
-
-	
 }
 
 void GrowingBrushStokeAct::updateJiggle()
@@ -141,7 +138,7 @@ void GrowingBrushStokeAct::draw() {
 	//edgeDetectionPostProcessing.begin();
 	ofPushStyle();
 	//ofSetColor( 255, 255 );
-	ofSetColor( 255, 200, 0, transparency );
+	ofSetColor( 255, transparency );
 	tintBuffer.draw( 0, 0 );
 	ofPopStyle();
 	//edgeDetectionPostProcessing.end();
@@ -150,6 +147,8 @@ void GrowingBrushStokeAct::draw() {
 	//ofSetColor( 255, transparency );
 	//slowWarp.draw();
 	//ofPopStyle();
+
+	sixRocks.draw();
 
 
 	//voro.draw( 0, 0 );

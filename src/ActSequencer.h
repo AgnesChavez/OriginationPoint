@@ -6,6 +6,8 @@
 #include "GrowingBrushStokeAct.h"
 #include "ManyLayersAct.h"
 
+#include "ofxPlaylist.h"
+#include "ofxQuadWarp.h"
 #include "ofxTimeMeasurements.h"
 
 class ActSequencer : public ofBaseApp
@@ -16,6 +18,11 @@ public:
 	void draw();
 	void keyPressed( int key );
 
+	ofxQuadWarp warper;
+
+	ofxPlaylist playlist;
+	float testVal;
+
 	StopMotionStonesAct * act1;
 
 	GrowingBrushStokeAct * act2;
@@ -24,5 +31,8 @@ public:
 	int stoneCurtainXpos;
 
 	ManyLayersAct * act3;
+
+	static std::vector< ofPoint > getLineSplitPoints( ofPolyline linesToSplit, float length );
+	static void drawSplitLines( std::vector< ofPoint > points );
 };
 

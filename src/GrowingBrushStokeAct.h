@@ -5,6 +5,7 @@
 #include "StoneCurtain.h"
 #include "VoronoiLayer.h"
 #include "Stone.h"
+#include "SixGrowingRocksLayer.h"
 
 #include "ofxPostProcessing.h"
 
@@ -51,4 +52,6 @@ public:
 
 	
 	float transparency;
+
+	SixGrowingRocksLayer sixRocks;
 };

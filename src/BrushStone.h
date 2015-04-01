@@ -68,6 +68,8 @@ public:
 	static vector<ofVec3f> resamplePolylineToCount( const ofPolyline& polyline, int n );
 	float currentGrowRad;
 	ofVec2f centroid;
+	ofPolyline border;
+
 
 private:
 	float radius, fuzzy;
@@ -79,7 +81,6 @@ private:
 	bool tDrawStone;
 	ofColor selectedColor;
 
-	ofPolyline border;
 
 	
 	float maxGrowRad;

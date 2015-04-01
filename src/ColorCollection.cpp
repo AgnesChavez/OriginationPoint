@@ -34,3 +34,11 @@ int ColorCollection::size()
 {
 	return colors.size();
 }
+
+ColorCollection ColorCollection::getBlackAndWhiteColorCollection()
+{
+	ColorCollection bwColor;
+	bwColor.addColor( ofColor(0, 0, 0) );
+	bwColor.addColor( ofColor(255, 255, 255) );
+	return bwColor;
+}

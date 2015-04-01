@@ -9,6 +9,8 @@ public:
 	ColorCollection();
 	~ColorCollection();
 
+	static ColorCollection getBlackAndWhiteColorCollection();
+
 	void addColor( float r, float g, float b );
 	void addColor( ofColor color );
 

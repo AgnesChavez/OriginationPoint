@@ -34,7 +34,6 @@ BrushStone::BrushStone()
 
 	layer.allocate( settings );
 	underlyingLayer.allocate( settings );
-
 }
 
 BrushStone::~BrushStone()
@@ -85,7 +84,7 @@ void BrushStone::grow( ofPolyline line )
 		ofEnableAlphaBlending();
 		std::vector< ofVec2f > pointsToDraw( nrToCheck );
 		// decide here weather to grow the stone from the centroid of the outline, or from the actual voronoi cell core
-		ofVec2f p = centroid;// line.getCentroid2D();
+		ofVec2f p = line.getCentroid2D(); // centroid
 #pragma omp parallel for 
 		for( int i = 0; i < nrToCheck; i++ ) {
 			float deg = ofRandom( 0, TWO_PI );
