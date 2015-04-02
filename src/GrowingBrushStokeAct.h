@@ -5,7 +5,8 @@
 #include "StoneCurtain.h"
 #include "VoronoiLayer.h"
 #include "Stone.h"
-#include "SixGrowingRocksLayer.h"
+#include "EightGrowingRocks.h"
+#include "FourGrowingStonesLayer.h"
 
 #include "ofxPostProcessing.h"
 
@@ -16,11 +17,13 @@ public:
 	~GrowingBrushStokeAct();
 
 	void setup();
-	void updateJiggle();
+	void updateScale();
 	void update();
 	void updateFourStones();
+	void updateVoronoiWeb( int speed );
 	void draw();
 	void keyPressed( int key );
+	void drawVoronoiWeb();
 
 	void createStone( ofPoint centerStone );
 
@@ -33,7 +36,8 @@ public:
 
 	ofxPostProcessing edgeDetectionPostProcessing, slowWarp;
 
-	bool doJiggle;
+	bool doScale;
+	float scaleVal;
 	float scaleNoiseVal, rotateNoiseVal;
 	int growBrushIndex;
 
@@ -53,5 +57,12 @@ public:
 	
 	float transparency;
 
-	SixGrowingRocksLayer sixRocks;
+	EightGrowingRocks eightRocks;
+	FourGrowingStonesLayer fourRocks;
+
+	// voronoi web
+	std::vector< std::vector< ofPoint > > dottedPoints;
+	VoronoiLayer voro2;
+	ofFbo voroWebLayer;
+	float voronoiWebTransparency;
 };

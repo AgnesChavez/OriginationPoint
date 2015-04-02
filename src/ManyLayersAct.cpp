@@ -52,61 +52,6 @@ void ManyLayersAct::setup()
 	agnesColorSelection.addColor( 71, 209, 108 );
 
 
-	// adds four stones
-	voroFor4Stones.clear();
-	ofVec2f rand1( 650 + ofRandom( -100, 100 ), 250 );
-	ofVec2f rand2( 1250 + ofRandom( -100, 100 ), 250 );
-	ofVec2f rand3( 650 + ofRandom( -100, 100 ), 750 );
-	ofVec2f rand4( 1250 + ofRandom( -100, 100 ), 750 );
-	voroFor4Stones.addPoint( rand1.x, rand1.y );
-	voroFor4Stones.addPoint( rand2.x, rand2.y );
-	voroFor4Stones.addPoint( rand3.x, rand3.y );
-	voroFor4Stones.addPoint( rand4.x, rand4.y );
-
-	for( int i = 0; i < 5; i++ ) {
-		voroFor4Stones.addPoint( ofRandom( 0, 1920 ), 0 );
-		voroFor4Stones.addPoint( ofRandom( 0, 1920 ), 1080 );
-		voroFor4Stones.addPoint( 0, ofRandom( 0, 1080 ) );
-		voroFor4Stones.addPoint( 1920, ofRandom( 0, 1080 ) );
-	}
-
-	voroFor4Stones.addPoint( 1920 / 2, 1080 / 2 );
-
-	voroFor4Stones.setSmoothAmount( 25 );
-	voroFor4Stones.compute();
-	//voroFor4Stones.render();
-
-
-	// creating the four brush stones
-	BrushStone s;
-	s.setColorCollection( blackWhiteColor );
-	s.setBrushCollection( brushCollection );
-	s.setBrushStrokeAlpha( 255 );
-	s.init( rand1.x, rand1.y );
-
-	BrushStone s2;
-	s2.setColorCollection( blackWhiteColor );
-	s2.setBrushCollection( brushCollection );
-	s2.setBrushStrokeAlpha( 255 );
-	s2.init( rand2.x, rand2.y );
-
-	BrushStone s3;
-	s3.setColorCollection( blackWhiteColor );
-	s3.setBrushCollection( brushCollection );
-	s3.setBrushStrokeAlpha( 255 );
-	s3.init( rand3.x, rand3.y );
-
-	BrushStone s4;
-	s4.setColorCollection( blackWhiteColor );
-	s4.setBrushCollection( brushCollection );
-	s4.setBrushStrokeAlpha( 255 );
-	s4.init( rand4.x, rand4.y );
-
-	fourStonesLayer.push_back( s );
-	fourStonesLayer.push_back( s2 );
-	fourStonesLayer.push_back( s3 );
-	fourStonesLayer.push_back( s4 );
-
 	stoneCurtain.setBrushCollection( brushCollection );
 	stoneCurtain.setColorCollection( agnesColorSelection );
 	stoneCurtain.render();
@@ -139,9 +84,9 @@ void ManyLayersAct::setup()
 
 void ManyLayersAct::update()
 {
-	for( int i = 0; i < fourStonesLayer.size(); i++ ) {
-		fourStonesLayer.at( i ).grow( *voroFor4Stones.getLine( i ) );
-	}
+	//for( int i = 0; i < fourStonesLayer.size(); i++ ) {
+	//	fourStonesLayer.at( i ).grow( *voroFor4Stones.getLine( i ) );
+	//}
 
 }
 
@@ -155,21 +100,21 @@ void ManyLayersAct::draw()
 	waterPostProcessing.end();
 	ofPopStyle();
 
-	// draw four stones		
-	fourStonesBuffer.begin();
-	edgeDetectionPostProcessing.begin();
-	ofClear( 0, 0, 0, 1 );
-	for( int i = 0; i < fourStonesLayer.size(); i++ ) {
-		fourStonesLayer.at( i ).draw( 0, 0, 1920, 1080 );
-	}
-	edgeDetectionPostProcessing.end();
-	fourStonesBuffer.end();
+	// draw four stones	-> moved to act 2
+	//fourStonesBuffer.begin();
+	//edgeDetectionPostProcessing.begin();
+	//ofClear( 0, 0, 0, 1 );
+	//for( int i = 0; i < fourStonesLayer.size(); i++ ) {
+	//	fourStonesLayer.at( i ).draw( 0, 0, 1920, 1080 );
+	//}
+	//edgeDetectionPostProcessing.end();
+	//fourStonesBuffer.end();
 
-	ofPushStyle();
-	ofSetColor( 255, transparency );
-	fourStonesBuffer.draw( fourStonesPos, 0  );
-	fourStonesBuffer.draw( fourStonesPos - 1920, 0 );
-	ofPopStyle();
+	//ofPushStyle();
+	//ofSetColor( 255, transparency );
+	//fourStonesBuffer.draw( fourStonesPos, 0  );
+	//fourStonesBuffer.draw( fourStonesPos - 1920, 0 );
+	//ofPopStyle();
 
 	// draw stone curtain
 	ofPushStyle();

@@ -7,14 +7,14 @@
 #include "VoronoiLayer.h"
 #include "ofxPostProcessing.h"
 
-class SixGrowingRocksLayer
+class EightGrowingRocks
 {
 public:
-	SixGrowingRocksLayer();
-	~SixGrowingRocksLayer();
+	EightGrowingRocks();
+	~EightGrowingRocks();
 
 	void init();
-	void update();
+	void update(int index);
 	void draw();
 
 
@@ -23,7 +23,6 @@ public:
 	BrushCollection brushes;
 
 	VoronoiLayer voro;
-	std::vector< std::vector< ofPoint > > dottedPoints;
 
 	ofFbo fbo;
 	ofxPostProcessing edge;

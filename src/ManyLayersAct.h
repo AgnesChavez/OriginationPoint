@@ -22,9 +22,6 @@ public:
 	void updateStoneCurtainPos();
 	void updateFourStonesPos();
 
-	std::vector< BrushStone > fourStonesLayer;
-	VoronoiLayer voroFor4Stones;
-
 	ofxPostProcessing edgeDetectionPostProcessing, stoneCurtainEdgeDetectionBuffer;
 	EdgePass::Ptr edgePass;
 

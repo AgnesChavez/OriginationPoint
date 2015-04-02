@@ -51,13 +51,15 @@ void ActSequencer::update()
 	playlist.update();
 	std::cout << testVal << std::endl;
 
-	unsigned long long act2Time = 270000;
-	unsigned long long act2FadeInTime = 280000;
-	unsigned long long act2UpdateStart = 290000;
-	unsigned long long act2UpdateSixStonesStart = 430000;
-	unsigned long long act3UpdateStart = 570000;
-	unsigned long long act3MoveStoneCurtainStart = 610000;
-	unsigned long long act3FourStonesMoveStart = 640000;
+	unsigned long long act2Time = 1000;// 274000;
+	unsigned long long act2FadeInTime = 2000;// 280000;
+	unsigned long long act2UpdateStart = 3000;// 290000;
+	unsigned long long act2StartScaleRock = 170000;
+	unsigned long long act2UpdateFourStonesStart = 300000;// 430000;
+	unsigned long long act2UpdateEightStonesStart = 390000;
+	unsigned long long act3UpdateStart = 720000;
+	unsigned long long act3MoveStoneCurtainStart = 760000;
+	unsigned long long act3FourStonesMoveStart = 790000;
 	
 	unsigned long long currentMillis = ofGetElapsedTimeMillis();
 
@@ -70,19 +72,40 @@ void ActSequencer::update()
 	}
 
 	if( currentMillis > act2UpdateStart ) {
+		
 		TS_START( "act2_update" );
 		act2->update();
 		TS_STOP( "act2_update" );
 		act2->transparency++;
-		if( currentMillis > act2UpdateSixStonesStart ) {
-			act2->sixRocks.update();
-			act2->sixRocks.transparency++;
+
+		if( currentMillis > act2StartScaleRock ) {
+			act2->doScale = true;
+			act2->transparency++;
+			act2->transparency = std::max( 170.0f, act2->transparency );
 		}
+
+		if( currentMillis > act2UpdateFourStonesStart ) {
+			int padding = 10000;
+			for( int i = 0; i < 4; i++ ) {
+				if( currentMillis > act2UpdateFourStonesStart + i * padding ) {
+					act2->fourRocks.update( i );
+				}
+			}
+			act2->fourRocks.transparency += 0.3;
+			act2->fourRocks.transparency = std::min( 90.0f, act2->fourRocks.transparency );
+		}
+		
 	}
 	else {
 		TS_START( "act1_update" );
 		act1->update();
 		TS_STOP( "act1_update" );
+	}
+
+	if( currentMillis > act2UpdateEightStonesStart ) {
+		//act2->updateVoronoiWeb( 1 );
+		act2->voronoiWebTransparency++;
+		act2->voronoiWebTransparency = std::min( act2->voronoiWebTransparency, 160.0f );
 	}
 
 	if( currentMillis > act3UpdateStart ) {
@@ -126,6 +149,10 @@ void ActSequencer::draw()
 	TS_START( "act2_draw" );
 	if( act2->transparency > 0 ) {
 		act2->draw();
+		if( act2->fourRocks.transparency > 1 ) {
+			act2->fourRocks.draw();
+		}
+
 	}
 	TS_STOP( "act2_draw" );
 

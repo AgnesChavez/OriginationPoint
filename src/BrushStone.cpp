@@ -194,6 +194,82 @@ void BrushStone::grow()
 	}
 }
 
+void BrushStone::grow( ofPolyline line, ofVec2f center )
+{
+	if( currentGrowRad < maxGrowRad ) {
+		currentGrowRad += 0.5f;
+
+		layer.begin();
+
+		int nrToCheck = ( int ) ( ofMap( currentGrowRad, 0, maxGrowRad, 5, 15 ) );
+		ofPushStyle();
+		ofEnableAlphaBlending();
+		std::vector< ofVec2f > pointsToDraw( nrToCheck );
+		// decide here weather to grow the stone from the centroid of the outline, or from the actual voronoi cell core
+		ofVec2f p = center; // centroid
+#pragma omp parallel for 
+		for( int i = 0; i < nrToCheck; i++ ) {
+			float deg = ofRandom( 0, TWO_PI );
+			float _x = currentGrowRad * cos( deg );
+			float _y = currentGrowRad * sin( deg );
+			//int randomId = ofRandom( 0, points.size() );
+
+			ofVec2f pToSave = p + ofVec2f( _x, _y );
+			pointsToDraw.at( i ) = pToSave;
+		}
+
+		ofPolyline lineToCheck = line.getResampledBySpacing( 50 );
+		std::vector< ofPoint > tempLocationsDrawn( nrToCheck );
+
+		// checking parallelized for overlapping
+#pragma omp parallel for 
+		for( int i = 0; i < pointsToDraw.size(); i++ ) {
+			ofVec2f p = pointsToDraw.at( i );
+			ofRectangle bb = lineToCheck.getBoundingBox();
+			// first check for bounding box inside as its quicker to compute
+			if( bb.inside( p ) ) {
+				if( lineToCheck.inside( p ) ) {
+					tempLocationsDrawn.at( i ) = ofPoint( p.x, p.y );
+				}
+			}
+		}
+
+		// removing vectors at around location 0, 0
+		vector<ofPoint>::iterator it = tempLocationsDrawn.begin();
+		for( ; it != tempLocationsDrawn.end(); ) {
+			ofPoint *_p = &( *it );
+			if( _p->x < 4 || _p->y < 4 ) {
+				it = tempLocationsDrawn.erase( it );
+			}
+			else {
+				++it;
+				locationsPointsDrawn.push_back( *_p );
+			}
+		}
+
+		for( int i = 0; i < tempLocationsDrawn.size(); i++ ) {
+			ofVec2f p = tempLocationsDrawn.at( i );
+			float s = ofRandom( brushStrokeSizeMin, brushStrokeSizeMax );
+			ofSetColor( colors.getRandomColor(), brushStrokeAlpha );
+			brushes.getRandomBrush().draw( p.x - s / 2.0, p.y - s / 2.0, s, s );
+		}
+
+		ofDisableAlphaBlending();
+		ofPopStyle();
+
+		layer.end();
+
+		underlyingLayer.begin();
+		ofClear( 1.0 );
+		underlyingLayer.end();
+
+		if( tDrawBorder ) {
+			calcBorder( locationsPointsDrawn );
+			renderBorder();
+		}
+	}
+}
+
 bool BrushStone::growForWaterColor( float rad )
 {
 	if( rad < maxGrowRad ) {

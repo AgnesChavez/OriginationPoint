@@ -1,9 +1,9 @@
-#include "SixGrowingRocksLayer.h"
+#include "EightGrowingRocks.h"
 #include "ActSequencer.h"
 
-SixGrowingRocksLayer::SixGrowingRocksLayer()
+EightGrowingRocks::EightGrowingRocks()
 {
-	rockCount = 6;
+	rockCount = 8;
 
 	edge.init( 1920, 1080 );
 	edge.createPass< EdgePass >()->setEnabled( true );
@@ -18,21 +18,16 @@ SixGrowingRocksLayer::SixGrowingRocksLayer()
 
 	fbo.allocate( settings );
 
-	for( int i = 0; i < rockCount; i++ ) {
-		std::vector< ofPoint > emptyPoints;
-		dottedPoints.push_back( emptyPoints );
-	}
-
 	init();
 }
 
 
-SixGrowingRocksLayer::~SixGrowingRocksLayer()
+EightGrowingRocks::~EightGrowingRocks()
 {
 	
 }
 
-void SixGrowingRocksLayer::init()
+void EightGrowingRocks::init()
 {
 	// clears everything so it can be re-started by calling this
 	fbo.begin();
@@ -41,10 +36,6 @@ void SixGrowingRocksLayer::init()
 	voro.clear();
 	rocks.clear();
 	transparency = 0;
-	for( int i = 0; i < rockCount; i++ ) {
-		dottedPoints.at( i ).clear();
-	}
-
 
 	for( int i = 0; i < rockCount; i++ ) {
 		BrushStone s;
@@ -71,27 +62,21 @@ void SixGrowingRocksLayer::init()
 	voro.setSmoothAmount( 20 );
 	voro.compute();
 	voro.render();
-
-
-	
-	
 }
 
-void SixGrowingRocksLayer::update()
+void EightGrowingRocks::update( int index)
 {
-	for( int i = 0; i < rockCount; i++ ) {
-		BrushStone * stone = &rocks.at( i );
-		stone->grow( *voro.getLine( i ) );
-	}
-
-	for( int i = 0; i < rockCount; i++ ) {
-		ofPolyline lineToDraw = *voro.getLine( i ); // rocks.at( i ).border
-		std::vector< ofPoint > pointsToDraw = ActSequencer::getLineSplitPoints( lineToDraw, 4 );
-		dottedPoints.at( i ) = pointsToDraw;
+	if( ofGetFrameNum() % 5 == 0 ) {
+		BrushStone * stone = &rocks.at( index );
+		stone->grow( *voro.getLine( index ) );
+		//for( int i = 0; i < rockCount; i++ ) {
+		//	BrushStone * stone = &rocks.at( i );
+		//	stone->grow( *voro.getLine( i ) );
+		//}
 	}
 }
 
-void SixGrowingRocksLayer::draw()
+void EightGrowingRocks::draw()
 {
 	fbo.begin();
 	edge.begin();
@@ -104,11 +89,6 @@ void SixGrowingRocksLayer::draw()
 	ofPushStyle();
 	ofSetColor( 255, transparency );
 	fbo.draw( 0, 0 );
-
-	for( int i = 0; i < rockCount; i++ ) {
-		//voro.getLine( i )->draw();
-		ActSequencer::drawSplitLines( dottedPoints.at( i ) );
-	}
-	
 	ofPopStyle();
+
 }
