@@ -31,10 +31,12 @@ void StopMotionStones::init()
 	currentScaleLeftOverStone = 3.0f;
 	transparency = 255;
 	isStarted = false;
+	flickeringStonesRelativeTransparency = 0.0;
 
 	voro->clear();
 	stones.clear();
 	transparencies.clear();
+	voronoiCentroids.clear();
 	stones.reserve( x * y );
 
 
@@ -129,6 +131,7 @@ void StopMotionStones::update()
 				currentStone = doBrownianMotion( currentStone, 0 );
 				secondCurrentStone = doBrownianMotion( secondCurrentStone, 1 );
 				thirdCurrentStone = doBrownianMotion( thirdCurrentStone, 2 );
+				flickeringStonesRelativeTransparency--;
 			}
 			if( isWithinMillis( millisBrownianMotionPart2, millisStartFadeAllOut ) ) {
 				for( int i = 0; i < 15; i++ ) {
@@ -147,7 +150,7 @@ void StopMotionStones::update()
 				
 				for( int i = 0; i < 35; i++ ) {
 					int rand = ( int ) ( ofRandom( x * y ) );
-					transparencies.at( rand ) -= 1;
+					transparencies.at( rand ) -= 2;
 				}
 			}
 		}
@@ -208,6 +211,12 @@ void StopMotionStones::drawCustomVoronoi()
 				ofSetColor( 0, transparencies.at( inde ) );
 				ofCircle( pts[ inde ].x, pts[ inde ].y, 4 );
 		}
+	}
+
+	for( int i = 0; i < voro->pts.size(); i++ ) {
+		ofPoint cent = voro->pts.at( i);
+		ofSetColor( ofRandom( 40, 100 ), 200 + flickeringStonesRelativeTransparency );
+		ofCircle( cent.x, cent.y, 1 );
 	}
 
 	/*

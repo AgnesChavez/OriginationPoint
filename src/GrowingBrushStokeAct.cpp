@@ -2,7 +2,8 @@
 #include "ActSequencer.h"
 
 GrowingBrushStokeAct::GrowingBrushStokeAct() :
-transparency( 255 )
+transparency( 255 ),
+secondPlainStoneTransparency( 0 )
 {
 	for( int i = 0; i < 80; i++ ) {
 		std::vector< ofPoint > emptyPoints;
@@ -40,18 +41,28 @@ void GrowingBrushStokeAct::setup() {
 	}
 
 	edgeDetectionPostProcessing.init( 1920, 1080 );
+	slowWarp.init( 1920, 1080 );
 
 	edgePass = edgeDetectionPostProcessing.createPass< EdgePass >();
 	edgePass->setEnabled( true );
+
+	noiseWarp = slowWarp.createPass< NoiseWarpPass >();
+	noiseWarp->setEnabled( false );
+	
 	edgeDetectionPostProcessing.setFlip( false );
+	slowWarp.setFlip( false );
 
 	background.loadImage( "lines_3_bw.jpg" );
+
+	doDrawBackground = false;
 
 	doScale = false;
 	scaleNoiseVal = 0.0f;
 	rotateNoiseVal = 0.0f;
 	growBrushIndex = 0;
 	scaleVal = 0.0;
+	rockYpos = 0.0;
+	backgroundTransparency = 255;
 	
 	ofBackground( 0 );
 
@@ -73,6 +84,8 @@ void GrowingBrushStokeAct::setup() {
 	settings.height = 1080;
 
 	tintBuffer.allocate( settings );
+	secondTintBuffer.allocate( settings );
+
 	voroWebLayer.allocate( settings );
 	voroWebLayer.begin();
 	drawVoronoiWeb();
@@ -89,11 +102,28 @@ void GrowingBrushStokeAct::createStone( ofPoint centerStone )
 	plainStone.init( centerStone.x, centerStone.y );
 	plainStone.setBrushStrokeSizeMin( 10 );
 	plainStone.setBrushStrokeSizeMax( 40 );
+
 	for( int i = 0; i < 3; i++ ) {
 		plainStone.grow( *voro.getLine( 0 ), ofVec2f( 1920 / 2, 1080 / 2 ) );
 	}
+
 	plainStone.setBrushStrokeSizeMin( 20 );
 	plainStone.setBrushStrokeSizeMax( 80 );
+
+	secondPlainStone.setColorCollection( blackWhiteColor );
+	secondPlainStone.setBrushCollection( brushCollection );
+	secondPlainStone.setBrushStrokeAlpha( 255 );
+	secondPlainStone.init( centerStone.x, centerStone.y );
+	secondPlainStone.setBrushStrokeSizeMin( 10 );
+	secondPlainStone.setBrushStrokeSizeMax( 40 );
+
+	for( int i = 0; i < 3; i++ ) {
+		secondPlainStone.grow( *voro.getLine( 0 ), ofVec2f( 1920 / 2, 1080 / 2 ) );
+	}
+
+	secondPlainStone.setBrushStrokeSizeMin( 20 );
+	secondPlainStone.setBrushStrokeSizeMax( 80 );
+
 }
 
 void GrowingBrushStokeAct::addCustomVoronoiPoints() {
@@ -134,8 +164,18 @@ void GrowingBrushStokeAct::update() {
 	if( doScale ) {
 		updateScale();
 	}
+	float am = ofMap( ofGetMouseX(), 0, 1920, 0, 2 );
+	float fr = ofMap( ofGetMouseY(), 0, 1080, 0, 2 );
+	noiseWarp->setAmplitude( am );
+	noiseWarp->setFrequency( fr );
+
 	// slowWarpPass->setAmplitude( 0.004 );
 	// slowWarpPass->setFrequency( 0.976 );
+}
+
+void GrowingBrushStokeAct::updateSecondStone()
+{
+	secondPlainStone.grow( *voro.getLine( 0 ), ofVec2f( 1920 / 2, 1080 / 2 ) );
 }
 
 void GrowingBrushStokeAct::updateScale()
@@ -145,10 +185,11 @@ void GrowingBrushStokeAct::updateScale()
 }
 
 void GrowingBrushStokeAct::draw() {
-
 	tintBuffer.begin();
-	ofClear( 0, 0, 0, 0 );
+	ofBackground( 0 );
+	
 	edgeDetectionPostProcessing.begin();
+
 	ofPushStyle();
 	ofPushMatrix();
 	ofTranslate( 1920 / 2, 1080 / 2, 0 );
@@ -165,27 +206,40 @@ void GrowingBrushStokeAct::draw() {
 	edgeDetectionPostProcessing.end();
 	tintBuffer.end();
 
+	
+
 	//edgeDetectionPostProcessing.begin();
 	ofPushStyle();
 	//ofSetColor( 255, 255 );
 	ofSetColor( 255, transparency );
 	tintBuffer.draw( 0, 0 );
+	//tintBuffer.draw( 0, rockYpos - 1080 );
 	ofPopStyle();
 	//edgeDetectionPostProcessing.end();
+	
+}
 
-	//ofPushStyle();
-	//ofSetColor( 255, transparency );
-	//slowWarp.draw();
-	//ofPopStyle();
+void GrowingBrushStokeAct::drawSecondStone()
+{
+	secondTintBuffer.begin();
+	edgeDetectionPostProcessing.begin();
 
-	//fourRocks.draw();
-	//eightRocks.draw();
-	TS_START( "voro_web" );
 	ofPushStyle();
-	ofSetColor( 255, voronoiWebTransparency );
-	voroWebLayer.draw( 0, 0 );
+
+	secondPlainStone.setSelectedColor( ofColor( 255 ) );
+	secondPlainStone.setTransparency( secondPlainStoneTransparency );
+	secondPlainStone.draw( 0, 0, 1920, 1080 );
+
 	ofPopStyle();
-	TS_STOP( "voro_web" );
+	edgeDetectionPostProcessing.end();
+	secondTintBuffer.end();
+
+	ofPushStyle();
+	ofSetColor( 255, secondPlainStoneTransparency );
+	secondTintBuffer.draw( 0, rockYpos );
+	secondTintBuffer.draw( 0, rockYpos - 1080 );
+
+	ofPopStyle();
 }
 
 void GrowingBrushStokeAct::keyPressed( int key )
@@ -217,19 +271,30 @@ void GrowingBrushStokeAct::updateFourStones()
 	
 }
 
-void GrowingBrushStokeAct::updateVoronoiWeb( int speed )
-{
-	voronoiWebTransparency += speed;
-}
-
 void GrowingBrushStokeAct::drawVoronoiWeb()
 {
 	ofPushStyle();
 	ofSetColor( 255, 255 );
+	glLineWidth( 3 );
 	for( int i = 0; i < dottedPoints.size(); i++ ) {
 		//voro2.getLine( i )->draw();
 		ActSequencer::drawSplitLines( dottedPoints.at( i ) );
 	}
 	ofPopStyle();
+}
+
+void GrowingBrushStokeAct::lowerScale()
+{
+	scaleVal -= 0.01f;
+	scaleVal = std::max( scaleVal, 0.0f );
+	doDrawBackground = true;
+}
+
+void GrowingBrushStokeAct::updateRockYpos()
+{
+	rockYpos += 0.5f;
+	if( rockYpos >= 1080 ){
+		rockYpos = 0;
+	}
 }
 

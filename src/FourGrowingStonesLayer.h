@@ -17,6 +17,8 @@ public:
 	void update( int index );
 	void draw();
 
+	void updateYpos();
+
 	VoronoiLayer voroFor4Stones;
 	std::vector< BrushStone > fourStonesLayer;
 	BrushCollection brushes;
@@ -24,5 +26,7 @@ public:
 	ofFbo fbo;
 	ofxPostProcessing edge;
 	float transparency;
+
+	float ypos;
 };
 

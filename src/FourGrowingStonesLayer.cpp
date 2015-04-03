@@ -33,6 +33,8 @@ void FourGrowingStonesLayer::init()
 	ofClear( 0, 0, 0 );
 	fbo.end();
 
+	ypos = 0;
+
 
 	// adds four stones
 	ofVec2f rand1( 650 + ofRandom( -100, 100 ), 250 );
@@ -115,7 +117,6 @@ void FourGrowingStonesLayer::init()
 void FourGrowingStonesLayer::update( int index )
 {
 	if( ofGetFrameNum() % 5 == 0 ) {
-
 		BrushStone * stone = &fourStonesLayer.at( index );
 		stone->grow( *voroFor4Stones.getLine( index ) );
 	}
@@ -133,7 +134,16 @@ void FourGrowingStonesLayer::draw()
 
 	ofPushStyle();
 	ofSetColor( 255, transparency );
-	fbo.draw( 0, 0 );
+	fbo.draw( 0, ypos );
+	fbo.draw( 0, ypos + 1080);
 
 	ofPopStyle();
+}
+
+void FourGrowingStonesLayer::updateYpos()
+{
+	ypos -= 0.5;
+	if( ypos < -1080 ) {
+		ypos = 0;
+	}
 }

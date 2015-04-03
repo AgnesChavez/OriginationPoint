@@ -18,19 +18,21 @@ public:
 
 	void setup();
 	void updateScale();
+	void lowerScale();
 	void update();
 	void updateFourStones();
-	void updateVoronoiWeb( int speed );
+	void updateSecondStone();
 	void draw();
 	void keyPressed( int key );
 	void drawVoronoiWeb();
+	void drawSecondStone();
 
 	void createStone( ofPoint centerStone );
 
 	//GrowingBrushStokesLayer waterColorStone;
 
 	ofFbo brushStoneBuffer;
-	BrushStone plainStone;
+	BrushStone plainStone, secondPlainStone;
 	BrushCollection brushCollection;
 	ColorCollection agnesColorSelection, blackWhiteColor;
 
@@ -43,19 +45,21 @@ public:
 
 	ofImage background;
 
-	ofFbo tintBuffer;
-
-	
+	ofFbo tintBuffer, secondTintBuffer;
 
 	EdgePass::Ptr edgePass;
-	NoiseWarpPass::Ptr noiseWarp, slowWarpPass;
+	NoiseWarpPass::Ptr noiseWarp;
 	ConvolutionPass::Ptr convPass;
 
 	VoronoiLayer voro;
 	void addCustomVoronoiPoints();
 
 	
-	float transparency;
+	float transparency, secondPlainStoneTransparency;
+	bool doDrawBackground;
+	void updateRockYpos();
+	float rockYpos;
+	float backgroundTransparency;
 
 	EightGrowingRocks eightRocks;
 	FourGrowingStonesLayer fourRocks;

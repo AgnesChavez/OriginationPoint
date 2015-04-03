@@ -35,8 +35,6 @@ void ManyLayersAct::setup()
 	waterPass->setAmplitude( 0.009 );
 	waterPass->setFrequency( 0.976 );
 
-	transparency = 255;
-
 	blackWhiteColor.addColor( 90, 90, 90 );
 	blackWhiteColor.addColor( 255, 255, 255 );
 
@@ -50,7 +48,6 @@ void ManyLayersAct::setup()
 	agnesColorSelection.addColor( 110, 18, 0 );
 	agnesColorSelection.addColor( 163, 87, 52 );
 	agnesColorSelection.addColor( 71, 209, 108 );
-
 
 	stoneCurtain.setBrushCollection( brushCollection );
 	stoneCurtain.setColorCollection( agnesColorSelection );
@@ -74,12 +71,11 @@ void ManyLayersAct::setup()
 	stoneCurtainEdgeDetectionBuffer.end();
 	stoneCurtainBuffer.end();
 
-	stoneCurtainXpos = 0;
+	stoneCurtainXpos = 1915;
 	stoneCurtainTransparency = 0;
 	fourStonesPos = 0;
 	transparency = 0;
 	doLoop4Stones = false;
-
  }
 
 void ManyLayersAct::update()
@@ -93,29 +89,15 @@ void ManyLayersAct::update()
 void ManyLayersAct::draw()
 {
 	// draw background water effect
+	/*
 	ofPushStyle();
 	ofSetColor( 255, transparency );
 	waterPostProcessing.begin();
 	background.draw( 0, 0, 1920, 1080 );
 	waterPostProcessing.end();
 	ofPopStyle();
-
-	// draw four stones	-> moved to act 2
-	//fourStonesBuffer.begin();
-	//edgeDetectionPostProcessing.begin();
-	//ofClear( 0, 0, 0, 1 );
-	//for( int i = 0; i < fourStonesLayer.size(); i++ ) {
-	//	fourStonesLayer.at( i ).draw( 0, 0, 1920, 1080 );
-	//}
-	//edgeDetectionPostProcessing.end();
-	//fourStonesBuffer.end();
-
-	//ofPushStyle();
-	//ofSetColor( 255, transparency );
-	//fourStonesBuffer.draw( fourStonesPos, 0  );
-	//fourStonesBuffer.draw( fourStonesPos - 1920, 0 );
-	//ofPopStyle();
-
+	*/
+	
 	// draw stone curtain
 	ofPushStyle();
 	ofSetColor( 255, stoneCurtainTransparency );
@@ -127,7 +109,7 @@ void ManyLayersAct::draw()
 
 void ManyLayersAct::updateStoneCurtainPos()
 {
-	stoneCurtainXpos--;
+	stoneCurtainXpos -= 0.5;
 	if( stoneCurtainXpos <= -1920 ) {
 		stoneCurtainXpos = 0;
 	}

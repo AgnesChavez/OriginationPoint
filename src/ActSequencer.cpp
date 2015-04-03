@@ -49,17 +49,21 @@ void ActSequencer::update()
 {
 
 	playlist.update();
-	std::cout << testVal << std::endl;
 
-	unsigned long long act2Time = 1000;// 274000;
-	unsigned long long act2FadeInTime = 2000;// 280000;
-	unsigned long long act2UpdateStart = 3000;// 290000;
-	unsigned long long act2StartScaleRock = 170000;
-	unsigned long long act2UpdateFourStonesStart = 300000;// 430000;
-	unsigned long long act2UpdateEightStonesStart = 390000;
-	unsigned long long act3UpdateStart = 720000;
-	unsigned long long act3MoveStoneCurtainStart = 760000;
-	unsigned long long act3FourStonesMoveStart = 790000;
+	unsigned long long act2Time = 220000;
+	unsigned long long act2FadeInTime = act2Time + 10000;
+	unsigned long long act2UpdateStart = act2FadeInTime + 10000;
+	unsigned long long act2StartScaleRock = act2UpdateStart + 150000;
+	unsigned long long act2UpdateFourStonesStart = act2StartScaleRock + 130000; // 427000
+	unsigned long long startStoneCurtain = act2UpdateFourStonesStart + 100000; // 537000
+	unsigned long long moveFourSTones = startStoneCurtain + 20000;
+	unsigned long long growNewBigRock = moveFourSTones + 20000;
+	unsigned long long startMoveBigRock = growNewBigRock + 20000;
+	unsigned long long fadeInVoroWeb = startMoveBigRock + 10000;
+	unsigned long long fadeOut4Stones = fadeInVoroWeb + 20000;
+	unsigned long long fadeOutBigStone = fadeOut4Stones + 20000;
+	unsigned long long fadeOutBackground = fadeOutBigStone + 20000;
+	unsigned long long fadeOutStoneCurtain = fadeOutBackground + 20000;
 	
 	unsigned long long currentMillis = ofGetElapsedTimeMillis();
 
@@ -91,10 +95,10 @@ void ActSequencer::update()
 					act2->fourRocks.update( i );
 				}
 			}
+
 			act2->fourRocks.transparency += 0.3;
-			act2->fourRocks.transparency = std::min( 90.0f, act2->fourRocks.transparency );
+			act2->fourRocks.transparency = std::min( 140.0f, act2->fourRocks.transparency );
 		}
-		
 	}
 	else {
 		TS_START( "act1_update" );
@@ -102,33 +106,57 @@ void ActSequencer::update()
 		TS_STOP( "act1_update" );
 	}
 
-	if( currentMillis > act2UpdateEightStonesStart ) {
-		//act2->updateVoronoiWeb( 1 );
-		act2->voronoiWebTransparency++;
-		act2->voronoiWebTransparency = std::min( act2->voronoiWebTransparency, 160.0f );
-	}
-
-	if( currentMillis > act3UpdateStart ) {
-		act2Ypos++;
+	if( currentMillis > startStoneCurtain ) {
+		//act2Ypos++;
 		if( act2Ypos >= 1080 ) {
 			act2Ypos = 0;
 		}
 
-		act2->transparency = -1;
+		act2->transparency--;
+		//act2->voronoiWebTransparency--;
 
-		TS_START( "act3_update" );
-		act3->update();
-		act3->transparency = std::min(255.0, act3->transparency + 1.0);
-		act3->stoneCurtainTransparency = std::min( 255.0, act3->stoneCurtainTransparency + 1.0 );
-		TS_STOP( "act_3update" );
-	}
-
-	if( currentMillis > act3MoveStoneCurtainStart ) {
+		//act3->update();
+		//act3->transparency++;// std::min( 255.0, act3->transparency + 1.0 );
 		act3->updateStoneCurtainPos();
+		act3->stoneCurtainTransparency = std::min( 190.0f, act3->stoneCurtainTransparency + 1.0f );
 	}
 
-	if( currentMillis > act3FourStonesMoveStart ) {
-		act3->updateFourStonesPos();
+	if( currentMillis > moveFourSTones ) {
+		act2->fourRocks.updateYpos();
+	}
+
+	if( currentMillis > growNewBigRock ) {
+		act2->updateSecondStone();
+		act2->secondPlainStoneTransparency += 0.5f;
+		act2->secondPlainStoneTransparency = std::min( act2->secondPlainStoneTransparency, 130.0f );
+		//act2->lowerScale();
+		//act2->transparency--;
+		//act2->transparency = std::max( act2->transparency, 180.0f );
+	}
+
+	if( currentMillis > startMoveBigRock ) {
+		act2->updateRockYpos();
+		//act3->updateFourStonesPos();
+	}
+
+	if( currentMillis > fadeInVoroWeb ) {
+		//act2->voronoiWebTransparency += 0.3f;
+	}
+
+	if( currentMillis > fadeOut4Stones ) {
+		act2->fourRocks.transparency -= 0.5f;
+	}
+
+	if( currentMillis > fadeOutBigStone ) {
+		act2->transparency -= 0.5f;
+	}
+
+	if( currentMillis > fadeOutBackground ) {
+		act2->backgroundTransparency -= 0.5f;
+	}
+
+	if( currentMillis > fadeOutStoneCurtain ) {
+		act3->stoneCurtainTransparency -= 0.5;
 	}
 }
 
@@ -157,16 +185,18 @@ void ActSequencer::draw()
 	TS_STOP( "act2_draw" );
 
 	TS_START( "act3_draw" );
-	if( act3->transparency > 0 ) {
+	if( act3->stoneCurtainTransparency > 0 ) {
 		act3->draw();
-		ofPushStyle();
-		ofSetColor( 255, 255 );
-		act2->tintBuffer.draw( 0, act2Ypos );
-		act2->tintBuffer.draw( 0, act2Ypos - 1080 );
-		ofPopStyle();
+		//ofPushStyle();
+		//ofSetColor( 255, 255 );
+		//act2->tintBuffer.draw( 0, act2Ypos );
+		//act2->tintBuffer.draw( 0, act2Ypos - 1080 );
+		//ofPopStyle();
 		
 	}
 	TS_STOP( "act3_draw" );
+
+	act2->drawSecondStone();
 
 	ofPopMatrix();
 	ofPushStyle();

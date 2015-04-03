@@ -62,6 +62,9 @@ private:
 
 	float currentScaleLeftOverStone;
 
+	std::vector< ofPoint > voronoiCentroids;
+	float flickeringStonesRelativeTransparency;
+
 	void removeOuterEdges();
 	bool isWithinMillis( unsigned long long start, unsigned long long end );
 	bool isPastMillis( unsigned long long mill );
