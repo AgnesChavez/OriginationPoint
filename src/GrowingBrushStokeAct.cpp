@@ -225,10 +225,16 @@ void GrowingBrushStokeAct::drawSecondStone()
 	edgeDetectionPostProcessing.begin();
 
 	ofPushStyle();
+	ofPushMatrix();
+	ofTranslate( 1920 / 2, 1080 / 2, 0 );
+	float scaleSecondStone = 1.3;
+	ofScale( scaleSecondStone, scaleSecondStone );
 
 	secondPlainStone.setSelectedColor( ofColor( 255 ) );
 	secondPlainStone.setTransparency( secondPlainStoneTransparency );
 	secondPlainStone.draw( 0, 0, 1920, 1080 );
+
+	ofPopMatrix();
 
 	ofPopStyle();
 	edgeDetectionPostProcessing.end();
