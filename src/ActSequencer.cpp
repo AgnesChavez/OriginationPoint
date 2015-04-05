@@ -108,9 +108,9 @@ void ActSequencer::update()
 
 	if( currentMillis > startStoneCurtain ) {
 		//act2Ypos++;
-		if( act2Ypos >= 1080 ) {
-			act2Ypos = 0;
-		}
+		//if( act2Ypos >= 1080 ) {
+		//	act2Ypos = 0;
+		//}
 
 		act2->transparency--;
 		//act2->voronoiWebTransparency--;
@@ -118,7 +118,7 @@ void ActSequencer::update()
 		//act3->update();
 		//act3->transparency++;// std::min( 255.0, act3->transparency + 1.0 );
 		act3->updateStoneCurtainPos();
-		std::cout << "updated stone curtain at ms: " << ofGetFrameNum() << std::endl;
+		//std::cout << "updated stone curtain at ms: " << ofGetFrameNum() << std::endl;
 		act3->stoneCurtainTransparency = std::min( 190.0f, act3->stoneCurtainTransparency + 1.0f );
 	}
 

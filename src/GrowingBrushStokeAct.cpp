@@ -232,7 +232,7 @@ void GrowingBrushStokeAct::drawSecondStone()
 
 	secondPlainStone.setSelectedColor( ofColor( 255 ) );
 	secondPlainStone.setTransparency( secondPlainStoneTransparency );
-	secondPlainStone.draw( 0, 0, 1920, 1080 );
+	secondPlainStone.draw( -1920 / 2, -1080 / 2, 1920, 1080 );
 
 	ofPopMatrix();
 

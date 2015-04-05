@@ -37,7 +37,7 @@ public:
 
 	ofFbo stoneCurtainBuffer, fourStonesBuffer;
 	StoneCurtain stoneCurtain;
-	int stoneCurtainXpos;
+	float stoneCurtainXpos;
 	int fourStonesPos;
 
 	bool doLoop4Stones;	

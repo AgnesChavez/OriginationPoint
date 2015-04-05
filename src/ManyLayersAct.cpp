@@ -109,7 +109,8 @@ void ManyLayersAct::draw()
 
 void ManyLayersAct::updateStoneCurtainPos()
 {
-	stoneCurtainXpos -= 0.5;
+	std::cout << "updating curtain X pos to: " << stoneCurtainXpos << std::endl;
+	stoneCurtainXpos -= 0.5f;
 	if( stoneCurtainXpos <= -1920 ) {
 		stoneCurtainXpos = 0;
 	}
