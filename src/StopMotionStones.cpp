@@ -33,12 +33,14 @@ void StopMotionStones::init()
 	isStarted = false;
 	flickeringStonesRelativeTransparency = 0.0;
 
+	//cutter.init();
+
+
 	voro->clear();
 	stones.clear();
 	transparencies.clear();
 	voronoiCentroids.clear();
 	stones.reserve( x * y );
-
 
 	/* Creates grid aligned voronoi diagram */
 	for( int i = 0; i < y; i++ ) {

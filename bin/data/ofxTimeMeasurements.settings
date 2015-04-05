@@ -1,6 +1,2 @@
 update()=1|1|0
-act1_update=1|1|0
 draw()=1|1|0
-act1_draw=1|1|1
-act2_draw=1|1|1
-act3_draw=1|1|1

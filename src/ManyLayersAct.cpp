@@ -2,17 +2,6 @@
 
 ManyLayersAct::ManyLayersAct()
 {
-	setup();
-}
-
-
-ManyLayersAct::~ManyLayersAct()
-{
-}
-
-void ManyLayersAct::setup()
-{
-
 	background.loadImage( "watercolor_rocks_pattern.jpg" );
 	gridImage.loadImage( "grid_invert.jpg" );
 
@@ -31,9 +20,6 @@ void ManyLayersAct::setup()
 	waterPass = waterPostProcessing.createPass<NoiseWarpPass>();
 	waterPass->setEnabled( true );
 	waterPostProcessing.setFlip( false );
-
-	waterPass->setAmplitude( 0.009 );
-	waterPass->setFrequency( 0.976 );
 
 	blackWhiteColor.addColor( 90, 90, 90 );
 	blackWhiteColor.addColor( 255, 255, 255 );
@@ -71,6 +57,19 @@ void ManyLayersAct::setup()
 	stoneCurtainEdgeDetectionBuffer.end();
 	stoneCurtainBuffer.end();
 
+	setup();
+}
+
+
+ManyLayersAct::~ManyLayersAct()
+{
+}
+
+void ManyLayersAct::setup()
+{
+	waterPass->setAmplitude( 0.009 );
+	waterPass->setFrequency( 0.976 );
+
 	stoneCurtainXpos = 1915;
 	stoneCurtainTransparency = 0;
 	fourStonesPos = 0;
@@ -80,10 +79,7 @@ void ManyLayersAct::setup()
 
 void ManyLayersAct::update()
 {
-	//for( int i = 0; i < fourStonesLayer.size(); i++ ) {
-	//	fourStonesLayer.at( i ).grow( *voroFor4Stones.getLine( i ) );
-	//}
-
+	
 }
 
 void ManyLayersAct::draw()

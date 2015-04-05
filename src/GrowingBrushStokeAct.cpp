@@ -10,6 +10,32 @@ secondPlainStoneTransparency( 0 )
 		dottedPoints.push_back( emptyPoints );
 	}
 
+	edgeDetectionPostProcessing.init( 1920, 1080 );
+	slowWarp.init( 1920, 1080 );
+
+	edgePass = edgeDetectionPostProcessing.createPass< EdgePass >();
+	edgePass->setEnabled( true );
+
+	noiseWarp = slowWarp.createPass< NoiseWarpPass >();
+	noiseWarp->setEnabled( false );
+
+	edgeDetectionPostProcessing.setFlip( false );
+	slowWarp.setFlip( false );
+
+	background.loadImage( "lines_3_bw.jpg" );
+
+	ofFbo::Settings settings;
+	settings.useDepth = true;
+	settings.useStencil = false;
+	settings.depthStencilAsTexture = true;
+	settings.width = 1920;
+	settings.height = 1080;
+
+	tintBuffer.allocate( settings );
+	secondTintBuffer.allocate( settings );
+
+	voroWebLayer.allocate( settings );
+
 	setup();
 
 }
@@ -21,7 +47,9 @@ GrowingBrushStokeAct::~GrowingBrushStokeAct()
 
 
 void GrowingBrushStokeAct::setup() {
+	transparency = 255;
 	voronoiWebTransparency = 0;
+	secondPlainStoneTransparency = 0;
 	voro2.clear();
 	for( int i = 0; i < dottedPoints.size(); i++ ) {
 		dottedPoints.at( i ).clear();
@@ -40,19 +68,7 @@ void GrowingBrushStokeAct::setup() {
 		dottedPoints.at( i ) = pointsToDraw;
 	}
 
-	edgeDetectionPostProcessing.init( 1920, 1080 );
-	slowWarp.init( 1920, 1080 );
-
-	edgePass = edgeDetectionPostProcessing.createPass< EdgePass >();
-	edgePass->setEnabled( true );
-
-	noiseWarp = slowWarp.createPass< NoiseWarpPass >();
-	noiseWarp->setEnabled( false );
 	
-	edgeDetectionPostProcessing.setFlip( false );
-	slowWarp.setFlip( false );
-
-	background.loadImage( "lines_3_bw.jpg" );
 
 	doDrawBackground = false;
 
@@ -64,7 +80,7 @@ void GrowingBrushStokeAct::setup() {
 	rockYpos = 0.0;
 	backgroundTransparency = 255;
 	
-	ofBackground( 0 );
+	//ofBackground( 0 );
 
 	blackWhiteColor.addColor( 90, 90, 90 );
 	blackWhiteColor.addColor( 255, 255, 255 );
@@ -76,20 +92,18 @@ void GrowingBrushStokeAct::setup() {
 	line.addVertex( 1920, 1080 );
 	line.setClosed( true );
 
-	ofFbo::Settings settings;
-	settings.useDepth = true;
-	settings.useStencil = false;
-	settings.depthStencilAsTexture = true;
-	settings.width = 1920;
-	settings.height = 1080;
-
-	tintBuffer.allocate( settings );
-	secondTintBuffer.allocate( settings );
-
-	voroWebLayer.allocate( settings );
+	
 	voroWebLayer.begin();
 	drawVoronoiWeb();
 	voroWebLayer.end();
+
+	tintBuffer.begin();
+	ofBackground( 0 );
+	tintBuffer.end();
+
+	secondTintBuffer.begin();
+	ofBackground( 0 );
+	secondTintBuffer.end();
 
 	addCustomVoronoiPoints();
 }

@@ -25,6 +25,8 @@ void StopMotionStonesAct::setup()
 
 	stones.setGrowing( true );
 
+	transparency = 255;
+
 	stones.start();
 }
 
