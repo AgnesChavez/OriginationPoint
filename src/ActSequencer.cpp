@@ -43,55 +43,64 @@ void ActSequencer::setup()
 	warper.setBottomRightCornerPosition( ofPoint( x + w, y + h ) ); // this is position of the quad warp corners, centering the image on the screen.
 	warper.setup();
 	warper.load(); // reload last saved changes.
+
+	currentMillisTimelinePosition = 0;
+	lastElapsedMillis = 0;
 }
 
 void ActSequencer::update()
 {
 
+	unsigned long long difference = ofGetElapsedTimeMillis() - lastElapsedMillis;
+	lastElapsedMillis = ofGetElapsedTimeMillis();
+
+	currentMillisTimelinePosition += difference;
+
 	playlist.update();
 
-	unsigned long long act2Time = 220000;
-	unsigned long long act2FadeInTime = act2Time + 10000;
-	unsigned long long act2UpdateStart = act2FadeInTime + 10000;
-	unsigned long long act2StartScaleRock = act2UpdateStart + 150000;
-	unsigned long long act2UpdateFourStonesStart = act2StartScaleRock + 130000; // 427000
-	unsigned long long startStoneCurtain = act2UpdateFourStonesStart + 100000; // 537000
-	unsigned long long moveFourSTones = startStoneCurtain + 20000;
-	unsigned long long growNewBigRock = moveFourSTones + 20000;
-	unsigned long long startMoveBigRock = growNewBigRock + 20000;
-	unsigned long long fadeInVoroWeb = startMoveBigRock + 10000;
-	unsigned long long fadeOut4Stones = fadeInVoroWeb + 20000;
-	unsigned long long fadeOutBigStone = fadeOut4Stones + 20000;
-	unsigned long long fadeOutBackground = fadeOutBigStone + 20000;
-	unsigned long long fadeOutStoneCurtain = fadeOutBackground + 20000;
-	
-	unsigned long long currentMillis = ofGetElapsedTimeMillis();
+	float factor = 1;
 
-	if( currentMillis > act2Time ) {
+	unsigned long long act2Time = 220000 * factor;
+	unsigned long long act2FadeInTime = act2Time + 10000 * factor;
+	unsigned long long act2UpdateStart = act2FadeInTime + 10000 * factor;
+	unsigned long long act2StartScaleRock = act2UpdateStart + 150000 * factor;
+	unsigned long long act2UpdateFourStonesStart = act2StartScaleRock + 130000 * factor; // 427000
+	unsigned long long startStoneCurtain = act2UpdateFourStonesStart + 100000 * factor; // 537000
+	unsigned long long moveFourSTones = startStoneCurtain + 120000 * factor;
+	unsigned long long growNewBigRock = moveFourSTones + 30000 * factor;
+	unsigned long long startMoveBigRock = growNewBigRock + 20000 * factor;
+	unsigned long long fadeOut4Stones = startMoveBigRock + 50000 * factor;
+	unsigned long long fadeOutBigStone = fadeOut4Stones + 20000 * factor;
+	unsigned long long fadeoutBackground = fadeOutBigStone + 20000 * factor;
+	unsigned long long fadeoutStoneCurtain = fadeoutBackground + 20000 * factor;
+	unsigned long long startOverMills = fadeoutStoneCurtain + 10000 * factor;
+
+	std::cout << "currentMillisTimelinePosition: " << currentMillisTimelinePosition << std::endl;
+
+	if( currentMillisTimelinePosition > act2Time ) {
 		act1->transparency--;
 	}
 
-	if( currentMillis > act2FadeInTime ) {
-		act2->transparency++;
+	if( currentMillisTimelinePosition > act2FadeInTime ) {
+		act2->transparency += 0.3;
+		act2->transparency = std::min( 170.0f, act2->transparency );
 	}
 
-	if( currentMillis > act2UpdateStart ) {
+	if( currentMillisTimelinePosition > act2UpdateStart ) {
 		
 		TS_START( "act2_update" );
 		act2->update();
 		TS_STOP( "act2_update" );
-		act2->transparency++;
 
-		if( currentMillis > act2StartScaleRock ) {
+		if( currentMillisTimelinePosition > act2StartScaleRock  ) {
 			act2->doScale = true;
-			act2->transparency++;
-			act2->transparency = std::max( 170.0f, act2->transparency );
+			//act2->transparency++;
 		}
 
-		if( currentMillis > act2UpdateFourStonesStart ) {
+		if( currentMillisTimelinePosition > act2UpdateFourStonesStart ) {
 			int padding = 10000;
 			for( int i = 0; i < 4; i++ ) {
-				if( currentMillis > act2UpdateFourStonesStart + i * padding ) {
+				if( currentMillisTimelinePosition > act2UpdateFourStonesStart + i * padding ) {
 					act2->fourRocks.update( i );
 				}
 			}
@@ -106,27 +115,20 @@ void ActSequencer::update()
 		TS_STOP( "act1_update" );
 	}
 
-	if( currentMillis > startStoneCurtain ) {
-		//act2Ypos++;
-		//if( act2Ypos >= 1080 ) {
-		//	act2Ypos = 0;
-		//}
+	if( currentMillisTimelinePosition > startStoneCurtain && currentMillisTimelinePosition < fadeoutBackground ) {
+		//act2->transparency--;
 
-		act2->transparency--;
-		//act2->voronoiWebTransparency--;
-
-		//act3->update();
-		//act3->transparency++;// std::min( 255.0, act3->transparency + 1.0 );
 		act3->updateStoneCurtainPos();
 		//std::cout << "updated stone curtain at ms: " << ofGetFrameNum() << std::endl;
-		act3->stoneCurtainTransparency = std::min( 190.0f, act3->stoneCurtainTransparency + 1.0f );
+		act3->stoneCurtainTransparency += 0.5f;
+		act3->stoneCurtainTransparency = std::min( 190.0f, act3->stoneCurtainTransparency );
 	}
 
-	if( currentMillis > moveFourSTones ) {
+	if( currentMillisTimelinePosition > moveFourSTones ) {
 		act2->fourRocks.updateYpos();
 	}
 
-	if( currentMillis > growNewBigRock ) {
+	if( currentMillisTimelinePosition > growNewBigRock && currentMillisTimelinePosition < fadeoutStoneCurtain ) {
 		act2->updateSecondStone();
 		act2->secondPlainStoneTransparency += 0.5f;
 		act2->secondPlainStoneTransparency = std::min( act2->secondPlainStoneTransparency, 130.0f );
@@ -135,29 +137,38 @@ void ActSequencer::update()
 		//act2->transparency = std::max( act2->transparency, 180.0f );
 	}
 
-	if( currentMillis > startMoveBigRock ) {
+	if( currentMillisTimelinePosition > startMoveBigRock ) {
 		act2->updateRockYpos();
 		//act3->updateFourStonesPos();
 	}
 
-	if( currentMillis > fadeInVoroWeb ) {
-		//act2->voronoiWebTransparency += 0.3f;
-	}
-
-	if( currentMillis > fadeOut4Stones ) {
+	if( currentMillisTimelinePosition > fadeOut4Stones ) {
 		act2->fourRocks.transparency -= 0.5f;
+		act2->fourRocks.transparency = std::max( act2->fourRocks.transparency, 0.0f );
+		std::cout << "fade out four rocks to " << act2->fourRocks.transparency << std::endl;
 	}
 
-	if( currentMillis > fadeOutBigStone ) {
-		act2->transparency -= 0.5f;
+	if( currentMillisTimelinePosition > fadeOutBigStone ) {
+		act2->transparency -= 1.0f;
+		std::cout << "fade out big stone to " << act2->transparency << std::endl;
+		act2->transparency = std::max( act2->transparency, 0.0f );
 	}
 
-	if( currentMillis > fadeOutBackground ) {
-		act2->backgroundTransparency -= 0.5f;
+	if( currentMillisTimelinePosition > fadeoutBackground ) {
+		act2->secondPlainStoneTransparency -= 0.5f;
+		act2->secondPlainStoneTransparency = std::max( act2->secondPlainStoneTransparency, 0.0f );
+		std::cout << "fade out second big stone to " << act2->secondPlainStoneTransparency << std::endl;
 	}
 
-	if( currentMillis > fadeOutStoneCurtain ) {
-		act3->stoneCurtainTransparency -= 0.5;
+	if( currentMillisTimelinePosition > fadeoutStoneCurtain ) {
+		act3->stoneCurtainTransparency -= 1.0f;
+		act3->stoneCurtainTransparency = std::max( act3->stoneCurtainTransparency, 0.0f );
+		std::cout << "fade out stone curtain to " << act3->stoneCurtainTransparency << std::endl;
+	}
+
+	if( currentMillisTimelinePosition > startOverMills && currentMillisTimelinePosition < startOverMills + 500 ) {
+		currentMillisTimelinePosition = 0;
+		std::cout << "Finished one cycle. yay." << std::endl;
 	}
 }
 
@@ -214,6 +225,7 @@ void ActSequencer::draw()
 	ofSetColor( ofColor::red );
 	warper.drawSelectedCorner();
 	ofPopStyle();
+
 }
 
 void ActSequencer::keyPressed( int key )

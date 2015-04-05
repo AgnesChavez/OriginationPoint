@@ -30,6 +30,8 @@ public:
 	int act2Ypos;
 	int stoneCurtainXpos;
 
+	unsigned long long currentMillisTimelinePosition, lastElapsedMillis;
+
 	ManyLayersAct * act3;
 
 	static std::vector< ofPoint > getLineSplitPoints( ofPolyline linesToSplit, float length );

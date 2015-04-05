@@ -197,7 +197,7 @@ void GrowingBrushStokeAct::draw() {
 	ofScale( actualScale, actualScale );
 
 	plainStone.setSelectedColor( ofColor( 255 ) );
-	plainStone.setTransparency( 200 );
+	plainStone.setTransparency( transparency );
 	plainStone.draw( -1920 / 2, -1080/2, 1920, 1080);
 
 	ofPopMatrix();
@@ -231,7 +231,7 @@ void GrowingBrushStokeAct::drawSecondStone()
 	ofScale( scaleSecondStone, scaleSecondStone );
 
 	secondPlainStone.setSelectedColor( ofColor( 255 ) );
-	secondPlainStone.setTransparency( secondPlainStoneTransparency );
+	secondPlainStone.setTransparency( 255 );
 	secondPlainStone.draw( -1920 / 2, -1080 / 2, 1920, 1080 );
 
 	ofPopMatrix();
