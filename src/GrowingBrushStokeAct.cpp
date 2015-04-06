@@ -1,9 +1,7 @@
 #include "GrowingBrushStokeAct.h"
 #include "ActSequencer.h"
 
-GrowingBrushStokeAct::GrowingBrushStokeAct() :
-transparency( 255 ),
-secondPlainStoneTransparency( 0 )
+GrowingBrushStokeAct::GrowingBrushStokeAct()
 {
 	for( int i = 0; i < 80; i++ ) {
 		std::vector< ofPoint > emptyPoints;
@@ -68,8 +66,6 @@ void GrowingBrushStokeAct::setup() {
 		dottedPoints.at( i ) = pointsToDraw;
 	}
 
-	
-
 	doDrawBackground = false;
 
 	doScale = false;
@@ -81,7 +77,7 @@ void GrowingBrushStokeAct::setup() {
 	backgroundTransparency = 255;
 	
 	//ofBackground( 0 );
-
+	blackWhiteColor.colors.clear();
 	blackWhiteColor.addColor( 90, 90, 90 );
 	blackWhiteColor.addColor( 255, 255, 255 );
 
@@ -98,12 +94,23 @@ void GrowingBrushStokeAct::setup() {
 	voroWebLayer.end();
 
 	tintBuffer.begin();
-	ofBackground( 0 );
+	ofClear( 255, 255, 255, 0 );
 	tintBuffer.end();
 
 	secondTintBuffer.begin();
-	ofBackground( 0 );
+	ofClear( 255, 255, 255, 0 );
 	secondTintBuffer.end();
+
+	edgeDetectionPostProcessing.begin();
+	ofClear( 255, 255, 255, 0 );
+	edgeDetectionPostProcessing.end();
+
+	slowWarp.begin();
+	ofClear( 255, 255, 255, 0 );
+	slowWarp.end();
+
+	plainStone.clear();
+	secondPlainStone.clear();
 
 	addCustomVoronoiPoints();
 }

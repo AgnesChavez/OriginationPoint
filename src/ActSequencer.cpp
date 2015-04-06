@@ -56,9 +56,9 @@ void ActSequencer::update()
 
 	currentMillisTimelinePosition += difference;
 
-	playlist.update();
+	//playlist.update();
 
-	float factor = 0.05;
+	float factor = 1;// 0.05;
 
 	unsigned long long act2Time = 220000 * factor;
 	unsigned long long act2FadeInTime = act2Time + 10000 * factor;
@@ -107,7 +107,7 @@ void ActSequencer::update()
 		}
 	}
 	else {
-		act1->update();
+		act1->update( currentMillisTimelinePosition );
 	}
 
 	if( currentMillisTimelinePosition > startStoneCurtain && currentMillisTimelinePosition < fadeoutBackground ) {
@@ -156,12 +156,25 @@ void ActSequencer::update()
 	}
 
 	if( currentMillisTimelinePosition > startOverMills && currentMillisTimelinePosition < startOverMills + 500 ) {
-		currentMillisTimelinePosition = 0;
+		
 		std::cout << "Finished one cycle. yay." << std::endl;
 		act1->setup();
 		act1->stones.start();
+		act2->createStone( act1->stones.centered );
+		//act2->plainStone.init( 1920 / 2, 1080 / 2 );
+		//act2->secondPlainStone.init( 1920 / 2, 1080 / 2 );
 		act2->setup();
 		act3->setup();
+
+		act2Transparency = 0;
+		act2->transparency = act2Transparency;
+
+		act2Ypos = 0;
+
+		act3->transparency = 0;
+
+		stoneCurtainXpos = 0;
+		currentMillisTimelinePosition = 0;
 	}
 }
 

@@ -1,7 +1,6 @@
 #include "StopMotionStonesAct.h"
 
-StopMotionStonesAct::StopMotionStonesAct() :
-transparency( 255 )
+StopMotionStonesAct::StopMotionStonesAct()
 {
 	setup();
 }
@@ -13,10 +12,10 @@ StopMotionStonesAct::~StopMotionStonesAct()
 
 void StopMotionStonesAct::setup()
 {
-	ofSetLogLevel( OF_LOG_ERROR );
-	ofSetVerticalSync( true );
-	ofSetFrameRate( 30 );
-	ofSetTextureWrap( GL_REPEAT );
+	//ofSetLogLevel( OF_LOG_ERROR );
+	//ofSetVerticalSync( true );
+	//ofSetFrameRate( 30 );
+	//ofSetTextureWrap( GL_REPEAT );
 	stones.init();
 
 	for( int i = 0; i < 10; i++ ) {
@@ -30,10 +29,10 @@ void StopMotionStonesAct::setup()
 	stones.start();
 }
 
-void StopMotionStonesAct::update()
+void StopMotionStonesAct::update( unsigned long long millis )
 {
 	stones.transparency = transparency;
-	stones.update();
+	stones.update( millis );
 }
 
 void StopMotionStonesAct::draw()

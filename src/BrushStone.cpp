@@ -40,14 +40,31 @@ BrushStone::~BrushStone()
 {
 }
 
-void BrushStone::init( float _x, float _y )
+void BrushStone::clear()
 {
 	layer.begin();
-	ofClear( 0.0 );
+	ofClear( 255, 255, 255, 0 );
 	layer.end();
 
 	underlyingLayer.begin();
-	ofClear( 0.0 );
+	ofClear( 255, 255, 255, 0 );
+	underlyingLayer.end();
+
+	locationsPointsDrawn.clear();
+	contourPoints.clear();
+
+	currentGrowRad = 5;
+	maxGrowRad = 700;
+}
+
+void BrushStone::init( float _x, float _y )
+{
+	layer.begin();
+	ofClear( 1.0 );
+	layer.end();
+
+	underlyingLayer.begin();
+	ofClear( 1.0 );
 	underlyingLayer.end();
 
 	centroid = ofPoint( _x, _y );
@@ -416,22 +433,6 @@ int BrushStone::getNumberOfStrokes()
 void BrushStone::setBrushCollection( BrushCollection _b )
 {
 	this->brushes = _b;
-}
-
-void BrushStone::clear()
-{
-	layer.begin();
-	ofClear( 1.0 );
-	layer.end();
-
-	underlyingLayer.begin();
-	ofClear( 1.0 );
-	underlyingLayer.end();
-
-	locationsPointsDrawn.clear();
-	contourPoints.clear();
-
-	currentGrowRad = 10.0f;
 }
 
 

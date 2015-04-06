@@ -19,7 +19,6 @@ public:
 
 	int size();
 
-private:
 	std::vector< ofColor > colors;
 };
 

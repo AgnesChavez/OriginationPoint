@@ -16,7 +16,7 @@ public:
 	~StopMotionStones();
 
 	void init();
-	void update();
+	void update( unsigned long long millis );
 	void draw();
 
 	void start();
@@ -66,8 +66,8 @@ private:
 	float flickeringStonesRelativeTransparency;
 
 	void removeOuterEdges();
-	bool isWithinMillis( unsigned long long start, unsigned long long end );
-	bool isPastMillis( unsigned long long mill );
+	bool isWithinMillis( unsigned long long currentSystemMillis, unsigned long long start, unsigned long long end );
+	bool isPastMillis( unsigned long long currentSystemMillis, unsigned long long mill );
 	int doBrownianMotion( int currStone, int which );
 };
 

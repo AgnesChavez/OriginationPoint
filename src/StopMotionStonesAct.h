@@ -9,7 +9,7 @@ public:
 	StopMotionStonesAct();
 	~StopMotionStonesAct();
 	void setup();
-	void update();
+	void update( unsigned long long millis );
 	void draw();
 	void keyPressed( int key );
 

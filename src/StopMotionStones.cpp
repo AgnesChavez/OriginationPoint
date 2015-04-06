@@ -41,6 +41,7 @@ void StopMotionStones::init()
 	transparencies.clear();
 	voronoiCentroids.clear();
 	stones.reserve( x * y );
+	toDrawStone.clear();
 
 	/* Creates grid aligned voronoi diagram */
 	for( int i = 0; i < y; i++ ) {
@@ -76,10 +77,10 @@ void StopMotionStones::init()
 void StopMotionStones::start()
 {
 	isStarted = true;
-	startedMillis = ofGetElapsedTimeMillis();
+	//startedMillis = ofGetElapsedTimeMillis();
 }
 
-void StopMotionStones::update()
+void StopMotionStones::update( unsigned long long millis )
 {
 	long millisStopMotionPart1 = 30000;
 	long millisStopMotionPart1AndAHalf = 40000;
@@ -90,70 +91,68 @@ void StopMotionStones::update()
 	long millisStartGrowLeftOverStone = 200000;
 	long millisStopGrowLeftOverStone = 201000;
 
+	std::cout << "stopmotionstones update: " << millis << std::endl;
+
 	if( isStarted ) {
-		
+		if( isWithinMillis( millis, 0, millisStopMotionPart1 ) ) {
+			toDrawStone.clear();
 
-		if( ofGetElapsedTimeMillis() - startedMillis > 0 ) {
-			if( isWithinMillis( 0, millisStopMotionPart1 ) ) {
-				toDrawStone.clear();
+			currentStone += 1;
+		}
+		if( isWithinMillis( millis, millisStopMotionPart1, millisStopMotionPart1AndAHalf ) ) {
+			toDrawStone.clear();
+			currentStone += 1;
+			secondCurrentStone += 2;
+		}
+		if( isWithinMillis( millis, millisStopMotionPart1AndAHalf, millisStopMotionPart2 ) ) {
+			toDrawStone.clear();
+			secondCurrentStone += 1;
+			currentStone += 2;
+			thirdCurrentStone += 4;
 
-				currentStone += 1;
-			}
-			if( isWithinMillis( millisStopMotionPart1, millisStopMotionPart1AndAHalf ) ) {
-				toDrawStone.clear();
-				currentStone += 1;
-				secondCurrentStone += 2;
-			}
-			if( isWithinMillis( millisStopMotionPart1AndAHalf, millisStopMotionPart2 ) ) {
-				toDrawStone.clear();
-				secondCurrentStone += 1;
-				currentStone += 2;
-				thirdCurrentStone += 4;
+			ofPoint index2d = get2DFromIndex( currentStone );
 
-				ofPoint index2d = get2DFromIndex( currentStone );
+			int _xIndex = index2d.x;
+			int _yIndx = index2d.y;
+			float rand = ofRandom( -1, 1 );
+			if( rand > 0.95f ) {
+				_yIndx++;
+			}
+			else if( rand < -0.95f ) {
+				_yIndx--;
+			}
+			currentStone = getIndexFrom2D( ofPoint( _xIndex, _yIndx ) );
+		}
+		if( isWithinMillis( millis, millisStopMotionPart2, millisBrownianMotionPart1 ) ) {
+			toDrawStone.clear();
+			currentStone = doBrownianMotion( currentStone, 0 );
+			secondCurrentStone = doBrownianMotion( secondCurrentStone, 1 );
+			thirdCurrentStone = doBrownianMotion( thirdCurrentStone, 2 );
+		}
+		if( isWithinMillis( millis, millisBrownianMotionPart1, millisBrownianMotionPart2 ) ) {
+			currentStone = doBrownianMotion( currentStone, 0 );
+			secondCurrentStone = doBrownianMotion( secondCurrentStone, 1 );
+			thirdCurrentStone = doBrownianMotion( thirdCurrentStone, 2 );
+			flickeringStonesRelativeTransparency--;
+		}
+		if( isWithinMillis( millis, millisBrownianMotionPart2, millisStartFadeAllOut ) ) {
+			for( int i = 0; i < 15; i++ ) {
+				int rand = static_cast< int >( ofRandom( x * y ) );
+				toDrawStone.insert( rand );
+			}
+		}
 
-				int _xIndex = index2d.x;
-				int _yIndx = index2d.y;
-				float rand = ofRandom( -1, 1 );
-				if( rand > 0.95f ) {
-					_yIndx++;
-				}
-				else if( rand < -0.95f ) {
-					_yIndx--;
-				}
-				currentStone = getIndexFrom2D( ofPoint( _xIndex, _yIndx ) );
-			}
-			if( isWithinMillis( millisStopMotionPart2, millisBrownianMotionPart1 ) ) {
-				toDrawStone.clear();
-				currentStone = doBrownianMotion( currentStone, 0 );
-				secondCurrentStone = doBrownianMotion( secondCurrentStone, 1 );
-				thirdCurrentStone = doBrownianMotion( thirdCurrentStone, 2 );
-			}
-			if( isWithinMillis( millisBrownianMotionPart1, millisBrownianMotionPart2 ) ) {
-				currentStone = doBrownianMotion( currentStone, 0 );
-				secondCurrentStone = doBrownianMotion( secondCurrentStone, 1 );
-				thirdCurrentStone = doBrownianMotion( thirdCurrentStone, 2 );
-				flickeringStonesRelativeTransparency--;
-			}
-			if( isWithinMillis( millisBrownianMotionPart2, millisStartFadeAllOut ) ) {
-				for( int i = 0; i < 15; i++ ) {
-					int rand = static_cast< int >( ofRandom( x * y ) );
-					toDrawStone.insert( rand );
-				}
-			}
+		if( isWithinMillis( millis, millisStartGrowLeftOverStone, millisStopGrowLeftOverStone ) ) {
+			currentScaleLeftOverStone += 0.2;
+			//int mostCenteredStoneIndex = getMostCenteredVoronoiStoneIndex();
+			//stones.at( mostCenteredStoneIndex ).border.scaleAboutPoint( currentScaleLeftOverStone, stones.at( mostCenteredStoneIndex ).border.getCentroid2D() );
+		}
 
-			if( isWithinMillis( millisStartGrowLeftOverStone, millisStopGrowLeftOverStone ) ) {
-				currentScaleLeftOverStone += 0.2;
-				//int mostCenteredStoneIndex = getMostCenteredVoronoiStoneIndex();
-				//stones.at( mostCenteredStoneIndex ).border.scaleAboutPoint( currentScaleLeftOverStone, stones.at( mostCenteredStoneIndex ).border.getCentroid2D() );
-			}
-
-			if( isPastMillis( millisStartFadeAllOut ) ) {
+		if( isPastMillis( millis, millisStartFadeAllOut ) ) {
 				
-				for( int i = 0; i < 35; i++ ) {
-					int rand = ( int ) ( ofRandom( x * y ) );
-					transparencies.at( rand ) -= 2;
-				}
+			for( int i = 0; i < 35; i++ ) {
+				int rand = ( int ) ( ofRandom( x * y ) );
+				transparencies.at( rand ) -= 2;
 			}
 		}
 	}
@@ -293,9 +292,9 @@ void StopMotionStones::removeOuterEdges()
 	}
 }
 
-bool StopMotionStones::isWithinMillis( unsigned long long start, unsigned long long end )
+bool StopMotionStones::isWithinMillis( unsigned long long currentSystemMillis, unsigned long long start, unsigned long long end )
 {
-	unsigned long long currentMillis = ofGetElapsedTimeMillis();
+	unsigned long long currentMillis = currentSystemMillis;
 	return currentMillis - startedMillis > start && currentMillis - startedMillis < end;
 }
 
@@ -346,9 +345,9 @@ int StopMotionStones::doBrownianMotion( int currStone, int which )
 	return ind;
 }
 
-bool StopMotionStones::isPastMillis( unsigned long long mill )
+bool StopMotionStones::isPastMillis( unsigned long long currentSystemMillis, unsigned long long mill )
 {
-	unsigned long long currentMillis = ofGetElapsedTimeMillis();
+	unsigned long long currentMillis = currentSystemMillis;
 	return currentMillis - startedMillis > mill;
 }
 
