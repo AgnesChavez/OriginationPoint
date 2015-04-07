@@ -33,7 +33,7 @@ BrushStone::BrushStone()
 	tDrawBorder = false;
 
 	layer.allocate( settings );
-	underlyingLayer.allocate( settings );
+	//underlyingLayer.allocate( settings );
 }
 
 BrushStone::~BrushStone()
@@ -46,31 +46,61 @@ void BrushStone::clear()
 	ofClear( 255, 255, 255, 0 );
 	layer.end();
 
-	underlyingLayer.begin();
-	ofClear( 255, 255, 255, 0 );
-	underlyingLayer.end();
+	//underlyingLayer.begin();
+	//ofClear( 255, 255, 255, 0 );
+	//underlyingLayer.end();
 
 	locationsPointsDrawn.clear();
 	contourPoints.clear();
 
 	currentGrowRad = 5;
 	maxGrowRad = 700;
+
+	setFuzzy( 10.0f );
+	setRadius( 40.0f );
+	setSize( 60 );
+	transparency = 255;
+	borderTransparency = 255;
+	brushStokeCount = 50;
+	brushStrokeSizeMin = 20;
+	brushStrokeSizeMax = 80;
+	brushStrokeAlpha = 140;
+	saturation = 255;
+
+	borderSize = 30;
+
+	selectedColor = ofColor( 255, 255, 255 );
 }
 
 void BrushStone::init( float _x, float _y )
 {
 	layer.begin();
-	ofClear( 1.0 );
+	ofClear( 255, 255, 255, 0 );
 	layer.end();
 
-	underlyingLayer.begin();
-	ofClear( 1.0 );
-	underlyingLayer.end();
+	//underlyingLayer.begin();
+	//ofClear( 255, 255, 255, 0 );
+	//underlyingLayer.end();
 
 	centroid = ofPoint( _x, _y );
 
 	currentGrowRad = 5;
 	maxGrowRad = 700;
+
+	setFuzzy( 10.0f );
+	setRadius( 40.0f );
+	setSize( 60 );
+	transparency = 255;
+	borderTransparency = 255;
+	brushStokeCount = 50;
+	brushStrokeSizeMin = 20;
+	brushStrokeSizeMax = 80;
+	brushStrokeAlpha = 140;
+	saturation = 255;
+
+	borderSize = 30;
+
+	selectedColor = ofColor( 255, 255, 255 );
 }
 
 void BrushStone::draw( float x, float y, float w, float h )
@@ -82,10 +112,10 @@ void BrushStone::draw( float x, float y, float w, float h )
 		ofSetColor( selectedColor, transparency );
 		layer.draw( x, y, w, h );
 	}
-	if( tDrawBorder ) {
-		ofSetColor( selectedColor, borderTransparency );
-		underlyingLayer.draw( x, y, w, h );
-	}
+	//if( tDrawBorder ) {
+	//	ofSetColor( selectedColor, borderTransparency );
+	//	underlyingLayer.draw( x, y, w, h );
+	//}
 	ofPopStyle();
 }
 
@@ -154,9 +184,9 @@ void BrushStone::grow( ofPolyline line )
 
 		layer.end();
 
-		underlyingLayer.begin();
-		ofClear( 1.0 );
-		underlyingLayer.end();
+		//underlyingLayer.begin();
+		//ofClear( 1.0 );
+		//underlyingLayer.end();
 
 		if( tDrawBorder ) {
 			calcBorder( locationsPointsDrawn );
@@ -172,9 +202,9 @@ void BrushStone::grow()
 
 		//calcBorder( locationsPointsDrawn );
 
-		underlyingLayer.begin();
-		ofClear( 1.0 );
-		underlyingLayer.end();
+		//underlyingLayer.begin();
+		//ofClear( 1.0 );
+		//underlyingLayer.end();
 
 		//renderBorder();
 
@@ -276,9 +306,9 @@ void BrushStone::grow( ofPolyline line, ofVec2f center )
 
 		layer.end();
 
-		underlyingLayer.begin();
-		ofClear( 1.0 );
-		underlyingLayer.end();
+		//underlyingLayer.begin();
+		//ofClear( 1.0 );
+		//underlyingLayer.end();
 
 		if( tDrawBorder ) {
 			calcBorder( locationsPointsDrawn );
@@ -293,9 +323,9 @@ bool BrushStone::growForWaterColor( float rad )
 
 		//calcBorder( locationsPointsDrawn );
 
-		underlyingLayer.begin();
-		ofClear( 1.0 );
-		underlyingLayer.end();
+		//underlyingLayer.begin();
+		//ofClear( 1.0 );
+		//underlyingLayer.end();
 
 		//renderBorder();
 
@@ -340,9 +370,9 @@ void BrushStone::growPlain( int brushId )
 
 		//calcBorder( locationsPointsDrawn );
 
-		underlyingLayer.begin();
-		ofClear( 1.0 );
-		underlyingLayer.end();
+		//underlyingLayer.begin();
+		//ofClear( 1.0 );
+		//underlyingLayer.end();
 
 		//renderBorder();
 
@@ -438,6 +468,7 @@ void BrushStone::setBrushCollection( BrushCollection _b )
 
 void BrushStone::renderBorder()
 {
+	/*
 	underlyingLayer.begin();
 	ofPushStyle();
 	ofEnableAlphaBlending();
@@ -501,6 +532,7 @@ void BrushStone::renderBorder()
 	ofDisableAlphaBlending();
 	ofPopStyle();
 	underlyingLayer.end();
+	*/
 }
 
 

@@ -30,8 +30,12 @@ void FourGrowingStonesLayer::init()
 	fourStonesLayer.clear();
 	transparency = 0;
 	fbo.begin();
-	ofClear( 0, 0, 0 );
+	ofClear( 255, 255, 255, 0 );
 	fbo.end();
+
+	edge.begin();
+	ofClear( 255, 255, 255, 0 );
+	edge.end();
 
 	ypos = 0;
 

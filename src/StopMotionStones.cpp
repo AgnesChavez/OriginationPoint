@@ -11,6 +11,8 @@ StopMotionStones::StopMotionStones() :
 	voro = new VoronoiLayer();
 	voro->setSmoothAmount( 10 );
 
+	waterEffect = new ofxPostProcessing();
+
 	stonesTex.init();
 	cutter.init();
 	noi.render();
@@ -19,6 +21,7 @@ StopMotionStones::StopMotionStones() :
 StopMotionStones::~StopMotionStones()
 {
 	delete voro;
+	delete waterEffect;
 }
 
 void StopMotionStones::init()
@@ -34,7 +37,6 @@ void StopMotionStones::init()
 	flickeringStonesRelativeTransparency = 0.0;
 
 	//cutter.init();
-
 
 	voro->clear();
 	stones.clear();
@@ -72,6 +74,15 @@ void StopMotionStones::init()
 	for( int i = 0; i < x*y; i++ ) {
 		transparencies.push_back( 255 );
 	}
+
+	delete waterEffect;
+	waterEffect = new ofxPostProcessing();
+	waterEffect->init( 1920, 1080 );
+	waterEffect->setFlip( false );
+	waterEffectPointer = waterEffect->createPass<NoiseWarpPass>();
+	waterEffectPointer->setEnabled( false );
+	waterEffectPointer->setAmplitude( 0.004 );
+	waterEffectPointer->setFrequency( 0.976 );
 }
 
 void StopMotionStones::start()
@@ -186,15 +197,15 @@ void StopMotionStones::update( unsigned long long millis )
 void StopMotionStones::draw()
 {
 	ofFbo * buf = cutter.getCutout( noi, stonesTex.getBuffer() );
+	waterEffect->begin();
 	ofPushStyle();
 	ofSetColor( 255, transparency );
+	ofBackground( 0 );
 	buf->draw( 0, 0 );
-	ofPopStyle();
-
-	ofPushStyle();
 	//ofSetColor( 255, 0, 0, transparency );
 	drawCustomVoronoi();
 	ofPopStyle();
+	waterEffect->end();
 }
 
 void StopMotionStones::drawCustomVoronoi()
@@ -220,15 +231,6 @@ void StopMotionStones::drawCustomVoronoi()
 		ofCircle( cent.x, cent.y, 1 );
 	}
 
-	/*
-	ofSetColor( 255, 0, 0, std::max( transparency - 170, 0.0f ) );
-	glLineWidth( 0.1 );
-
-	std::vector< ofPolyline > lines = voro->getLines();
-	for( int i = 0; i < lines.size(); i++ ) {
-		lines.at( i ).draw();
-	}
-	*/
 	ofPopStyle();
 }
 

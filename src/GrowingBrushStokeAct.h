@@ -5,7 +5,7 @@
 #include "StoneCurtain.h"
 #include "VoronoiLayer.h"
 #include "Stone.h"
-#include "EightGrowingRocks.h"
+//#include "EightGrowingRocks.h"
 #include "FourGrowingStonesLayer.h"
 
 #include "ofxPostProcessing.h"
@@ -32,11 +32,11 @@ public:
 	//GrowingBrushStokesLayer waterColorStone;
 
 	ofFbo brushStoneBuffer;
-	BrushStone plainStone, secondPlainStone;
+	BrushStone * plainStone, * secondPlainStone;
 	BrushCollection brushCollection;
 	ColorCollection agnesColorSelection, blackWhiteColor;
 
-	ofxPostProcessing edgeDetectionPostProcessing, slowWarp;
+	ofxPostProcessing * edgeDetectionPostProcessing, * secondEdgeDetectionPass;
 
 	bool doScale;
 	float scaleVal;
@@ -47,7 +47,7 @@ public:
 
 	ofFbo tintBuffer, secondTintBuffer;
 
-	EdgePass::Ptr edgePass;
+	EdgePass::Ptr edgePass, secondEdgePass;
 	NoiseWarpPass::Ptr noiseWarp;
 	ConvolutionPass::Ptr convPass;
 
@@ -61,12 +61,14 @@ public:
 	float rockYpos;
 	float backgroundTransparency;
 
-	EightGrowingRocks eightRocks;
-	FourGrowingStonesLayer fourRocks;
+	//EightGrowingRocks eightRocks;
+	FourGrowingStonesLayer * fourRocks;
 
 	// voronoi web
 	std::vector< std::vector< ofPoint > > dottedPoints;
 	VoronoiLayer voro2;
 	ofFbo voroWebLayer;
 	float voronoiWebTransparency;
+
+	ofImage whiteLinesBackground;
 };

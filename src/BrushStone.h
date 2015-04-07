@@ -92,7 +92,7 @@ private:
 	ofxConvexHull convexHull;
 
 	int bufferWidth, bufferHeight;
-	ofFbo layer, underlyingLayer;
+	ofFbo layer;
 	BrushCollection brushes;
 	ColorCollection colors;
 	int brushStokeCount;

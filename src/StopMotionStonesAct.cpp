@@ -12,10 +12,6 @@ StopMotionStonesAct::~StopMotionStonesAct()
 
 void StopMotionStonesAct::setup()
 {
-	//ofSetLogLevel( OF_LOG_ERROR );
-	//ofSetVerticalSync( true );
-	//ofSetFrameRate( 30 );
-	//ofSetTextureWrap( GL_REPEAT );
 	stones.init();
 
 	for( int i = 0; i < 10; i++ ) {

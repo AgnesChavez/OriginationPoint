@@ -8,19 +8,8 @@ GrowingBrushStokeAct::GrowingBrushStokeAct()
 		dottedPoints.push_back( emptyPoints );
 	}
 
-	edgeDetectionPostProcessing.init( 1920, 1080 );
-	slowWarp.init( 1920, 1080 );
-
-	edgePass = edgeDetectionPostProcessing.createPass< EdgePass >();
-	edgePass->setEnabled( true );
-
-	noiseWarp = slowWarp.createPass< NoiseWarpPass >();
-	noiseWarp->setEnabled( false );
-
-	edgeDetectionPostProcessing.setFlip( false );
-	slowWarp.setFlip( false );
-
 	background.loadImage( "lines_3_bw.jpg" );
+	whiteLinesBackground.loadImage( "black_room-white_lines.jpg" );
 
 	ofFbo::Settings settings;
 	settings.useDepth = true;
@@ -32,15 +21,24 @@ GrowingBrushStokeAct::GrowingBrushStokeAct()
 	tintBuffer.allocate( settings );
 	secondTintBuffer.allocate( settings );
 
-	voroWebLayer.allocate( settings );
+	//voroWebLayer.allocate( settings );
+
+	plainStone = new BrushStone();
+	secondPlainStone = new BrushStone();
+	edgeDetectionPostProcessing = new ofxPostProcessing();
+	secondEdgeDetectionPass = new ofxPostProcessing();
+	fourRocks = new FourGrowingStonesLayer();
 
 	setup();
-
 }
 
 GrowingBrushStokeAct::~GrowingBrushStokeAct()
 {
-
+	delete plainStone;
+	delete secondPlainStone;
+	delete edgeDetectionPostProcessing;
+	delete secondEdgeDetectionPass;
+	delete fourRocks;
 }
 
 
@@ -89,62 +87,85 @@ void GrowingBrushStokeAct::setup() {
 	line.setClosed( true );
 
 	
-	voroWebLayer.begin();
-	drawVoronoiWeb();
-	voroWebLayer.end();
+	//voroWebLayer.begin();
+	//drawVoronoiWeb();
+	//voroWebLayer.end();
 
 	tintBuffer.begin();
-	ofClear( 255, 255, 255, 0 );
+	ofBackground( 0 );
 	tintBuffer.end();
 
 	secondTintBuffer.begin();
-	ofClear( 255, 255, 255, 0 );
+	ofBackground( 0 );
 	secondTintBuffer.end();
 
-	edgeDetectionPostProcessing.begin();
-	ofClear( 255, 255, 255, 0 );
-	edgeDetectionPostProcessing.end();
+	delete edgeDetectionPostProcessing;
+	delete secondEdgeDetectionPass;
 
-	slowWarp.begin();
-	ofClear( 255, 255, 255, 0 );
-	slowWarp.end();
+	edgeDetectionPostProcessing = new ofxPostProcessing();
+	edgeDetectionPostProcessing->init( 1920, 1080 );
+	edgePass = edgeDetectionPostProcessing->createPass< EdgePass >();
+	edgePass->setEnabled( true );
+	edgeDetectionPostProcessing->setFlip( false );
 
-	plainStone.clear();
-	secondPlainStone.clear();
+	secondEdgeDetectionPass = new ofxPostProcessing();
+	secondEdgeDetectionPass->init( 1920, 1080 );
+	secondEdgePass = secondEdgeDetectionPass->createPass<EdgePass>();
+	secondEdgePass->setEnabled( true );
+	secondEdgeDetectionPass->setFlip( false );
+
+	edgeDetectionPostProcessing->begin();
+	ofBackground( 0 );
+	edgeDetectionPostProcessing->end();
+
+	secondEdgeDetectionPass->begin();
+	ofBackground( 0 );
+	secondEdgeDetectionPass->end();
+
+	delete fourRocks;
+	fourRocks = new FourGrowingStonesLayer();
+
+	//plainStone.clear();
+	//secondPlainStone.clear();
 
 	addCustomVoronoiPoints();
 }
 
 void GrowingBrushStokeAct::createStone( ofPoint centerStone )
 {
-	plainStone.setColorCollection( blackWhiteColor );
-	plainStone.setBrushCollection( brushCollection );
-	plainStone.setBrushStrokeAlpha( 255 );
-	plainStone.init( centerStone.x, centerStone.y );
-	plainStone.setBrushStrokeSizeMin( 10 );
-	plainStone.setBrushStrokeSizeMax( 40 );
+	delete plainStone;
+	delete secondPlainStone;
+
+	plainStone = new BrushStone();
+	plainStone->setColorCollection( blackWhiteColor );
+	plainStone->setBrushCollection( brushCollection );
+	plainStone->setBrushStrokeAlpha( 255 );
+	plainStone->init( centerStone.x, centerStone.y );
+	plainStone->setBrushStrokeSizeMin( 10 );
+	plainStone->setBrushStrokeSizeMax( 40 );
 
 	for( int i = 0; i < 3; i++ ) {
-		plainStone.grow( *voro.getLine( 0 ), ofVec2f( 1920 / 2, 1080 / 2 ) );
+		plainStone->grow( *voro.getLine( 0 ), ofVec2f( 1920 / 2, 1080 / 2 ) );
 	}
 
-	plainStone.setBrushStrokeSizeMin( 20 );
-	plainStone.setBrushStrokeSizeMax( 80 );
+	plainStone->setBrushStrokeSizeMin( 20 );
+	plainStone->setBrushStrokeSizeMax( 80 );
 
-	secondPlainStone.setColorCollection( blackWhiteColor );
-	secondPlainStone.setBrushCollection( brushCollection );
-	secondPlainStone.setBrushStrokeAlpha( 255 );
-	secondPlainStone.init( centerStone.x, centerStone.y );
-	secondPlainStone.setBrushStrokeSizeMin( 10 );
-	secondPlainStone.setBrushStrokeSizeMax( 40 );
+
+	secondPlainStone = new BrushStone();
+	secondPlainStone->setColorCollection( blackWhiteColor );
+	secondPlainStone->setBrushCollection( brushCollection );
+	secondPlainStone->setBrushStrokeAlpha( 255 );
+	secondPlainStone->init( centerStone.x, centerStone.y );
+	secondPlainStone->setBrushStrokeSizeMin( 10 );
+	secondPlainStone->setBrushStrokeSizeMax( 40 );
 
 	for( int i = 0; i < 3; i++ ) {
-		secondPlainStone.grow( *voro.getLine( 0 ), ofVec2f( 1920 / 2, 1080 / 2 ) );
+		secondPlainStone->grow( *voro.getLine( 0 ), ofVec2f( 1920 / 2, 1080 / 2 ) );
 	}
 
-	secondPlainStone.setBrushStrokeSizeMin( 20 );
-	secondPlainStone.setBrushStrokeSizeMax( 80 );
-
+	secondPlainStone->setBrushStrokeSizeMin( 20 );
+	secondPlainStone->setBrushStrokeSizeMax( 80 );
 }
 
 void GrowingBrushStokeAct::addCustomVoronoiPoints() {
@@ -181,16 +202,16 @@ void GrowingBrushStokeAct::addCustomVoronoiPoints() {
 
 void GrowingBrushStokeAct::update() {
 	if( ofGetFrameNum() % 6 == 0 ) {
-		plainStone.grow( *voro.getLine( 0 ), ofVec2f( 1920/2, 1080/2 ) );
+		plainStone->grow( *voro.getLine( 0 ), ofVec2f( 1920 / 2, 1080 / 2 ) );
 	}
 
 	if( doScale ) {
 		updateScale();
 	}
-	float am = ofMap( ofGetMouseX(), 0, 1920, 0, 2 );
-	float fr = ofMap( ofGetMouseY(), 0, 1080, 0, 2 );
-	noiseWarp->setAmplitude( am );
-	noiseWarp->setFrequency( fr );
+	//float am = ofMap( ofGetMouseX(), 0, 1920, 0, 2 );
+	//float fr = ofMap( ofGetMouseY(), 0, 1080, 0, 2 );
+	//noiseWarp->setAmplitude( am );
+	//noiseWarp->setFrequency( fr );
 
 	// slowWarpPass->setAmplitude( 0.004 );
 	// slowWarpPass->setFrequency( 0.976 );
@@ -198,7 +219,7 @@ void GrowingBrushStokeAct::update() {
 
 void GrowingBrushStokeAct::updateSecondStone()
 {
-	secondPlainStone.grow( *voro.getLine( 0 ), ofVec2f( 1920 / 2, 1080 / 2 ) );
+	secondPlainStone->grow( *voro.getLine( 0 ), ofVec2f( 1920 / 2, 1080 / 2 ) );
 }
 
 void GrowingBrushStokeAct::updateScale()
@@ -209,9 +230,7 @@ void GrowingBrushStokeAct::updateScale()
 
 void GrowingBrushStokeAct::draw() {
 	tintBuffer.begin();
-	ofBackground( 0 );
-	
-	edgeDetectionPostProcessing.begin();
+	edgeDetectionPostProcessing->begin();
 
 	ofPushStyle();
 	ofPushMatrix();
@@ -219,33 +238,27 @@ void GrowingBrushStokeAct::draw() {
 	float actualScale = scaleVal + 1.6;
 	ofScale( actualScale, actualScale );
 
-	plainStone.setSelectedColor( ofColor( 255 ) );
-	plainStone.setTransparency( transparency );
-	plainStone.draw( -1920 / 2, -1080/2, 1920, 1080);
+	plainStone->setSelectedColor( ofColor( 255 ) );
+	plainStone->setTransparency( 255 );
+	plainStone->draw( -1920 / 2, -1080 / 2, 1920, 1080 );
 
 	ofPopMatrix();
 	
 	ofPopStyle();
-	edgeDetectionPostProcessing.end();
+	edgeDetectionPostProcessing->end();
 	tintBuffer.end();
 
-	
-
-	//edgeDetectionPostProcessing.begin();
+	//whiteLinesBackground.draw( 0, 0 );
 	ofPushStyle();
-	//ofSetColor( 255, 255 );
 	ofSetColor( 255, transparency );
 	tintBuffer.draw( 0, 0 );
-	//tintBuffer.draw( 0, rockYpos - 1080 );
 	ofPopStyle();
-	//edgeDetectionPostProcessing.end();
-	
 }
 
 void GrowingBrushStokeAct::drawSecondStone()
 {
 	secondTintBuffer.begin();
-	edgeDetectionPostProcessing.begin();
+	secondEdgeDetectionPass->begin();
 
 	ofPushStyle();
 	ofPushMatrix();
@@ -253,14 +266,14 @@ void GrowingBrushStokeAct::drawSecondStone()
 	float scaleSecondStone = 1.3;
 	ofScale( scaleSecondStone, scaleSecondStone );
 
-	secondPlainStone.setSelectedColor( ofColor( 255 ) );
-	secondPlainStone.setTransparency( 255 );
-	secondPlainStone.draw( -1920 / 2, -1080 / 2, 1920, 1080 );
+	secondPlainStone->setSelectedColor( ofColor( 255 ) );
+	secondPlainStone->setTransparency( 255 );
+	secondPlainStone->draw( -1920 / 2, -1080 / 2, 1920, 1080 );
 
 	ofPopMatrix();
 
 	ofPopStyle();
-	edgeDetectionPostProcessing.end();
+	secondEdgeDetectionPass->end();
 	secondTintBuffer.end();
 
 	ofPushStyle();
@@ -276,7 +289,7 @@ void GrowingBrushStokeAct::keyPressed( int key )
 	if( key == 'g' ) {
 		// 0 means random brush
 		//plainStone.growPlain( growBrushIndex );
-		plainStone.grow( *voro.getLine( 0 ) );
+		plainStone->grow( *voro.getLine( 0 ) );
 	}
 	else if( key == 'f' ) {
 		ofToggleFullscreen();

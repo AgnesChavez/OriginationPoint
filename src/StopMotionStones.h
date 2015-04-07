@@ -7,6 +7,8 @@
 #include "NoiseTexture.h"
 #include "ofMain.h"
 
+#include "ofxPostProcessing.h"
+
 #include <algorithm>
 
 class StopMotionStones
@@ -69,5 +71,8 @@ private:
 	bool isWithinMillis( unsigned long long currentSystemMillis, unsigned long long start, unsigned long long end );
 	bool isPastMillis( unsigned long long currentSystemMillis, unsigned long long mill );
 	int doBrownianMotion( int currStone, int which );
+
+	ofxPostProcessing * waterEffect;
+	NoiseWarpPass::Ptr waterEffectPointer;
 };
 
