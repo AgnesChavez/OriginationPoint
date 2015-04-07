@@ -158,9 +158,11 @@ void GrowingBrushStokeAct::addCustomVoronoiPoints() {
 	voro.addPoint( ofRandom( 1200, 1600 ), 100 );
 	voro.addPoint( ofRandom( 1600, 1920 ), 100 );
 
-	voro.addPoint( ofRandom( 100, 500 ), 1000 );
-	voro.addPoint( ofRandom( 500, 1000 ), 1000 );
-	voro.addPoint( ofRandom( 1000, 1900 ), 1000 );
+	voro.addPoint( ofRandom( 100, 300 ), 1000 );
+	voro.addPoint( ofRandom( 300, 700 ), 1000 );
+	voro.addPoint( ofRandom( 700, 1200 ), 1000 );
+	voro.addPoint( ofRandom( 1200, 1600 ), 1000 );
+	voro.addPoint( ofRandom( 1600, 1920 ), 1000 );
 
 	voro.addPoint( 100, ofRandom( 100, 300 ) );
 	voro.addPoint( 100, ofRandom( 300, 800 ) );
