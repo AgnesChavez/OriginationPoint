@@ -13,10 +13,13 @@ KinectInteractionManager::~KinectInteractionManager()
 
 void KinectInteractionManager::init()
 {
+#ifndef KINECT_NOT_CONNCETED
+
 	wrapper.openKinect();
 	wrapper.openDepthStream();
 
 	kinectToStoneDistance = 163.3f;
+	offset = 1.0f;
 	displayKinect = true;
 
 	kinectFbo.allocate( wrapper.depthWidth, wrapper.depthHeight, GL_RGBA );
@@ -54,10 +57,14 @@ void KinectInteractionManager::init()
 	kinectShader.setupShaderFromSource( GL_VERTEX_SHADER, vertShaderSrc );
 	kinectShader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragShaderSrc );
 	kinectShader.linkProgram();
+
+#endif // !KINECT_NOT_DETECTED
 }
 
 void KinectInteractionManager::update()
 {
+#ifndef KINECT_NOT_CONNCETED
+
 	bool isUpdated = wrapper.updateDepthFrame();
 
 	if( isUpdated ) {
@@ -71,8 +78,8 @@ void KinectInteractionManager::update()
 		kinectFbo2.begin();
 		ofClear( 0, 255 );
 		kinectShader.begin();
-		kinectShader.setUniform1f( "min", ( float ) ( ( kinectToStoneDistance - 1 ) / 255.0 ) );
-		kinectShader.setUniform1f( "max", ( float ) ( ( kinectToStoneDistance + 1 ) / 255.0 ) );
+		kinectShader.setUniform1f( "min", ( float ) ( ( kinectToStoneDistance - offset ) / 255.0 ) );
+		kinectShader.setUniform1f( "max", ( float ) ( ( kinectToStoneDistance + offset ) / 255.0 ) );
 		kinectShader.setUniformTexture( "tex", kinectFbo.getTextureReference(), 0 );
 		glBegin( GL_QUADS );
 		glTexCoord2f( 0, 0 ); glVertex3f( 0, 0, 0 );
@@ -82,7 +89,11 @@ void KinectInteractionManager::update()
 		glEnd();
 		kinectShader.end();
 		kinectFbo2.end();
+
+		
 	}
+#endif // !KINECT_NOT_DETECTED
+
 }
 
 void KinectInteractionManager::draw()
@@ -90,4 +101,22 @@ void KinectInteractionManager::draw()
 	if( displayKinect ) {
 		kinectFbo2.draw( 250, 0 );
 	}
+}
+
+std::vector< ofxCvBlob > KinectInteractionManager::getBlobs()
+{
+#ifndef KINECT_NOT_CONNCETED
+
+	if( doBlobDetection ) {
+		ofPixels pix;
+		kinectFbo2.readToPixels( pix );
+		gr.setFromPixels( pix );
+		contourFinder.findContours( gr, 0, 1000, 20, false );
+		return contourFinder.blobs;
+	}
+
+#endif // !KINECT_NOT_DETECTED
+	std::vector< ofxCvBlob > blobs;
+	return blobs;
+
 }

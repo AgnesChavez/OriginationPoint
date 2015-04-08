@@ -11,6 +11,11 @@ void ActSequencer::setup()
 	TIME_SAMPLE_SET_FRAMERATE( 30.0f );
 	TIME_SAMPLE_SET_DRAW_LOCATION( TIME_MEASUREMENTS_TOP_RIGHT );
 
+	kinect.init();
+	kinect.doBlobDetection = true;
+
+	sender.setup( HOST, PORT );
+
 	act1 = new StopMotionStonesAct();
 	//act1->stones.start();
 
@@ -50,6 +55,13 @@ void ActSequencer::setup()
 
 void ActSequencer::update()
 {
+	kinect.update();
+	int stones = kinect.getBlobs().size();
+	ofxOscMessage msg;
+	msg.setAddress( "/stones" );
+	msg.addIntArg( stones );
+	sender.sendMessage( msg );
+
 
 	unsigned long long difference = ofGetElapsedTimeMillis() - lastElapsedMillis;
 	lastElapsedMillis = ofGetElapsedTimeMillis();
@@ -225,6 +237,8 @@ void ActSequencer::draw()
 	if( act2->secondPlainStoneTransparency > 0 ) {
 		act2->drawSecondStone();
 	}
+
+	kinect.draw();
 
 	ofPopMatrix();
 	ofPushStyle();

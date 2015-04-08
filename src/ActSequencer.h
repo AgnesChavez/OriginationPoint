@@ -5,10 +5,16 @@
 #include "StopMotionStonesAct.h"
 #include "GrowingBrushStokeAct.h"
 #include "ManyLayersAct.h"
+#include "KinectInteractionManager.h"
 
 #include "ofxPlaylist.h"
 #include "ofxQuadWarp.h"
 #include "ofxTimeMeasurements.h"
+
+#include "ofxOsc.h"
+
+#define HOST "localhost"
+#define PORT 5001
 
 class ActSequencer : public ofBaseApp
 {
@@ -17,6 +23,9 @@ public:
 	void update();
 	void draw();
 	void keyPressed( int key );
+
+	KinectInteractionManager kinect;
+	ofxOscSender sender;
 
 	ofxQuadWarp warper;
 

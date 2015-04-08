@@ -1,7 +1,11 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxOpenCv.h"
+
 #include "KinectWrapper.h"
+
+#define KINECT_NOT_CONNCETED
 
 class KinectInteractionManager
 {
@@ -13,7 +17,11 @@ public:
 	void update();
 	void draw();
 
-	float kinectToStoneDistance;
+	std::vector< ofxCvBlob > getBlobs();
+
+	bool doBlobDetection;
+
+	float kinectToStoneDistance, offset;
 	bool displayKinect;
 
 private: 
@@ -22,5 +30,7 @@ private:
 	ofShader kinectShader;
 	ofFbo kinectFbo, kinectFbo2;
 
+	ofxCvGrayscaleImage gr;
+	ofxCvContourFinder contourFinder;
 };
 
