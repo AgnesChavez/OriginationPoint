@@ -43,7 +43,7 @@ BrushStone::~BrushStone()
 void BrushStone::clear()
 {
 	layer.begin();
-	ofClear( 255, 255, 255, 0 );
+	ofClear( 0.0, 0.0, 0.0, 1.0 );
 	layer.end();
 
 	//underlyingLayer.begin();

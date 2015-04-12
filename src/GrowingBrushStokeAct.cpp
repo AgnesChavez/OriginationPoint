@@ -1,5 +1,5 @@
 #include "GrowingBrushStokeAct.h"
-#include "ActSequencer.h"
+#include "Misc.h"
 
 GrowingBrushStokeAct::GrowingBrushStokeAct()
 {
@@ -60,7 +60,7 @@ void GrowingBrushStokeAct::setup() {
 
 	for( int i = 0; i < voro2.getLines().size(); i++ ) {
 		ofPolyline lineToDraw = *voro2.getLine( i ); // rocks.at( i ).border
-		std::vector< ofPoint > pointsToDraw = ActSequencer::getLineSplitPoints( lineToDraw, 4 );
+		std::vector< ofPoint > pointsToDraw = Misc::getLineSplitPoints( lineToDraw, 4 );
 		dottedPoints.at( i ) = pointsToDraw;
 	}
 
@@ -115,11 +115,11 @@ void GrowingBrushStokeAct::setup() {
 	secondEdgeDetectionPass->setFlip( false );
 
 	edgeDetectionPostProcessing->begin();
-	ofBackground( 0 );
+	ofClear( 0.0, 0.0, 0.0, 1.0 );
 	edgeDetectionPostProcessing->end();
 
 	secondEdgeDetectionPass->begin();
-	ofBackground( 0 );
+	ofClear( 0.0, 0.0, 0.0, 1.0 );
 	secondEdgeDetectionPass->end();
 
 	delete fourRocks;
@@ -320,7 +320,7 @@ void GrowingBrushStokeAct::drawVoronoiWeb()
 	glLineWidth( 3 );
 	for( int i = 0; i < dottedPoints.size(); i++ ) {
 		//voro2.getLine( i )->draw();
-		ActSequencer::drawSplitLines( dottedPoints.at( i ) );
+		Misc::drawSplitLines( dottedPoints.at( i ) );
 	}
 	ofPopStyle();
 }

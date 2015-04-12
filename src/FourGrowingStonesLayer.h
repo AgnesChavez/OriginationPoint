@@ -6,6 +6,7 @@
 #include "ColorCollection.h"
 #include "VoronoiLayer.h"
 #include "ofxPostProcessing.h"
+#include "ofxPostGlitch.h"
 
 class FourGrowingStonesLayer
 {
@@ -28,5 +29,7 @@ public:
 	float transparency;
 
 	float ypos;
+
+	ofxPostGlitch	glitch;
 };
 

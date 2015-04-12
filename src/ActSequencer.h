@@ -36,14 +36,13 @@ public:
 	// projection mapping
 	ofxQuadWarp warper;
 
+	// the three acts
 	StopMotionStonesAct * act1;
 	GrowingBrushStokeAct * act2;
 	StoneCurtainLayer * act3;
 
-	static std::vector< ofPoint > getLineSplitPoints( ofPolyline linesToSplit, float length );
-	static void drawSplitLines( std::vector< ofPoint > points );
-
 private:
-	void sendOscMessages( KinectInteractionManager * kinect);
+	void sendKinectOscMessages( KinectInteractionManager * kinect );
+	void sendChapterOscMessages( int chapterId );
 };
 
