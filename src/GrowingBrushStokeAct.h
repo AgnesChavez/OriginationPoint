@@ -1,12 +1,11 @@
 #pragma once
 
 #include "ofMain.h"
-//#include "GrowingBrushStokesLayer.h"
 #include "StoneCurtain.h"
 #include "VoronoiLayer.h"
 #include "Stone.h"
-//#include "EightGrowingRocks.h"
 #include "FourGrowingStonesLayer.h"
+#include "ofxPostGlitch.h"
 
 #include "ofxPostProcessing.h"
 
@@ -29,7 +28,6 @@ public:
 
 	void createStone( ofPoint centerStone );
 
-	//GrowingBrushStokesLayer waterColorStone;
 
 	ofFbo brushStoneBuffer;
 	BrushStone * plainStone, * secondPlainStone;
@@ -71,4 +69,6 @@ public:
 	float voronoiWebTransparency;
 
 	ofImage whiteLinesBackground;
+
+	ofxPostGlitch myGlitch;
 };

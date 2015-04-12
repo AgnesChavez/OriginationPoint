@@ -5,7 +5,7 @@
 
 #include "KinectWrapper.h"
 
-#define KINECT_NOT_CONNCETED
+//#define KINECT_NOT_CONNCETED
 
 class KinectInteractionManager
 {

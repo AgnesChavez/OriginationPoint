@@ -1,12 +1,10 @@
 #include "ActSequencer.h"
 
-
 void ActSequencer::setup()
 {
 	ofSetLogLevel( OF_LOG_ERROR );
 	ofSetVerticalSync( true );
 	ofSetFrameRate( 30 );
-	//ofEnableSmoothing();
 
 	TIME_SAMPLE_SET_FRAMERATE( 30.0f );
 	TIME_SAMPLE_SET_DRAW_LOCATION( TIME_MEASUREMENTS_TOP_RIGHT );
@@ -20,22 +18,11 @@ void ActSequencer::setup()
 	//act1->stones.start();
 
 	act2 = new GrowingBrushStokeAct();
-
 	act2->createStone( act1->stones.centered );
+	act2->transparency = 0;
 
-	act2Transparency = 0;
-	act2->transparency = act2Transparency;
+	act3 = new StoneCurtainLayer();
 
-	act2Ypos = 0;
-
-	act3 = new ManyLayersAct();
-	act3->transparency = 0;
-
-	stoneCurtainXpos = 0;
-
-	testVal = 0.0;
-	playlist.addKeyFrame( Playlist::Action::tween( 200.0f, &testVal, 100.0 ) );
-	playlist.addKeyFrame( Playlist::Action::tween( 200.0f, &testVal, 300.0 ) );
 
 	int x = 0;
 	int y = 0;
@@ -56,19 +43,12 @@ void ActSequencer::setup()
 void ActSequencer::update()
 {
 	kinect.update();
-	int stones = kinect.getBlobs().size();
-	ofxOscMessage msg;
-	msg.setAddress( "/stones" );
-	msg.addIntArg( stones );
-	sender.sendMessage( msg );
-
+	sendKinectOscMessages( &kinect );
 
 	unsigned long long difference = ofGetElapsedTimeMillis() - lastElapsedMillis;
 	lastElapsedMillis = ofGetElapsedTimeMillis();
 
 	currentMillisTimelinePosition += difference;
-
-	//playlist.update();
 
 	float factor = 1;// 0.05;
 
@@ -89,6 +69,8 @@ void ActSequencer::update()
 
 	//std::cout << "currentMillisTimelinePosition: " << currentMillisTimelinePosition << std::endl;
 
+	unsigned int currentAct = 1;
+
 	if( currentMillisTimelinePosition > act2Time ) {
 		act1->transparency--;
 	}
@@ -100,7 +82,7 @@ void ActSequencer::update()
 	}
 
 	if( currentMillisTimelinePosition > act2UpdateStart ) {
-		
+		currentAct = 2;
 		act2->update();
 
 		if( currentMillisTimelinePosition > act2StartScaleRock  ) {
@@ -108,6 +90,7 @@ void ActSequencer::update()
 		}
 
 		if( currentMillisTimelinePosition > act2UpdateFourStonesStart ) {
+			currentAct = 3;
 			int padding = 10000;
 			for( int i = 0; i < 4; i++ ) {
 				if( currentMillisTimelinePosition > act2UpdateFourStonesStart + i * padding ) {
@@ -175,14 +158,8 @@ void ActSequencer::update()
 		//act2->secondPlainStone.init( 1920 / 2, 1080 / 2 );
 		act3->setup();
 
-		act2Transparency = 0;
-		act2->transparency = act2Transparency;
+		act2->transparency = 0;
 
-		act2Ypos = 0;
-
-		act3->transparency = 0;
-
-		stoneCurtainXpos = 0;
 		currentMillisTimelinePosition = 0;
 		
 		/*
@@ -200,15 +177,15 @@ void ActSequencer::update()
 		act2Transparency = 0;
 		act2->transparency = act2Transparency;
 
-		act2Ypos = 0;
 
 		act3 = new ManyLayersAct();
 		act3->transparency = 0;
 
-		stoneCurtainXpos = 0;
 		currentMillisTimelinePosition = 0;
 		*/
 	}
+
+	sendChapterOscMessages( currentAct );
 }
 
 void ActSequencer::draw()
@@ -312,4 +289,21 @@ void ActSequencer::drawSplitLines( std::vector< ofPoint > points )
 			}
 		}
 	}
+}
+
+void ActSequencer::sendKinectOscMessages( KinectInteractionManager * kin )
+{
+	int stones = kin->getBlobs().size();
+	ofxOscMessage msg;
+	msg.setAddress( "/stones" );
+	msg.addIntArg( stones );
+	sender.sendMessage( msg );
+}
+
+void ActSequencer::sendChapterOscMessages( int actId )
+{
+	ofxOscMessage msg;
+	msg.setAddress( "/act" );
+	msg.addIntArg( actId );
+	sender.sendMessage( msg );
 }

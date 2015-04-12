@@ -4,7 +4,7 @@
 
 #include "StopMotionStonesAct.h"
 #include "GrowingBrushStokeAct.h"
-#include "ManyLayersAct.h"
+#include "StoneCurtainLayer.h"
 #include "KinectInteractionManager.h"
 
 #include "ofxPlaylist.h"
@@ -24,26 +24,26 @@ public:
 	void draw();
 	void keyPressed( int key );
 
+	// timing
+	unsigned long long currentMillisTimelinePosition, lastElapsedMillis;
+	
+	// kinect input
 	KinectInteractionManager kinect;
+
+	// osc output
 	ofxOscSender sender;
 
+	// projection mapping
 	ofxQuadWarp warper;
 
-	ofxPlaylist playlist;
-	float testVal;
-
 	StopMotionStonesAct * act1;
-
 	GrowingBrushStokeAct * act2;
-	float act2Transparency;
-	int act2Ypos;
-	int stoneCurtainXpos;
-
-	unsigned long long currentMillisTimelinePosition, lastElapsedMillis;
-
-	ManyLayersAct * act3;
+	StoneCurtainLayer * act3;
 
 	static std::vector< ofPoint > getLineSplitPoints( ofPolyline linesToSplit, float length );
 	static void drawSplitLines( std::vector< ofPoint > points );
+
+private:
+	void sendOscMessages( KinectInteractionManager * kinect);
 };
 
