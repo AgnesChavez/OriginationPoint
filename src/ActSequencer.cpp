@@ -52,11 +52,11 @@ void ActSequencer::update()
 
 	float factor = 1;// 0.05;
 
-	unsigned long long act2Time = 220000 * factor;
-	unsigned long long act2FadeInTime = act2Time + 15000 * factor;
-	unsigned long long act2UpdateStart = act2FadeInTime + 10000 * factor;
-	unsigned long long act2StartScaleRock = act2UpdateStart + 150000 * factor;
-	unsigned long long act2UpdateFourStonesStart = act2StartScaleRock + 130000 * factor; // 427000
+	unsigned long long act2Time = 194000 * factor;
+	unsigned long long act2FadeInTime = act2Time + 6000 * factor;
+	unsigned long long act2UpdateStart = act2FadeInTime + 1000 * factor;
+	unsigned long long act2StartScaleRock = act2UpdateStart + 60000 * factor;
+	unsigned long long act2UpdateFourStonesStart = act2StartScaleRock + 100000 * factor; // 427000
 	unsigned long long startStoneCurtain = act2UpdateFourStonesStart + 100000 * factor; // 537000
 	unsigned long long moveFourSTones = startStoneCurtain + 120000 * factor;
 	unsigned long long growNewBigRock = moveFourSTones + 30000 * factor;
@@ -72,7 +72,7 @@ void ActSequencer::update()
 	unsigned int currentAct = 1;
 
 	if( currentMillisTimelinePosition > act2Time ) {
-		act1->transparency--;
+		act1->transparency -= 1.5;
 	}
 
 	if( currentMillisTimelinePosition > act2FadeInTime && currentMillisTimelinePosition < fadeOutBigStone ) {

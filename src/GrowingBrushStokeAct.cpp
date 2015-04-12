@@ -201,7 +201,7 @@ void GrowingBrushStokeAct::addCustomVoronoiPoints() {
 
 
 void GrowingBrushStokeAct::update() {
-	if( ofGetFrameNum() % 6 == 0 ) {
+	if( ofGetFrameNum() % 2 == 0 ) {
 		plainStone->grow( *voro.getLine( 0 ), ofVec2f( 1920 / 2, 1080 / 2 ) );
 	}
 

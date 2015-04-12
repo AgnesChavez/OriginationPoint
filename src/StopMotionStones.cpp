@@ -31,7 +31,6 @@ void StopMotionStones::init()
 	secondCurrentStone = 0;
 	thirdCurrentStone = 0;
 	doGrow = false;
-	currentScaleLeftOverStone = 3.0f;
 	transparency = 255;
 	isStarted = false;
 	flickeringStonesRelativeTransparency = 0.0;
@@ -98,11 +97,7 @@ void StopMotionStones::update( unsigned long long millis )
 	long millisStopMotionPart2 = 70000;
 	long millisBrownianMotionPart1 = 110000;
 	long millisBrownianMotionPart2 = 150000;
-	long millisStartFadeAllOut = 180000;
-	long millisStartGrowLeftOverStone = 200000;
-	long millisStopGrowLeftOverStone = 201000;
-
-	std::cout << "stopmotionstones update: " << millis << std::endl;
+	long millisStartFadeAllOut = 158000;
 
 	if( isStarted ) {
 		if( isWithinMillis( millis, 0, millisStopMotionPart1 ) ) {
@@ -151,12 +146,6 @@ void StopMotionStones::update( unsigned long long millis )
 				int rand = static_cast< int >( ofRandom( x * y ) );
 				toDrawStone.insert( rand );
 			}
-		}
-
-		if( isWithinMillis( millis, millisStartGrowLeftOverStone, millisStopGrowLeftOverStone ) ) {
-			currentScaleLeftOverStone += 0.2;
-			//int mostCenteredStoneIndex = getMostCenteredVoronoiStoneIndex();
-			//stones.at( mostCenteredStoneIndex ).border.scaleAboutPoint( currentScaleLeftOverStone, stones.at( mostCenteredStoneIndex ).border.getCentroid2D() );
 		}
 
 		if( isPastMillis( millis, millisStartFadeAllOut ) ) {

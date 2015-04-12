@@ -62,8 +62,6 @@ private:
 	ofPoint getMostCenteredVoronoiCellCenter();
 	int getMostCenteredVoronoiStoneIndex();
 
-	float currentScaleLeftOverStone;
-
 	std::vector< ofPoint > voronoiCentroids;
 	float flickeringStonesRelativeTransparency;
 
