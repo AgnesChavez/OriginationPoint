@@ -99,6 +99,8 @@ void GrowingBrushStokeAct::setup() {
 	edgeDetectionPostProcessing->init( 1920, 1080 );
 	edgePass = edgeDetectionPostProcessing->createPass< EdgePass >();
 	edgePass->setEnabled( true );
+	noiseWarp = edgeDetectionPostProcessing->createPass<NoiseWarpPass>();
+	noiseWarp->setEnabled( false );
 	edgeDetectionPostProcessing->setFlip( false );
 
 	secondEdgeDetectionPass = new ofxPostProcessing();
@@ -117,9 +119,6 @@ void GrowingBrushStokeAct::setup() {
 
 	delete fourRocks;
 	fourRocks = new FourGrowingStonesLayer();
-
-	//plainStone.clear();
-	//secondPlainStone.clear();
 
 	addCustomVoronoiPoints();
 }
@@ -201,13 +200,6 @@ void GrowingBrushStokeAct::update() {
 	if( doScale ) {
 		updateScale();
 	}
-	//float am = ofMap( ofGetMouseX(), 0, 1920, 0, 2 );
-	//float fr = ofMap( ofGetMouseY(), 0, 1080, 0, 2 );
-	//noiseWarp->setAmplitude( am );
-	//noiseWarp->setFrequency( fr );
-
-	// slowWarpPass->setAmplitude( 0.004 );
-	// slowWarpPass->setFrequency( 0.976 );
 }
 
 void GrowingBrushStokeAct::updateSecondStone()
@@ -217,7 +209,7 @@ void GrowingBrushStokeAct::updateSecondStone()
 
 void GrowingBrushStokeAct::updateScale()
 {
-	scaleVal += 0.0005f;
+	scaleVal += 0.0015f;
 	scaleVal = std::min( scaleVal, 2.4f );
 }
 
@@ -231,7 +223,7 @@ void GrowingBrushStokeAct::draw() {
 	float actualScale = scaleVal + 1.6;
 	ofScale( actualScale, actualScale );
 
-	plainStone->setSelectedColor( ofColor( 255 ) );
+	plainStone->setSelectedColor( ofColor( 255, 197, 120 ) );
 	plainStone->setTransparency( 255 );
 	plainStone->draw( -1920 / 2, -1080 / 2, 1920, 1080 );
 
@@ -243,7 +235,7 @@ void GrowingBrushStokeAct::draw() {
 
 	//whiteLinesBackground.draw( 0, 0 );
 	ofPushStyle();
-	ofSetColor( 255, transparency );
+	ofSetColor( 232, 151, 44, transparency );
 	tintBuffer.draw( 0, 0 );
 	ofPopStyle();
 }

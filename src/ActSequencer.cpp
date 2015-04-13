@@ -57,16 +57,16 @@ void ActSequencer::update()
 
 	currentMillisTimelinePosition += difference;
 
-	float factor = 0.1;// 0.05;
+	float factor = 1;// 0.05;
 
-	unsigned long long act2Time = 194000 * factor;
-	unsigned long long act2FadeInTime = act2Time + 6000 * factor;
+	unsigned long long act2Time = 185000 * factor;
+	unsigned long long act2FadeInTime = act2Time + 3000 * factor;
 	unsigned long long act2UpdateStart = act2FadeInTime + 1000 * factor;
 	unsigned long long act2StartScaleRock = act2UpdateStart + 60000 * factor;
-	unsigned long long act2UpdateFourStonesStart = act2StartScaleRock + 100000 * factor; // 427000
+	unsigned long long act2UpdateFourStonesStart = act2StartScaleRock + 55000 * factor; // 427000
 	unsigned long long startStoneCurtain = act2UpdateFourStonesStart + 100000 * factor; // 537000
-	unsigned long long moveFourSTones = startStoneCurtain + 120000 * factor;
-	unsigned long long growNewBigRock = moveFourSTones + 30000 * factor;
+	unsigned long long moveFourSTones = startStoneCurtain + 30000 * factor;
+	unsigned long long growNewBigRock = moveFourSTones + 15000 * factor;
 	unsigned long long startMoveBigRock = growNewBigRock + 20000 * factor;
 	unsigned long long fadeOut4Stones = startMoveBigRock + 50000 * factor;
 	unsigned long long fadeOutBigStone = fadeOut4Stones + 20000 * factor;
@@ -74,53 +74,27 @@ void ActSequencer::update()
 	unsigned long long fadeoutStoneCurtain = fadeoutBackground + 20000 * factor;
 	unsigned long long startOverMills = fadeoutStoneCurtain + 20000 * factor;
 
-	unsigned int currentAct = 1;
-	if( !hasSentAct1 ) {
-		sendChapterOscMessages( 1 );
-		hasSentAct1 = true;
-	}
-	
 
 	if( currentMillisTimelinePosition > act2Time ) {
 		act1->transparency -= 1.5;
+		if( act1->transparency < 0 ) {
+			act1->transparency = 0;
+		}
 	}
 
 	if( currentMillisTimelinePosition > act2FadeInTime && currentMillisTimelinePosition < fadeOutBigStone ) {
-		act2->transparency = 200.0;
-	}
-
-	if( currentMillisTimelinePosition > act2UpdateStart - 1000 ) {
-		if( !hasSentPrevAct2 ) {
-			sendPreChapterOscMessages( 2 );
-			hasSentPrevAct2 = true;
-		}
+		act2->transparency = 250.0;
 	}
 
 	if( currentMillisTimelinePosition > act2UpdateStart ) {
-		if( !hasSentAct2 ) {
-			sendChapterOscMessages( 2 );
-			hasSentAct2 = true;
-		}
-		//currentAct = 2;
 		act2->update();
 
 		if( currentMillisTimelinePosition > act2StartScaleRock  ) {
 			act2->doScale = true;
 		}
 
-		if( currentMillisTimelinePosition > act2UpdateFourStonesStart - 1000 ) {
-			if( !hasSentPrevAct3 ) {
-				sendPreChapterOscMessages( 3 );
-				hasSentPrevAct3 = true;
-			}
-		}
-
 		if( currentMillisTimelinePosition > act2UpdateFourStonesStart ) {
-			if( !hasSentAct3 ) {
-				sendChapterOscMessages( 3 );
-				hasSentAct3 = true;
-			}
-
+		
 			int padding = 10000;
 			for( int i = 0; i < 4; i++ ) {
 				if( currentMillisTimelinePosition > act2UpdateFourStonesStart + i * padding ) {
@@ -134,6 +108,12 @@ void ActSequencer::update()
 	}
 	else {
 		act1->update( currentMillisTimelinePosition );
+	}
+
+	if( currentMillisTimelinePosition > startStoneCurtain - 5000 ) {
+		act2->noiseWarp->setEnabled( true );
+		act2->noiseWarp->setAmplitude( 0.004 );
+		act2->noiseWarp->setFrequency( 0.976 );
 	}
 
 	if( currentMillisTimelinePosition > startStoneCurtain && currentMillisTimelinePosition < fadeoutStoneCurtain + 20000 ) {
@@ -162,8 +142,8 @@ void ActSequencer::update()
 	}
 
 	if( currentMillisTimelinePosition > fadeOutBigStone ) {
-		act2->transparency -= 1.0f;
-		act2->transparency = std::max( act2->transparency, 1.5f );
+		//act2->transparency -= 1.0f;
+		//act2->transparency = std::max( act2->transparency, 1.5f );
 	}
 
 	if( currentMillisTimelinePosition > fadeoutBackground ) {
@@ -189,6 +169,42 @@ void ActSequencer::update()
 		currentMillisTimelinePosition = 0;
 		hasSentAct1 = hasSentAct2 = hasSentAct3 = hasSentPrevAct2 = hasSentPrevAct3 = false;
 	}
+
+
+	// act osc sending
+	if( !hasSentAct1 ) {
+		sendChapterOscMessages( 1 );
+		hasSentAct1 = true;
+	}
+
+	if( currentMillisTimelinePosition > act2UpdateStart - 1000 ) {
+		if( !hasSentPrevAct2 ) {
+			sendPreChapterOscMessages( 2 );
+			hasSentPrevAct2 = true;
+		}
+	}
+
+	if( currentMillisTimelinePosition > act2UpdateStart ) {
+		if( !hasSentAct2 ) {
+			sendChapterOscMessages( 2 );
+			hasSentAct2 = true;
+		}
+	}
+
+	if( currentMillisTimelinePosition > act2UpdateFourStonesStart - 1000 ) {
+		if( !hasSentPrevAct3 ) {
+			sendPreChapterOscMessages( 3 );
+			hasSentPrevAct3 = true;
+		}
+	}
+
+	if( currentMillisTimelinePosition > act2UpdateFourStonesStart ) {
+		if( !hasSentAct3 ) {
+			sendChapterOscMessages( 3 );
+			hasSentAct3 = true;
+		}
+	}
+
 }
 
 void ActSequencer::draw()

@@ -94,7 +94,7 @@ void BrushStone::init( float _x, float _y )
 
 	borderSize = 30;
 
-	selectedColor = ofColor( 255, 255, 255 );
+	selectedColor = ofColor( 232, 151, 44 );
 }
 
 void BrushStone::draw( float x, float y, float w, float h )

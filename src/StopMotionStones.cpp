@@ -189,7 +189,6 @@ void StopMotionStones::draw()
 	waterEffect->begin();
 	ofPushStyle();
 	ofSetColor( 255, transparency );
-	ofBackground( 0 );
 	buf->draw( 0, 0 );
 	//ofSetColor( 255, 0, 0, transparency );
 	drawCustomVoronoi();

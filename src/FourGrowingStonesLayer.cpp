@@ -9,8 +9,8 @@ FourGrowingStonesLayer::FourGrowingStonesLayer()
 
 	fbo.allocate( Misc::getDefaultFboSettings() );
 
-	glitch.setup( &fbo );
-	glitch.setFx( OFXPOSTGLITCH_CONVERGENCE, true );
+	//glitch.setup( &fbo );
+	//glitch.setFx( OFXPOSTGLITCH_CONVERGENCE, true );
 
 	init();
 }
@@ -132,10 +132,10 @@ void FourGrowingStonesLayer::draw()
 	edge.end();
 	fbo.end();
 
-	glitch.generateFx();
+	//glitch.generateFx();
 
 	ofPushStyle();
-	ofSetColor( 255, transparency );
+	ofSetColor( 209, 79, 62, transparency );
 	fbo.draw( 0, ypos );
 	fbo.draw( 0, ypos + 1080);
 

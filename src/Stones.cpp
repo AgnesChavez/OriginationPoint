@@ -18,6 +18,7 @@ void Stones::init()
 void Stones::render( std::vector< ofPolyline > closedLines, std::vector< float > transparencies, ofPoint centered )
 {
 	buffer.begin();
+	ofPushStyle();
 	ofClear( 1.0 );
 	ofFill();
 	for( int i = 0; i < closedLines.size(); i++ ) {
@@ -36,7 +37,7 @@ void Stones::render( std::vector< ofPolyline > closedLines, std::vector< float >
 		}
 		ofEndShape();
 	}
-
+	ofPopStyle();
 	buffer.end();
 }
 

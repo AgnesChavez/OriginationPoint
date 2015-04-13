@@ -2,6 +2,8 @@
 
 #include "StopMotionStones.h"
 #include "ofMain.h"
+#include "ofxVectorField.h"
+
 
 class StopMotionStonesAct
 {
@@ -15,4 +17,6 @@ public:
 
 	StopMotionStones stones;
 	float transparency;
+
+	ofxVectorField vectorField;
 };

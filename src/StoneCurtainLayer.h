@@ -7,7 +7,6 @@
 #include "StoneCurtain.h"
 
 #include "ofxPostProcessing.h"
-#include "ofxVectorField.h"
 
 class StoneCurtainLayer
 {
@@ -34,6 +33,5 @@ public:
 	float noiseVal;
 	float movementSpeed;
 
-	ofxVectorField vectorField;
 };
 

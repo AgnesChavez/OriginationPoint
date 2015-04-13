@@ -51,7 +51,6 @@ public:
 
 	VoronoiLayer voro;
 	void addCustomVoronoiPoints();
-
 	
 	float transparency, secondPlainStoneTransparency;
 	bool doDrawBackground;

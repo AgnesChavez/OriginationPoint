@@ -30,6 +30,6 @@ public:
 
 	float ypos;
 
-	ofxPostGlitch	glitch;
+	//ofxPostGlitch	glitch;
 };
 

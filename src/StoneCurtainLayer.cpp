@@ -22,9 +22,6 @@ StoneCurtainLayer::StoneCurtainLayer()
 	stoneCurtainBuffer.allocate( Misc::getDefaultFboSettings() );
 	stoneCurtainBuffer2.allocate( Misc::getDefaultFboSettings() );
 
-	vectorField.setup( 1920, 1080, 15 );
-	vectorField.randomize();
-
 	// drawing stone curtain
 	stoneCurtainBuffer.begin();
 	ofClear( 0.0, 0.0, 0.0, 1.0 );
@@ -42,7 +39,7 @@ StoneCurtainLayer::StoneCurtainLayer()
 
 	setup();
 
-	movementSpeed = 6;
+	movementSpeed = 12;
 }
 
 
@@ -65,7 +62,7 @@ void StoneCurtainLayer::update()
 void StoneCurtainLayer::draw()
 {
 	ofPushStyle();
-	ofSetColor( 255, stoneCurtainTransparency );
+	ofSetColor( 209, 183, 53, stoneCurtainTransparency );
 	/*
 	unsigned int currentXPos = stoneCurtainXpos;
 	if( stoneCurtainXpos <= -1920 ) {
@@ -82,10 +79,7 @@ void StoneCurtainLayer::draw()
 	stoneCurtainBuffer2.draw( stoneCurtainXpos2, 60 );
 	stoneCurtainBuffer2.draw( stoneCurtainXpos2 - 1920, 60 );
 	ofPopStyle();
-	ofPushStyle();
-	vectorField.animate( 0.008 );
-	vectorField.draw( 90 );
-	ofPopStyle();
+	
 }
 
 void StoneCurtainLayer::updateStoneCurtainPos()
