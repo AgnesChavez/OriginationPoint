@@ -1,5 +1,5 @@
 #include "FourGrowingStonesLayer.h"
-
+#include "Misc.h"
 
 FourGrowingStonesLayer::FourGrowingStonesLayer()
 {
@@ -7,17 +7,10 @@ FourGrowingStonesLayer::FourGrowingStonesLayer()
 	edge.createPass< EdgePass >()->setEnabled( true );
 	edge.setFlip( false );
 
-	ofFbo::Settings settings;
-	settings.useDepth = true;
-	settings.useStencil = false;
-	settings.depthStencilAsTexture = true;
-	settings.width = 1920;
-	settings.height = 1080;
-
-	fbo.allocate( settings );
+	fbo.allocate( Misc::getDefaultFboSettings() );
 
 	glitch.setup( &fbo );
-	glitch.setFx( OFXPOSTGLITCH_OUTLINE, true );
+	glitch.setFx( OFXPOSTGLITCH_CONVERGENCE, true );
 
 	init();
 }

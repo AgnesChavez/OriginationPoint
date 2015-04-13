@@ -374,4 +374,18 @@ int StopMotionStones::getMostCenteredVoronoiStoneIndex()
 	return index;
 }
 
+void StopMotionStones::detectedStoneCount( int count )
+{
+	switch( count ) {
+	case 0:
+		break;
+	case 1:
+		break;
+	case 2:
+		break;
+	case 3:
+		break;
+	}
+}
+
 

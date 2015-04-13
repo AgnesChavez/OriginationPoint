@@ -32,6 +32,8 @@ public:
 
 	// osc output
 	ofxOscSender sender;
+	bool hasSentAct1, hasSentAct2, hasSentAct3;
+	bool hasSentPrevAct2, hasSentPrevAct3;
 
 	// projection mapping
 	ofxQuadWarp warper;
@@ -41,8 +43,12 @@ public:
 	GrowingBrushStokeAct * act2;
 	StoneCurtainLayer * act3;
 
+	// generak offscreen buffer
+	ofFbo buffer;
+
 private:
 	void sendKinectOscMessages( KinectInteractionManager * kinect );
 	void sendChapterOscMessages( int chapterId );
+	void sendPreChapterOscMessages( int chapterId );
 };
 

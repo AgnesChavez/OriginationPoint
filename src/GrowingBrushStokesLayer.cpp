@@ -1,15 +1,9 @@
 #include "GrowingBrushStokesLayer.h"
-
+#include "Misc.h"
 
 GrowingBrushStokesLayer::GrowingBrushStokesLayer()
 {
-	ofFbo::Settings settings;
-	settings.useDepth = true;
-	settings.useStencil = false;
-	settings.depthStencilAsTexture = true;
-	settings.width = 1920;
-	settings.height = 1080;
-	buffer.allocate( settings );
+	buffer.allocate( Misc::getDefaultFboSettings() );
 	transparency = 255;
 
 	growRad = 10;
@@ -30,10 +24,8 @@ GrowingBrushStokesLayer::GrowingBrushStokesLayer()
 
 	setBrushCollection( brushCollection );
 	setColorCollection( blackWhiteColor );
-
 	
 	add( 1920 / 4, 1080 / 2 );
-
 }
 
 

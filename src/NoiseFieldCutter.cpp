@@ -1,5 +1,5 @@
 #include "NoiseFieldCutter.h"
-
+#include "Misc.h"
 
 NoiseFieldCutter::NoiseFieldCutter()
 {
@@ -12,14 +12,7 @@ NoiseFieldCutter::~NoiseFieldCutter()
 
 void NoiseFieldCutter::init()
 {
-	ofFbo::Settings settings;
-	settings.useDepth = true;
-	settings.useStencil = true;
-	settings.depthStencilAsTexture = true;
-	settings.width = 1920;
-	settings.height = 1080;
-
-	buffer.allocate( settings );
+	buffer.allocate( Misc::getDefaultFboSettings() );
 
 	cutoutShader.load( "", ofToDataPath("shader/cutout.fs" ) );
 }

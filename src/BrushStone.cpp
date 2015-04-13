@@ -1,6 +1,6 @@
 #include "BrushStone.h"
 #include "omp.h"
-
+#include "Misc.h"
 
 BrushStone::BrushStone()
 {
@@ -22,17 +22,11 @@ BrushStone::BrushStone()
 
 	bufferWidth = 1920;
 	bufferHeight = 1080;
-	ofFbo::Settings settings;
-	settings.useDepth = true;
-	settings.useStencil = true;
-	settings.depthStencilAsTexture = true;
-	settings.width = bufferWidth;
-	settings.height = bufferHeight;
 
 	tDrawStone = true;
 	tDrawBorder = false;
 
-	layer.allocate( settings );
+	layer.allocate( Misc::getDefaultFboSettings() );
 	//underlyingLayer.allocate( settings );
 }
 

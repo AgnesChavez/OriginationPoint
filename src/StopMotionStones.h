@@ -27,6 +27,8 @@ public:
 	void setGrowing( bool gr );
 	bool isGrowing();
 
+	void detectedStoneCount( int count );
+
 	float transparency;
 	ofPoint centered;
 

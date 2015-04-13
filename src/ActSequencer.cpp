@@ -1,4 +1,5 @@
 #include "ActSequencer.h"
+#include "Misc.h"
 
 void ActSequencer::setup()
 {
@@ -23,6 +24,10 @@ void ActSequencer::setup()
 
 	act3 = new StoneCurtainLayer();
 
+	buffer.allocate( Misc::getDefaultFboSettings() );
+	buffer.begin();
+	ofClear( 255, 255, 255, 0 );
+	buffer.end();
 
 	int x = 0;
 	int y = 0;
@@ -34,10 +39,12 @@ void ActSequencer::setup()
 	warper.setBottomLeftCornerPosition( ofPoint( x, y + h ) );      // this is position of the quad warp corners, centering the image on the screen.
 	warper.setBottomRightCornerPosition( ofPoint( x + w, y + h ) ); // this is position of the quad warp corners, centering the image on the screen.
 	warper.setup();
-	warper.load(); // reload last saved changes.
+	warper.load();
 
 	currentMillisTimelinePosition = 0;
 	lastElapsedMillis = 0;
+
+	hasSentAct1 = hasSentAct2 = hasSentAct3 = hasSentPrevAct2 = hasSentPrevAct3 = false;
 }
 
 void ActSequencer::update()
@@ -50,7 +57,7 @@ void ActSequencer::update()
 
 	currentMillisTimelinePosition += difference;
 
-	float factor = 1;// 0.05;
+	float factor = 0.1;// 0.05;
 
 	unsigned long long act2Time = 194000 * factor;
 	unsigned long long act2FadeInTime = act2Time + 6000 * factor;
@@ -67,30 +74,53 @@ void ActSequencer::update()
 	unsigned long long fadeoutStoneCurtain = fadeoutBackground + 20000 * factor;
 	unsigned long long startOverMills = fadeoutStoneCurtain + 20000 * factor;
 
-	//std::cout << "currentMillisTimelinePosition: " << currentMillisTimelinePosition << std::endl;
-
 	unsigned int currentAct = 1;
+	if( !hasSentAct1 ) {
+		sendChapterOscMessages( 1 );
+		hasSentAct1 = true;
+	}
+	
 
 	if( currentMillisTimelinePosition > act2Time ) {
 		act1->transparency -= 1.5;
 	}
 
 	if( currentMillisTimelinePosition > act2FadeInTime && currentMillisTimelinePosition < fadeOutBigStone ) {
-		//act2->transparency += 0.3;
-		//act2->transparency = std::min( 170.0f, act2->transparency );
-		act2->transparency = 170.0;
+		act2->transparency = 200.0;
+	}
+
+	if( currentMillisTimelinePosition > act2UpdateStart - 1000 ) {
+		if( !hasSentPrevAct2 ) {
+			sendPreChapterOscMessages( 2 );
+			hasSentPrevAct2 = true;
+		}
 	}
 
 	if( currentMillisTimelinePosition > act2UpdateStart ) {
-		currentAct = 2;
+		if( !hasSentAct2 ) {
+			sendChapterOscMessages( 2 );
+			hasSentAct2 = true;
+		}
+		//currentAct = 2;
 		act2->update();
 
 		if( currentMillisTimelinePosition > act2StartScaleRock  ) {
 			act2->doScale = true;
 		}
 
+		if( currentMillisTimelinePosition > act2UpdateFourStonesStart - 1000 ) {
+			if( !hasSentPrevAct3 ) {
+				sendPreChapterOscMessages( 3 );
+				hasSentPrevAct3 = true;
+			}
+		}
+
 		if( currentMillisTimelinePosition > act2UpdateFourStonesStart ) {
-			currentAct = 3;
+			if( !hasSentAct3 ) {
+				sendChapterOscMessages( 3 );
+				hasSentAct3 = true;
+			}
+
 			int padding = 10000;
 			for( int i = 0; i < 4; i++ ) {
 				if( currentMillisTimelinePosition > act2UpdateFourStonesStart + i * padding ) {
@@ -147,55 +177,25 @@ void ActSequencer::update()
 	}
 
 	if( currentMillisTimelinePosition > startOverMills && currentMillisTimelinePosition < startOverMills + 500 ) {
-		
-		
 		act1->setup();
 		act1->stones.start();
-		//act2->fourRocks->init();
+
 		act2->setup();
 		act2->createStone( act1->stones.centered );
-		//act2->plainStone.init( 1920 / 2, 1080 / 2 );
-		//act2->secondPlainStone.init( 1920 / 2, 1080 / 2 );
-		act3->setup();
-
 		act2->transparency = 0;
 
-		currentMillisTimelinePosition = 0;
-		
-		/*
-		delete act1;
-		delete act2;
-		delete act3;
-
-		act1 = new StopMotionStonesAct();
-		//act1->stones.start();
-
-		act2 = new GrowingBrushStokeAct();
-
-		act2->createStone( act1->stones.centered );
-
-		act2Transparency = 0;
-		act2->transparency = act2Transparency;
-
-
-		act3 = new ManyLayersAct();
-		act3->transparency = 0;
+		act3->setup();
 
 		currentMillisTimelinePosition = 0;
-		*/
+		hasSentAct1 = hasSentAct2 = hasSentAct3 = hasSentPrevAct2 = hasSentPrevAct3 = false;
 	}
-
-	sendChapterOscMessages( currentAct );
 }
 
 void ActSequencer::draw()
 {
+	buffer.begin();
+	ofDisableSmoothing();
 	ofBackground( 0 );
-
-	ofPushMatrix();
-	ofMatrix4x4 mat = warper.getMatrix();
-	ofMultMatrix( mat );
-
 	if( act1->transparency > 0 ) {
 		act1->draw();
 	}
@@ -215,7 +215,15 @@ void ActSequencer::draw()
 		act2->drawSecondStone();
 	}
 
+	buffer.end();
+
 	kinect.draw();
+
+	ofPushMatrix();
+	ofMatrix4x4 mat = warper.getMatrix();
+	ofMultMatrix( mat );
+
+	buffer.draw( 0, 0, 1920, 1080 );
 
 	ofPopMatrix();
 	ofPushStyle();
@@ -226,13 +234,7 @@ void ActSequencer::draw()
 	ofSetColor( ofColor::yellow );
 	warper.drawCorners();
 
-	ofSetColor( ofColor::magenta );
-	warper.drawHighlightedCorner();
-
-	ofSetColor( ofColor::red );
-	warper.drawSelectedCorner();
 	ofPopStyle();
-
 }
 
 void ActSequencer::keyPressed( int key )
@@ -260,5 +262,13 @@ void ActSequencer::sendChapterOscMessages( int actId )
 	ofxOscMessage msg;
 	msg.setAddress( "/act" );
 	msg.addIntArg( actId );
+	sender.sendMessage( msg );
+}
+
+void ActSequencer::sendPreChapterOscMessages( int preActId )
+{
+	ofxOscMessage msg;
+	msg.setAddress( "/act_pre" );
+	msg.addIntArg( preActId );
 	sender.sendMessage( msg );
 }

@@ -11,15 +11,8 @@ GrowingBrushStokeAct::GrowingBrushStokeAct()
 	background.loadImage( "lines_3_bw.jpg" );
 	whiteLinesBackground.loadImage( "black_room-white_lines.jpg" );
 
-	ofFbo::Settings settings;
-	settings.useDepth = true;
-	settings.useStencil = false;
-	settings.depthStencilAsTexture = true;
-	settings.width = 1920;
-	settings.height = 1080;
-
-	tintBuffer.allocate( settings );
-	secondTintBuffer.allocate( settings );
+	tintBuffer.allocate( Misc::getDefaultFboSettings() );
+	secondTintBuffer.allocate( Misc::getDefaultFboSettings() );
 
 	//voroWebLayer.allocate( settings );
 

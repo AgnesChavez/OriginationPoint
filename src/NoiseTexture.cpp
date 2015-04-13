@@ -1,5 +1,5 @@
 #include "NoiseTexture.h"
-
+#include "Misc.h"
 
 NoiseTexture::NoiseTexture()
 {
@@ -8,14 +8,7 @@ NoiseTexture::NoiseTexture()
 	noiseZoom = 3.0f;
 	noiseSpeed = 1.0f;
 
-	ofFbo::Settings settings;
-	settings.useDepth = true;
-	settings.useStencil = true;
-	settings.depthStencilAsTexture = false;
-	settings.width = 1920;
-	settings.height = 1080;
-
-	noiseFbo.allocate( settings );
+	noiseFbo.allocate( Misc::getDefaultFboSettings() );
 
 	w1 = 0.5;
 	w2 = 0.25;

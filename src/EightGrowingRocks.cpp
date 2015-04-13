@@ -1,5 +1,6 @@
 #include "EightGrowingRocks.h"
 #include "ActSequencer.h"
+#include "Misc.h"
 
 EightGrowingRocks::EightGrowingRocks()
 {
@@ -9,14 +10,7 @@ EightGrowingRocks::EightGrowingRocks()
 	edge.createPass< EdgePass >()->setEnabled( true );
 	edge.setFlip( false );
 
-	ofFbo::Settings settings;
-	settings.useDepth = true;
-	settings.useStencil = false;
-	settings.depthStencilAsTexture = true;
-	settings.width = 1920;
-	settings.height = 1080;
-
-	fbo.allocate( settings );
+	fbo.allocate( Misc::getDefaultFboSettings() );
 
 	init();
 }

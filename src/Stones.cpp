@@ -1,5 +1,5 @@
 #include "Stones.h"
-
+#include "Misc.h"
 
 Stones::Stones()
 {
@@ -12,14 +12,7 @@ Stones::~Stones()
 
 void Stones::init()
 {
-	ofFbo::Settings settings;
-	settings.useDepth = true;
-	settings.useStencil = false;
-	settings.depthStencilAsTexture = true;
-	settings.width = 1920;
-	settings.height = 1080;
-
-	buffer.allocate( settings );
+	buffer.allocate( Misc::getDefaultFboSettings() );
 }
 
 void Stones::render( std::vector< ofPolyline > closedLines, std::vector< float > transparencies, ofPoint centered )

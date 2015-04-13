@@ -13,8 +13,6 @@ KinectInteractionManager::~KinectInteractionManager()
 
 void KinectInteractionManager::init()
 {
-#ifndef KINECT_NOT_CONNCETED
-
 	wrapper.openKinect();
 	wrapper.openDepthStream();
 
@@ -57,14 +55,10 @@ void KinectInteractionManager::init()
 	kinectShader.setupShaderFromSource( GL_VERTEX_SHADER, vertShaderSrc );
 	kinectShader.setupShaderFromSource( GL_FRAGMENT_SHADER, fragShaderSrc );
 	kinectShader.linkProgram();
-
-#endif // !KINECT_NOT_DETECTED
 }
 
 void KinectInteractionManager::update()
 {
-#ifndef KINECT_NOT_CONNCETED
-
 	bool isUpdated = wrapper.updateDepthFrame();
 
 	if( isUpdated ) {
@@ -89,11 +83,12 @@ void KinectInteractionManager::update()
 		glEnd();
 		kinectShader.end();
 		kinectFbo2.end();
-
-		
 	}
-#endif // !KINECT_NOT_DETECTED
 
+	ofPixels pix;
+	kinectFbo2.readToPixels( pix );
+	gr.setFromPixels( pix );
+	contourFinder.findContours( gr, 0, 1000, 20, false );
 }
 
 void KinectInteractionManager::draw()
@@ -105,18 +100,5 @@ void KinectInteractionManager::draw()
 
 std::vector< ofxCvBlob > KinectInteractionManager::getBlobs()
 {
-#ifndef KINECT_NOT_CONNCETED
-
-	if( doBlobDetection ) {
-		ofPixels pix;
-		kinectFbo2.readToPixels( pix );
-		gr.setFromPixels( pix );
-		contourFinder.findContours( gr, 0, 1000, 20, false );
-		return contourFinder.blobs;
-	}
-
-#endif // !KINECT_NOT_DETECTED
-	std::vector< ofxCvBlob > blobs;
-	return blobs;
-
+	return contourFinder.blobs;
 }
