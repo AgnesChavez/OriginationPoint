@@ -15,6 +15,8 @@ void ActSequencer::setup()
 
 	sender.setup( HOST, PORT );
 
+	setupGui();
+
 	act1 = new StopMotionStonesAct();
 	//act1->stones.start();
 
@@ -260,6 +262,7 @@ void ActSequencer::keyPressed( int key )
 	switch( key ) {
 	case ' ':
 		warper.toggleShow();
+		gui->toggleVisible();
 		break;
 	}
 }
@@ -287,4 +290,20 @@ void ActSequencer::sendPreChapterOscMessages( int preActId )
 	msg.setAddress( "/act_pre" );
 	msg.addIntArg( preActId );
 	sender.sendMessage( msg );
+}
+
+void ActSequencer::setupGui()
+{
+	gui = new ofxUISuperCanvas( "The Other", OFX_UI_FONT_MEDIUM );
+	gui->addSpacer();
+	gui->addFPSSlider( "FPS" );
+	gui->addSpacer();
+	gui->addLabel( "Kinect" );
+	gui->addSlider( "KinectDistance", 0.0f, 255.0f, &kinect.kinectToStoneDistance );
+	gui->addSpacer();
+}
+
+void ActSequencer::guiEvent( ofxUIEventArgs &e )
+{
+
 }

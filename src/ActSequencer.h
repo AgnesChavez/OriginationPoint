@@ -10,7 +10,7 @@
 #include "ofxPlaylist.h"
 #include "ofxQuadWarp.h"
 #include "ofxTimeMeasurements.h"
-
+#include "ofxUI.h"
 #include "ofxOsc.h"
 
 #define HOST "localhost"
@@ -42,6 +42,11 @@ public:
 	StopMotionStonesAct * act1;
 	GrowingBrushStokeAct * act2;
 	StoneCurtainLayer * act3;
+
+	// gui
+	ofxUISuperCanvas *gui;
+	void setupGui();
+	void guiEvent( ofxUIEventArgs &e );
 
 	// generak offscreen buffer
 	ofFbo buffer;
