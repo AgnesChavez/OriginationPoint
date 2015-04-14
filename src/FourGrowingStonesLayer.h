@@ -28,6 +28,8 @@ public:
 	ofxPostProcessing edge;
 	float transparency;
 
+	ofColor color;
+
 	float ypos;
 
 	//ofxPostGlitch	glitch;

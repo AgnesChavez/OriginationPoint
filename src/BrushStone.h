@@ -71,6 +71,7 @@ public:
 	ofVec2f centroid;
 	ofPolyline border;
 
+	float maxGrowRad;
 
 private:
 	float radius, fuzzy;
@@ -84,7 +85,6 @@ private:
 
 
 	
-	float maxGrowRad;
 
 	int getNumberOfStrokes();
 

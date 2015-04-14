@@ -5,9 +5,10 @@
 #include "VoronoiLayer.h"
 #include "Stone.h"
 #include "FourGrowingStonesLayer.h"
-#include "ofxPostGlitch.h"
 
+#include "ofxPostGlitch.h"
 #include "ofxPostProcessing.h"
+#include "ofxVectorField.h"
 
 class GrowingBrushStokeAct {
 
@@ -70,4 +71,8 @@ public:
 	ofImage whiteLinesBackground;
 
 	ofxPostGlitch myGlitch;
+
+	ofColor bigRockColor, secondBigRockColor;
+
+	//ofxVectorField vectorField;
 };

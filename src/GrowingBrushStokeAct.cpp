@@ -22,6 +22,12 @@ GrowingBrushStokeAct::GrowingBrushStokeAct()
 	secondEdgeDetectionPass = new ofxPostProcessing();
 	fourRocks = new FourGrowingStonesLayer();
 
+	//vectorField.setup( 1920, 1080, 200 );
+	//vectorField.randomize();
+
+	bigRockColor = ofColor( 232, 202, 44 );
+	secondBigRockColor = ofColor( 255 );
+
 	setup();
 }
 
@@ -235,9 +241,15 @@ void GrowingBrushStokeAct::draw() {
 
 	//whiteLinesBackground.draw( 0, 0 );
 	ofPushStyle();
-	ofSetColor( 232, 151, 44, transparency );
+	ofSetColor( bigRockColor, transparency );
+	//ofSetColor( 255, transparency );
 	tintBuffer.draw( 0, 0 );
 	ofPopStyle();
+
+	//ofPushStyle();
+	//vectorField.animate( 0.008 );
+	//vectorField.draw( transparency - 50 );
+	//ofPopStyle();
 }
 
 void GrowingBrushStokeAct::drawSecondStone()
@@ -262,7 +274,7 @@ void GrowingBrushStokeAct::drawSecondStone()
 	secondTintBuffer.end();
 
 	ofPushStyle();
-	ofSetColor( 255, secondPlainStoneTransparency );
+	ofSetColor( secondBigRockColor, secondPlainStoneTransparency );
 	secondTintBuffer.draw( 0, rockYpos );
 	secondTintBuffer.draw( 0, rockYpos - 1080 );
 

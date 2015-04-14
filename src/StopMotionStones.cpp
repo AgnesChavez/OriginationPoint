@@ -6,7 +6,8 @@ StopMotionStones::StopMotionStones() :
 	y( 20 ),
 	xSpacing( 1920 / x ),
 	ySpacing( 1080 / y ),
-	transparency( 255 )
+	transparency( 255 ),
+	showVector( false )
 {
 	voro = new VoronoiLayer();
 	voro->setSmoothAmount( 10 );
@@ -16,6 +17,9 @@ StopMotionStones::StopMotionStones() :
 	stonesTex.init();
 	cutter.init();
 	noi.render();
+
+	vectorField.setup( 1920, 1080, 5 );
+	vectorField.randomize();
 }
 
 StopMotionStones::~StopMotionStones()
@@ -34,6 +38,8 @@ void StopMotionStones::init()
 	transparency = 255;
 	isStarted = false;
 	flickeringStonesRelativeTransparency = 0.0;
+	vectorFieldTransparency = 255;
+	showVector = false;
 
 	//cutter.init();
 
@@ -92,12 +98,13 @@ void StopMotionStones::start()
 
 void StopMotionStones::update( unsigned long long millis )
 {
-	long millisStopMotionPart1 = 30000;
-	long millisStopMotionPart1AndAHalf = 40000;
-	long millisStopMotionPart2 = 70000;
-	long millisBrownianMotionPart1 = 110000;
-	long millisBrownianMotionPart2 = 150000;
-	long millisStartFadeAllOut = 158000;
+	float factor = 1;
+	long millisStopMotionPart1 = 30000 * factor;
+	long millisStopMotionPart1AndAHalf = 40000 * factor;
+	long millisStopMotionPart2 = 70000 * factor;
+	long millisBrownianMotionPart1 = 110000 * factor;
+	long millisBrownianMotionPart2 = 150000 * factor;
+	long millisStartFadeAllOut = 158000 * factor;
 
 	if( isStarted ) {
 		if( isWithinMillis( millis, 0, millisStopMotionPart1 ) ) {
@@ -140,6 +147,7 @@ void StopMotionStones::update( unsigned long long millis )
 			secondCurrentStone = doBrownianMotion( secondCurrentStone, 1 );
 			thirdCurrentStone = doBrownianMotion( thirdCurrentStone, 2 );
 			flickeringStonesRelativeTransparency--;
+			vectorFieldTransparency -= 0.25;
 		}
 		if( isWithinMillis( millis, millisBrownianMotionPart2, millisStartFadeAllOut ) ) {
 			for( int i = 0; i < 15; i++ ) {
@@ -194,6 +202,13 @@ void StopMotionStones::draw()
 	drawCustomVoronoi();
 	ofPopStyle();
 	waterEffect->end();
+
+	if( showVector ) {
+		ofPushStyle();
+		vectorField.animate( 0.008 );
+		vectorField.draw( vectorFieldTransparency - 170 );
+		ofPopStyle();
+	}
 }
 
 void StopMotionStones::drawCustomVoronoi()
@@ -209,7 +224,7 @@ void StopMotionStones::drawCustomVoronoi()
 		ofVec2f pt = pts[ inde ];
 		if( pt.x > 95 && pt.x < 1860 && pt.y > 68 && pt.y < 1037 ) {
 				ofSetColor( 0, transparencies.at( inde ) );
-				ofCircle( pts[ inde ].x, pts[ inde ].y, 4 );
+				ofCircle( pts[ inde ].x, pts[ inde ].y, 2.5 );
 		}
 	}
 

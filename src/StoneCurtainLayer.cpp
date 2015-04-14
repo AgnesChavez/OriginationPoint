@@ -22,6 +22,9 @@ StoneCurtainLayer::StoneCurtainLayer()
 	stoneCurtainBuffer.allocate( Misc::getDefaultFboSettings() );
 	stoneCurtainBuffer2.allocate( Misc::getDefaultFboSettings() );
 
+	vectorField.setup( 1920, 1080, 35 );
+	vectorField.randomize();
+
 	// drawing stone curtain
 	stoneCurtainBuffer.begin();
 	ofClear( 0.0, 0.0, 0.0, 1.0 );
@@ -39,9 +42,13 @@ StoneCurtainLayer::StoneCurtainLayer()
 
 	setup();
 
-	movementSpeed = 12;
-}
+	movementSpeed = 25;
 
+	leftColor = ofColor( 232, 91, 32 );
+	rightColor = ofColor( 232, 91, 32 );
+
+	showVectorField = false;
+}
 
 StoneCurtainLayer::~StoneCurtainLayer()
 {
@@ -52,6 +59,7 @@ void StoneCurtainLayer::setup()
 	stoneCurtainXpos = 1920;
 	stoneCurtainXpos2 = -1920;
 	stoneCurtainTransparency = 0;
+	vectorFieldTransparency = 0;
  }
 
 void StoneCurtainLayer::update()
@@ -62,24 +70,16 @@ void StoneCurtainLayer::update()
 void StoneCurtainLayer::draw()
 {
 	ofPushStyle();
-	ofSetColor( 209, 183, 53, stoneCurtainTransparency );
-	/*
-	unsigned int currentXPos = stoneCurtainXpos;
-	if( stoneCurtainXpos <= -1920 ) {
-		int mod = static_cast< int > ( stoneCurtainXpos ) % -1920;
-		currentXPos = mod;
-	}
-	else if( stoneCurtainXpos >= 1920 ) {
-		currentXPos = static_cast< int > ( stoneCurtainXpos ) % 1920;
-	}
-	*/
+	ofSetColor( leftColor, stoneCurtainTransparency );
+	//ofSetColor( 255, stoneCurtainTransparency );
 	stoneCurtainBuffer.draw( stoneCurtainXpos, -70 );
 	stoneCurtainBuffer.draw( stoneCurtainXpos + 1920, -70 );
 
+	//ofSetColor( 120, stoneCurtainTransparency );
+	ofSetColor( rightColor, stoneCurtainTransparency );
 	stoneCurtainBuffer2.draw( stoneCurtainXpos2, 60 );
 	stoneCurtainBuffer2.draw( stoneCurtainXpos2 - 1920, 60 );
 	ofPopStyle();
-	
 }
 
 void StoneCurtainLayer::updateStoneCurtainPos()
@@ -93,5 +93,15 @@ void StoneCurtainLayer::updateStoneCurtainPos()
 	stoneCurtainXpos2 += randomSpeed;
 	if( stoneCurtainXpos2 >= 1920 ) {
 		stoneCurtainXpos2 = 0;
+	}
+}
+
+void StoneCurtainLayer::drawVectorField()
+{
+	if( showVectorField ) {
+		ofPushStyle();
+		vectorField.animate( 0.008 );
+		vectorField.draw( vectorFieldTransparency );
+		ofPopStyle();
 	}
 }

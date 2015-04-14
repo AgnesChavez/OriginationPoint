@@ -8,6 +8,7 @@
 #include "ofMain.h"
 
 #include "ofxPostProcessing.h"
+#include "ofxVectorField.h"
 
 #include <algorithm>
 
@@ -31,9 +32,6 @@ public:
 
 	float transparency;
 	ofPoint centered;
-
-
-private:
 
 	bool isStarted;
 	unsigned long long startedMillis;
@@ -66,6 +64,7 @@ private:
 
 	std::vector< ofPoint > voronoiCentroids;
 	float flickeringStonesRelativeTransparency;
+	float vectorFieldTransparency;
 
 	void removeOuterEdges();
 	bool isWithinMillis( unsigned long long currentSystemMillis, unsigned long long start, unsigned long long end );
@@ -74,5 +73,8 @@ private:
 
 	ofxPostProcessing * waterEffect;
 	NoiseWarpPass::Ptr waterEffectPointer;
+
+	ofxVectorField vectorField;
+	bool showVector;
 };
 

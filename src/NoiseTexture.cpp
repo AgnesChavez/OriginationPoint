@@ -10,10 +10,10 @@ NoiseTexture::NoiseTexture()
 
 	noiseFbo.allocate( Misc::getDefaultFboSettings() );
 
-	w1 = 0.5;
+	w1 = 0.2;
 	w2 = 0.25;
-	w3 = 0.125;
-	w4 = 0.075;
+	w3 = 0.25;
+	w4 = 0.3;
 }
 
 
@@ -35,17 +35,17 @@ void NoiseTexture::render()
 	ofClear( 0 );
 	noise.begin();
 	noise.setUniform2f( "resolution", 1920.0, 1080.0 );
-	noise.setUniform1f( "time", ofGetElapsedTimef()*noiseSpeed );
+	//noise.setUniform1f( "time", ofGetElapsedTimef()*noiseSpeed );
 	noise.setUniform1f( "w1", w1 );
 	noise.setUniform1f( "w2", w2 );
 	noise.setUniform1f( "w3", w3 );
 	noise.setUniform1f( "w4", w4 );
-	noise.setUniform1f( "zPos", noiseZoom );
-	noise.setUniform1f( "normalization", 1.0f );
-	noise.setUniform1i( "octaves", 4 );
-	noise.setUniform1f( "seed", ofMap(ofGetMouseX(), 0, 1920, 0, 1 ) );
-	noise.setUniform1fv( "weights", weights, 8 );
-	noise.setUniform1fv( "scaling", scalings, 8 );
+	//noise.setUniform1f( "zPos", noiseZoom );
+	//noise.setUniform1f( "normalization", 1.0f );
+	//noise.setUniform1i( "octaves", 4 );
+	//noise.setUniform1f( "seed", ofMap(ofGetMouseX(), 0, 1920, 0, 1 ) );
+	//noise.setUniform1fv( "weights", weights, 8 );
+	//noise.setUniform1fv( "scaling", scalings, 8 );
 	glBegin( GL_QUADS );
 	glTexCoord2f( 0, 0 ); glVertex3f( 0, 0, 0 );
 	glTexCoord2f( noiseFbo.getWidth(), 0 ); glVertex3f( noiseFbo.getWidth(), 0, 0 );

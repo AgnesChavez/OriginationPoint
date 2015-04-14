@@ -7,6 +7,8 @@
 #include "StoneCurtain.h"
 
 #include "ofxPostProcessing.h"
+#include "ofxVectorField.h"
+
 
 class StoneCurtainLayer
 {
@@ -17,6 +19,7 @@ public:
 	void setup();
 	void update();
 	void draw();
+	void drawVectorField();
 
 	void updateStoneCurtainPos();
 	void updateFourStonesPos();
@@ -28,10 +31,15 @@ public:
 	ofxPostProcessing edge, edge2;
 	
 	float stoneCurtainTransparency;
+	float vectorFieldTransparency;
 	double stoneCurtainXpos, stoneCurtainXpos2;
 
 	float noiseVal;
 	float movementSpeed;
 
+	ofxVectorField vectorField;
+	bool showVectorField;
+
+	ofColor rightColor, leftColor;
 };
 

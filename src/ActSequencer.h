@@ -48,8 +48,10 @@ public:
 	void setupGui();
 	void guiEvent( ofxUIEventArgs &e );
 
-	// generak offscreen buffer
+	// general offscreen buffer
 	ofFbo buffer;
+
+	bool visualTrigger;
 
 private:
 	void sendKinectOscMessages( KinectInteractionManager * kinect );

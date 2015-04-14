@@ -12,7 +12,7 @@ BrushStone::BrushStone()
 	brushStokeCount = 50;
 	brushStrokeSizeMin = 20;
 	brushStrokeSizeMax = 80;
-	brushStrokeAlpha = 140;
+	brushStrokeAlpha = 240;
 	saturation = 255;
 
 	borderSize = 30;
@@ -89,7 +89,7 @@ void BrushStone::init( float _x, float _y )
 	brushStokeCount = 50;
 	brushStrokeSizeMin = 20;
 	brushStrokeSizeMax = 80;
-	brushStrokeAlpha = 140;
+	brushStrokeAlpha = 240;
 	saturation = 255;
 
 	borderSize = 30;
@@ -230,8 +230,6 @@ void BrushStone::grow()
 		ofPopStyle();
 
 		layer.end();
-
-
 	}
 }
 
