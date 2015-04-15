@@ -206,7 +206,13 @@ void ActSequencer::update()
 
 	if( currentMillisTimelinePosition > startStoneCurtain - 5000 ) {
 		act2->noiseWarp->setEnabled( true );
-		act2->noiseWarp->setAmplitude( 0.004 );
+		act2->noiseWarp->setAmplitude( act2->noiseWarp->getAmplitude() + 0.0002 );
+		if( act2->noiseWarp->getAmplitude() >= 0.004 )
+		{
+			act2->noiseWarp->setAmplitude( 0.004 );
+		}
+
+		//act2->noiseWarp->setAmplitude( 0.004 );
 		act2->noiseWarp->setFrequency( 0.976 );
 	}
 
@@ -264,7 +270,8 @@ void ActSequencer::update()
 
 		act2->setup();
 		act2->createStone( act1->stones.centered );
-		act2->transparency = 0;
+		act2->transparency = 0; 
+		act2->noiseWarp->setAmplitude( 0.0 );
 
 		act3->setup();
 

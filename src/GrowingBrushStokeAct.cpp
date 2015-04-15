@@ -103,8 +103,11 @@ void GrowingBrushStokeAct::setup() {
 	edgePass = edgeDetectionPostProcessing->createPass< EdgePass >();
 	edgePass->setEnabled( true );
 	noiseWarp = edgeDetectionPostProcessing->createPass<NoiseWarpPass>();
-	noiseWarp->setEnabled( false );
+	noiseWarp->setEnabled( true );
 	edgeDetectionPostProcessing->setFlip( false );
+
+	noiseWarp->setAmplitude( 0.0 );
+	noiseWarp->setFrequency( 0.0 );
 
 	secondEdgeDetectionPass = new ofxPostProcessing();
 	secondEdgeDetectionPass->init( 1920, 1080 );
