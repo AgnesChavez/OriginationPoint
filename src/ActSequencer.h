@@ -13,6 +13,10 @@
 #include "ofxUI.h"
 #include "ofxOsc.h"
 
+#include "ofxAnimatableFloat.h"
+#include "ofxAnimatableOfPoint.h"
+#include "ofxAnimatableOfColor.h"
+
 #define HOST "localhost"
 #define PORT 5001
 
@@ -51,7 +55,9 @@ public:
 	// general offscreen buffer
 	ofFbo buffer;
 
-	bool visualTrigger;
+	bool visualTrigger, prevVisualTrigger;
+
+	ofxAnimatableOfColor bigRockColor, fourRocksColor, curtainLeftColor, curtainRightColor;
 
 private:
 	void sendKinectOscMessages( KinectInteractionManager * kinect );

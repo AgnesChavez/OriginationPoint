@@ -107,6 +107,7 @@ void StopMotionStones::update( unsigned long long millis )
 
 	if( isStarted ) {
 		if( isWithinMillis( millis, 0, millisStopMotionPart1 ) ) {
+			showVector = true;
 			toDrawStone.clear();
 			vectorFieldTransparency += 0.5;
 			currentStone += 1;
@@ -149,6 +150,7 @@ void StopMotionStones::update( unsigned long long millis )
 			vectorFieldTransparency -= 0.25;
 		}
 		if( isWithinMillis( millis, millisBrownianMotionPart2, millisStartFadeAllOut ) ) {
+			showVector = false;
 			for( int i = 0; i < 15; i++ ) {
 				auto rand = static_cast< int >( ofRandom( x * y ) );
 				toDrawStone.insert( rand );

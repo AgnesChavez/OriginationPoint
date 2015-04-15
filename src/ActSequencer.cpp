@@ -47,6 +47,23 @@ void ActSequencer::setup()
 	hasSentAct1 = hasSentAct2 = hasSentAct3 = hasSentPrevAct2 = hasSentPrevAct3 = false;
 
 	visualTrigger = false;
+	prevVisualTrigger = false;
+
+	bigRockColor.setColor( ofColor( 255 ) );
+	bigRockColor.setDuration( 0.5f );
+	bigRockColor.setCurve( EASE_IN );
+
+	fourRocksColor.setColor( ofColor( 255 ) );
+	fourRocksColor.setDuration( 0.5f );
+	fourRocksColor	.setCurve( EASE_IN );
+
+	curtainLeftColor.setColor( ofColor( 255 ) );
+	curtainLeftColor.setDuration( 0.5f );
+	curtainLeftColor.setCurve( EASE_IN );
+
+	curtainRightColor.setColor( ofColor( 255 ) );
+	curtainRightColor.setDuration( 0.5f );
+	curtainRightColor.setCurve( EASE_IN );
 }
 
 void ActSequencer::update()
@@ -61,22 +78,67 @@ void ActSequencer::update()
 	float factor = 1;
 	
 	if( visualTrigger ) {
-		act2->bigRockColor = ofColor( 239, 206, 27 );
-		act2->fourRocks->color = ofColor( 255, 152, 29 );
-		act3->leftColor = ofColor( 33, 110, 13 );
-		act3->rightColor = ofColor( 33, 110, 13 );
+		//act2->bigRockColor = ofColor( 239, 206, 27 );
+		//act2->fourRocks->color = ofColor( 255, 152, 29 );
+		//act3->leftColor = ofColor( 33, 110, 13 );
+		//act3->rightColor = ofColor( 33, 110, 13 );
 		//act2->secondBigRockColor = ofColor( 255, 152, 29 );
-		act1->stones.showVector = true;
-		act3->showVectorField = true;
+		//act1->stones.showVector = true;
+		act1->stones.vectorFieldTransparency += 2.0f;
+		act1->stones.vectorFieldTransparency = std::min( 255.0f, act1->stones.vectorFieldTransparency );
+
+		act3->vectorFieldTransparency += 2.0f;
+		act3->vectorFieldTransparency = std::min( 255.0f, act3->vectorFieldTransparency );
+		
+
+		if( !prevVisualTrigger )
+		{
+			// start color animations to colored
+			bigRockColor.animateTo( ofColor( 239, 206, 27 ) );
+			fourRocksColor.animateTo( ofColor( 255, 152, 29 ) );
+			curtainLeftColor.animateTo( ofColor( 33, 110, 13 ) );
+			curtainRightColor.animateTo( ofColor( 33, 110, 13 ) );
+		}
+
+		prevVisualTrigger = true;
 	}
 	else {
-		act2->bigRockColor = ofColor( 255 );
-		act2->fourRocks->color = ofColor( 255 );
-		act3->leftColor = ofColor( 255 );
-		act3->rightColor = ofColor( 255 );
-		act1->stones.showVector = false;
-		act3->showVectorField = false;
+		//act2->bigRockColor = ofColor( 255 );
+		//act2->fourRocks->color = ofColor( 255 );
+		//act3->leftColor = ofColor( 255 );
+		//act3->rightColor = ofColor( 255 );
+		//act1->stones.showVector = false;
+		act1->stones.vectorFieldTransparency -= 2.0f;
+		act1->stones.vectorFieldTransparency = std::max( 0.0f, act1->stones.vectorFieldTransparency );
+		act3->vectorFieldTransparency -= 2.0f;
+		act3->vectorFieldTransparency = std::max( 0.0f, act3->vectorFieldTransparency );
+		if( act3->vectorFieldTransparency < 5 )
+		{
+			act3->showVectorField = false;
+		}
+
+		if( prevVisualTrigger )
+		{
+			// start color animations to b/w
+			bigRockColor.animateTo( ofColor( 255 ) );
+			fourRocksColor.animateTo( ofColor( 255 ) );
+			curtainLeftColor.animateTo( ofColor( 255 ) );
+			curtainRightColor.animateTo( ofColor( 255 ) );
+		}
+
+		prevVisualTrigger = false;
 	}
+
+	float dt = 1.0f / 60.0f;
+	bigRockColor.update( dt );
+	fourRocksColor.update( dt );
+	curtainLeftColor.update( dt );
+	curtainRightColor.update( dt );
+
+	act2->bigRockColor = bigRockColor.getCurrentColor();
+	act2->fourRocks->color = fourRocksColor.getCurrentColor();
+	act3->leftColor = curtainLeftColor.getCurrentColor();
+	act3->rightColor = curtainRightColor.getCurrentColor();
 	
 
 	unsigned long long act2Time = 183000 * factor;
@@ -94,6 +156,8 @@ void ActSequencer::update()
 	unsigned long long fadeoutStoneCurtain = fadeoutBackground + 20000 * factor;
 	unsigned long long fadeOutVectorField = fadeoutStoneCurtain + 5000 * factor;
 	unsigned long long startOverMills = fadeOutVectorField + 20000 * factor;
+
+	act3->showVectorField = false;
 
 	if( currentMillisTimelinePosition > act2Time ) {
 		act1->transparency -= 1.5;
@@ -130,6 +194,10 @@ void ActSequencer::update()
 			act2->fourRocks->transparency = std::min( 160.0f, act2->fourRocks->transparency );
 			act3->vectorFieldTransparency += 0.2;
 			act3->vectorFieldTransparency = std::min( 100.0f, act3->vectorFieldTransparency );
+			if( act3->vectorFieldTransparency > 20 )
+			{
+				act3->showVectorField = true;
+			}
 		}
 	}
 	else {

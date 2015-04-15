@@ -10,8 +10,8 @@ VoronoiLayer::VoronoiLayer()
 
 	int off = 100;
 
-	con = new voro::container( -off, settings.width + (2 * off ),
-		-off, settings.height + ( 2 * off ),
+	con = new voro::container( -off, Misc::getDefaultFboSettings().width + (2 * off ),
+		-off, Misc::getDefaultFboSettings().height + ( 2 * off ),
 		-10, 10,
 		1, 1, 1, true, true, true, 3 );
 
