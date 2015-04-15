@@ -16,34 +16,27 @@ void ActSequencer::setup()
 	sender.setup( HOST, PORT );
 
 	setupGui();
-	std::cout << "0" << std::endl;
 	act1 = new StopMotionStonesAct();
 	//act1->stones.start();
-	std::cout << "1" << std::endl;
 
 	act2 = new GrowingBrushStokeAct();
 	act2->createStone( act1->stones.centered );
 	act2->transparency = 0;
-	std::cout << "2" << std::endl;
 
 	act3 = new StoneCurtainLayer();
-	std::cout << "3" << std::endl;
 
-	//buffer.allocate( 1920, 1080 );
-	//buffer.begin();
-	//ofClear( 255, 255, 255, 0 );
-	//buffer.end();
-	std::cout << "3,5" << std::endl;
+	buffer.allocate( Misc::getDefaultFboSettings() );
+	buffer.begin();
+	ofClear( 255, 255, 255, 0 );
+	buffer.end();
 
-	int x = 0;
-	int y = 0;
-	int w = 1920;
-	int h = 1080;
+	int WIDTH = 1920;
+	int HEIGHT = 1080;
 	warper.setSourceRect( ofRectangle( 0, 0, ofGetWidth(), ofGetHeight() ) );              // this is the source rectangle which is the size of the image and located at ( 0, 0 )
-	warper.setTopLeftCornerPosition( ofPoint( x, y ) );             // this is position of the quad warp corners, centering the image on the screen.
-	warper.setTopRightCornerPosition( ofPoint( x + w, y ) );        // this is position of the quad warp corners, centering the image on the screen.
-	warper.setBottomLeftCornerPosition( ofPoint( x, y + h ) );      // this is position of the quad warp corners, centering the image on the screen.
-	warper.setBottomRightCornerPosition( ofPoint( x + w, y + h ) ); // this is position of the quad warp corners, centering the image on the screen.
+	warper.setTopLeftCornerPosition( ofPoint( 0, 0 ) );             // this is position of the quad warp corners, centering the image on the screen.
+	warper.setTopRightCornerPosition( ofPoint( WIDTH, 0 ) );        // this is position of the quad warp corners, centering the image on the screen.
+	warper.setBottomLeftCornerPosition( ofPoint( 0, HEIGHT ) );      // this is position of the quad warp corners, centering the image on the screen.
+	warper.setBottomRightCornerPosition( ofPoint( WIDTH, HEIGHT ) ); // this is position of the quad warp corners, centering the image on the screen.
 	warper.setup();
 	warper.load();
 
@@ -51,10 +44,8 @@ void ActSequencer::setup()
 	lastElapsedMillis = 0;
 
 	hasSentAct1 = hasSentAct2 = hasSentAct3 = hasSentPrevAct2 = hasSentPrevAct3 = false;
-	std::cout << "4" << std::endl;
 
 	visualTrigger = false;
-	std::cout << "5" << std::endl;
 }
 
 void ActSequencer::update()
@@ -66,8 +57,7 @@ void ActSequencer::update()
 	lastElapsedMillis = ofGetElapsedTimeMillis();
 
 	currentMillisTimelinePosition += difference;
-	float factor = 1;
-	std::cout << "6" << std::endl;
+	float factor = 1.01;
 	
 	if( visualTrigger ) {
 		act2->bigRockColor = ofColor( 239, 206, 27 );
@@ -87,10 +77,8 @@ void ActSequencer::update()
 		act3->showVectorField = false;
 	}
 	
-	std::cout << "7" << std::endl;
 
-
-	unsigned long long act2Time = 180000 * factor;
+	unsigned long long act2Time = 183000 * factor;
 	unsigned long long act2FadeInTime = act2Time + 3000 * factor;
 	unsigned long long act2UpdateStart = act2FadeInTime + 1000 * factor;
 	unsigned long long act2StartScaleRock = act2UpdateStart + 60000 * factor;
@@ -105,8 +93,6 @@ void ActSequencer::update()
 	unsigned long long fadeoutStoneCurtain = fadeoutBackground + 20000 * factor;
 	unsigned long long fadeOutVectorField = fadeoutStoneCurtain + 5000 * factor;
 	unsigned long long startOverMills = fadeOutVectorField + 20000 * factor;
-
-	std::cout << "8" << std::endl;
 
 	if( currentMillisTimelinePosition > act2Time ) {
 		act1->transparency -= 1.5;
@@ -142,7 +128,7 @@ void ActSequencer::update()
 			act2->fourRocks->transparency += 0.3;
 			act2->fourRocks->transparency = std::min( 160.0f, act2->fourRocks->transparency );
 			act3->vectorFieldTransparency += 0.2;
-			act3->vectorFieldTransparency = std::min( 200.0f, act3->vectorFieldTransparency );
+			act3->vectorFieldTransparency = std::min( 100.0f, act3->vectorFieldTransparency );
 		}
 	}
 	else {
@@ -202,8 +188,6 @@ void ActSequencer::update()
 		}
 	}
 	
-	std::cout << "9" << std::endl;
-
 
 	if( currentMillisTimelinePosition > startOverMills && currentMillisTimelinePosition < startOverMills + 500 ) {
 		act1->setup();
@@ -253,22 +237,17 @@ void ActSequencer::update()
 			hasSentAct3 = true;
 		}
 	}
-	std::cout << "10" << std::endl;
 
 }
 
 void ActSequencer::draw()
 {
-	std::cout << "11" << std::endl;
-
-	//buffer.begin();
-	std::cout << "11,5" << std::endl;
+	buffer.begin();
 	ofDisableSmoothing();
 	ofBackground( 0 );
 	if( act1->transparency > 0 ) {
 		act1->draw();
 	}
-	std::cout << "12" << std::endl;
 
 	if( act2->transparency > 0 ) {
 		act2->draw();
@@ -289,7 +268,7 @@ void ActSequencer::draw()
 		act2->drawSecondStone();
 	}
 
-	//buffer.end();
+	buffer.end();
 
 	kinect.draw();
 
@@ -297,7 +276,7 @@ void ActSequencer::draw()
 	ofMatrix4x4 mat = warper.getMatrix();
 	ofMultMatrix( mat );
 
-	//buffer.draw( 0, 0, 1920, 1080 );
+	buffer.draw( 0, 0, 1920, 1080 );
 
 	ofPopMatrix();
 	ofPushStyle();
@@ -309,7 +288,6 @@ void ActSequencer::draw()
 	warper.drawCorners();
 
 	ofPopStyle();
-	std::cout << "13" << std::endl;
 }
 
 void ActSequencer::keyPressed( int key )
