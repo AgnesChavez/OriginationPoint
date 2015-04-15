@@ -93,25 +93,24 @@ void StopMotionStones::init()
 void StopMotionStones::start()
 {
 	isStarted = true;
-	//startedMillis = ofGetElapsedTimeMillis();
+	startedMillis = ofGetElapsedTimeMillis();
 }
 
 void StopMotionStones::update( unsigned long long millis )
 {
-	float factor = 1;
-	long millisStopMotionPart1 = 30000 * factor;
-	long millisStopMotionPart1AndAHalf = 40000 * factor;
-	long millisStopMotionPart2 = 70000 * factor;
-	long millisBrownianMotionPart1 = 110000 * factor;
-	long millisBrownianMotionPart2 = 150000 * factor;
-	long millisStartFadeAllOut = 162000 * factor;
+	unsigned long long millisStopMotionPart1 = 30000;
+	unsigned long long millisStopMotionPart1AndAHalf = 40000;
+	unsigned long long millisStopMotionPart2 = 70000;
+	unsigned long long millisBrownianMotionPart1 = 110000;
+	unsigned long long millisBrownianMotionPart2 = 150000;
+	unsigned long long millisStartFadeAllOut = 162000;
 
 	if( isStarted ) {
 		if( isWithinMillis( millis, 0, millisStopMotionPart1 ) ) {
 			toDrawStone.clear();
 			vectorFieldTransparency += 0.5;
 			currentStone += 1;
-		}
+		} 
 		if( isWithinMillis( millis, millisStopMotionPart1, millisStopMotionPart1AndAHalf ) ) {
 			toDrawStone.clear();
 			currentStone += 1;
@@ -151,7 +150,7 @@ void StopMotionStones::update( unsigned long long millis )
 		}
 		if( isWithinMillis( millis, millisBrownianMotionPart2, millisStartFadeAllOut ) ) {
 			for( int i = 0; i < 15; i++ ) {
-				int rand = static_cast< int >( ofRandom( x * y ) );
+				auto rand = static_cast< int >( ofRandom( x * y ) );
 				toDrawStone.insert( rand );
 			}
 		}
@@ -299,8 +298,16 @@ void StopMotionStones::removeOuterEdges()
 
 bool StopMotionStones::isWithinMillis( unsigned long long currentSystemMillis, unsigned long long start, unsigned long long end )
 {
-	unsigned long long currentMillis = currentSystemMillis;
-	return currentMillis - startedMillis > start && currentMillis - startedMillis < end;
+	/*
+	if( currentSystemMillis > start && currentSystemMillis < end )
+	{
+		return true;
+	} 
+
+	return false;
+	*/
+	//unsigned long long currentMillis = currentSystemMillis;
+	return currentSystemMillis - startedMillis > start && currentSystemMillis - startedMillis < end;
 }
 
 int StopMotionStones::doBrownianMotion( int currStone, int which )

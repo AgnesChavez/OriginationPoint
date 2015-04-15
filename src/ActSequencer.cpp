@@ -18,7 +18,7 @@ void ActSequencer::setup()
 
 	setupGui();
 	act1 = new StopMotionStonesAct();
-	//act1->stones.start();
+	act1->stones.start();
 
 	act2 = new GrowingBrushStokeAct();
 	act2->createStone( act1->stones.centered );
@@ -200,7 +200,7 @@ void ActSequencer::update()
 
 		act3->setup();
 
-		currentMillisTimelinePosition = 0;
+		currentMillisTimelinePosition;
 		hasSentAct1 = hasSentAct2 = hasSentAct3 = hasSentPrevAct2 = hasSentPrevAct3 = false;
 	}
 
