@@ -8,9 +8,6 @@ GrowingBrushStokeAct::GrowingBrushStokeAct()
 		dottedPoints.push_back( emptyPoints );
 	}
 
-	background.loadImage( "lines_3_bw.jpg" );
-	whiteLinesBackground.loadImage( "black_room-white_lines.jpg" );
-
 	tintBuffer.allocate( Misc::getDefaultFboSettings() );
 	secondTintBuffer.allocate( Misc::getDefaultFboSettings() );
 

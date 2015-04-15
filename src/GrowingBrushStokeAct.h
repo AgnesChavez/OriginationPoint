@@ -42,8 +42,6 @@ public:
 	float scaleNoiseVal, rotateNoiseVal;
 	int growBrushIndex;
 
-	ofImage background;
-
 	ofFbo tintBuffer, secondTintBuffer;
 
 	EdgePass::Ptr edgePass, secondEdgePass;
@@ -67,8 +65,6 @@ public:
 	VoronoiLayer voro2;
 	ofFbo voroWebLayer;
 	float voronoiWebTransparency;
-
-	ofImage whiteLinesBackground;
 
 	ofxPostGlitch myGlitch;
 
