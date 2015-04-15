@@ -6,6 +6,7 @@ void ActSequencer::setup()
 	ofSetLogLevel( OF_LOG_ERROR );
 	ofSetVerticalSync( true );
 	ofSetFrameRate( 30 );
+	ofHideCursor();
 
 	TIME_SAMPLE_SET_FRAMERATE( 30.0f );
 	TIME_SAMPLE_SET_DRAW_LOCATION( TIME_MEASUREMENTS_TOP_RIGHT );
@@ -57,7 +58,7 @@ void ActSequencer::update()
 	lastElapsedMillis = ofGetElapsedTimeMillis();
 
 	currentMillisTimelinePosition += difference;
-	float factor = 1.01;
+	float factor = 1;
 	
 	if( visualTrigger ) {
 		act2->bigRockColor = ofColor( 239, 206, 27 );

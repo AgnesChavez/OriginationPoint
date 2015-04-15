@@ -38,7 +38,7 @@ void StopMotionStones::init()
 	transparency = 255;
 	isStarted = false;
 	flickeringStonesRelativeTransparency = 0.0;
-	vectorFieldTransparency = 255;
+	vectorFieldTransparency = 0;
 	showVector = false;
 
 	//cutter.init();
@@ -109,7 +109,7 @@ void StopMotionStones::update( unsigned long long millis )
 	if( isStarted ) {
 		if( isWithinMillis( millis, 0, millisStopMotionPart1 ) ) {
 			toDrawStone.clear();
-
+			vectorFieldTransparency += 0.5;
 			currentStone += 1;
 		}
 		if( isWithinMillis( millis, millisStopMotionPart1, millisStopMotionPart1AndAHalf ) ) {
