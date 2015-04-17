@@ -1,5 +1,8 @@
 #include "KinectInteractionManager.h"
+#include "Misc.h"
 #define STRINGIFY(A) #A
+
+#include <ofxCv/libs/ofxCv/include/ofxCv/Wrappers.h>
 
 
 KinectInteractionManager::KinectInteractionManager()
@@ -20,8 +23,18 @@ void KinectInteractionManager::init()
 	offset = 1.0f;
 	displayKinect = true;
 
-	kinectFbo.allocate( wrapper.depthWidth, wrapper.depthHeight, GL_RGBA );
-	kinectFbo2.allocate( wrapper.depthWidth, wrapper.depthHeight, GL_RGBA );
+	ofFbo::Settings generalSettings;
+	generalSettings.useDepth = true;
+	generalSettings.useStencil = false;
+	generalSettings.depthStencilAsTexture = true;
+	generalSettings.width = wrapper.depthWidth;
+	generalSettings.height = wrapper.depthHeight;
+
+
+	kinectFbo.allocate( generalSettings );
+	kinectFbo2.allocate( generalSettings );
+
+	gr.allocate( generalSettings.width, generalSettings.height );
 	std::string fragShaderSrc = STRINGIFY(
 		// fragment shader
 		uniform float min;
@@ -85,20 +98,63 @@ void KinectInteractionManager::update()
 		kinectFbo2.end();
 	}
 
-	ofPixels pix;
 	kinectFbo2.readToPixels( pix );
-	gr.setFromPixels( pix );
-	contourFinder.findContours( gr, 0, 1000, 20, false );
+	ofImage im;
+	im.setFromPixels( pix );
+	ofxCv::convertColor( im.getPixelsRef(), gr.getPixelsRef(), CV_RGBA2GRAY );
+	gr.threshold( 120 );
+	contourFinder.findContours( gr, 100, 5000, 3, false, true );
 }
 
 void KinectInteractionManager::draw()
 {
-	if( displayKinect ) {
-		kinectFbo2.draw( 250, 0 );
+	kinectFbo2.draw( 0, 0 );
+	ofPushStyle();
+	ofNoFill();
+	//ofSetColor( 255, 0, 0 );
+	for( int i = 0; i < contourFinder.blobs.size(); i++ )
+	{
+		ofPolyline cur1;
+		// add all the current vertices to cur polyline
+		cur1.addVertices( contourFinder.blobs[ i ].pts );
+		cur1.setClosed( true );
+		//cur.draw();
+		ofSetColor( 0, 0, 255 );
+		drawWithNormals( cur1 );
+		ofPolyline smoothed = cur1.getSmoothed( 8 );
+		ofSetColor( 0, 255, 255 );
+		drawWithNormals( smoothed );
+
+		ofSetColor( 255, 0, 0 );
+		ofRect( smoothed.getBoundingBox() );
 	}
+	ofPopStyle();
 }
 
 std::vector< ofxCvBlob > KinectInteractionManager::getBlobs()
 {
 	return contourFinder.blobs;
+}
+
+void KinectInteractionManager::drawWithNormals( const ofPolyline & polyline )
+{
+	for( int i = 0; i < ( int ) polyline.size(); i++ ) {
+		bool repeatNext = i == ( int ) polyline.size() - 1;
+
+		const ofPoint& cur = polyline[ i ];
+		const ofPoint& next = repeatNext ? polyline[ 0 ] : polyline[ i + 1 ];
+
+		float angle = atan2f( next.y - cur.y, next.x - cur.x ) * RAD_TO_DEG;
+		float distance = cur.distance( next );
+
+		if( repeatNext ) {
+			ofSetColor( 255, 0, 255 );
+		}
+		glPushMatrix();
+		glTranslatef( cur.x, cur.y, 0 );
+		ofRotate( angle );
+		ofLine( 0, 0, 0, distance );
+		ofLine( 0, 0, distance, 0 );
+		glPopMatrix();
+	}
 }

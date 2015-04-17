@@ -69,6 +69,7 @@ void ActSequencer::setup()
 void ActSequencer::update()
 {
 	kinect.update();
+	std::cout << "Blobs: " << kinect.getBlobs().size() << std::endl;
 	sendKinectOscMessages( &kinect );
 
 	unsigned long long difference = ofGetElapsedTimeMillis() - lastElapsedMillis;
@@ -346,13 +347,14 @@ void ActSequencer::draw()
 
 	buffer.end();
 
-	kinect.draw();
+	
 
 	ofPushMatrix();
 	ofMatrix4x4 mat = warper.getMatrix();
 	ofMultMatrix( mat );
 
 	buffer.draw( 0, 0, 1920, 1080 );
+	kinect.draw();
 
 	ofPopMatrix();
 	ofPushStyle();

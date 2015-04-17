@@ -32,5 +32,9 @@ private:
 
 	ofxCvGrayscaleImage gr;
 	ofxCvContourFinder contourFinder;
+	ofxCvColorImage colorImage;
+	ofPixels pix;
+
+	void drawWithNormals( const ofPolyline & polyline );
 };
 
