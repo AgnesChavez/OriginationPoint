@@ -94,6 +94,24 @@ void StoneCurtainLayer::updateStoneCurtainPos()
 	if( stoneCurtainXpos2 >= 1920 ) {
 		stoneCurtainXpos2 = 0;
 	}
+	/*
+	stoneCurtain.grow();
+	stoneCurtain2.grow();
+
+	stoneCurtainBuffer.begin();
+	ofClear( 0.0, 0.0, 0.0, 1.0 );
+	edge.begin();
+	stoneCurtain.draw( 0, 0 );
+	edge.end();
+	stoneCurtainBuffer.end();
+
+	stoneCurtainBuffer2.begin();
+	ofClear( 0.0, 0.0, 0.0, 1.0 );
+	edge2.begin();
+	stoneCurtain2.draw( 0, 0 );
+	edge2.end();
+	stoneCurtainBuffer2.end();
+	*/
 }
 
 void StoneCurtainLayer::drawVectorField()

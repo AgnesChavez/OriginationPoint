@@ -12,8 +12,8 @@ public:
 
 	void setBrushCollection( BrushCollection _b );
 	void setColorCollection( ColorCollection _c );
-
 	void render();
+	void grow();
 	void draw( float x, float y );
 
 	void setTransparency( float _trans );

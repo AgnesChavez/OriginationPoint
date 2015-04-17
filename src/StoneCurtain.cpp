@@ -49,9 +49,9 @@ void StoneCurtain::render()
 			s.setColorCollection( colors );
 			float xpos = ( 1980 / xStoneCount * x ) + ( 1920 / xStoneCount / 2.0 );
 			float ypos = ( 1080 / yStoneCount * y ) + ( 1080 / yStoneCount / 2.0 );
-			
-			 xpos += ofRandom( -50, 50 );
-			 ypos += ofRandom( -50, 50 );
+
+			xpos += ofRandom( -50, 50 );
+			ypos += ofRandom( -50, 50 );
 
 			s.init( xpos, ypos );
 			s.maxGrowRad = ofRandom( 10, 60 );
@@ -59,7 +59,6 @@ void StoneCurtain::render()
 			stones.push_back( s );
 		}
 	}
-
 	for( int i = 0; i < stones.size(); i++ ) {
 		for( int k = 0; k < 200; k++ ) {
 			stones.at( i ).grow();
@@ -84,4 +83,20 @@ void StoneCurtain::render()
 void StoneCurtain::setTransparency( float _trans )
 {
 	this->transparency = _trans;
+}
+
+void StoneCurtain::grow()
+{
+	for( int i = 0; i < stones.size(); i++ ) {
+		stones.at( i ).grow();
+	}
+	buffer.begin();
+	ofPushStyle();
+	//ofSetColor( 255, 255 );
+	ofEnableAlphaBlending();
+	for( int i = 0; i < stones.size(); i++ ) {
+		stones.at( i ).draw( 0, 0, buffer.getWidth(), buffer.getHeight() );
+	}
+	ofPopStyle();
+	buffer.end();
 }
