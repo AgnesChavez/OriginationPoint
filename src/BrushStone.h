@@ -25,6 +25,7 @@ public:
 
 	void grow( ofPolyline line );
 	void grow();
+	void grow( int brushIndex );
 	void grow( ofPolyline line, ofVec2f center );
 	bool growForWaterColor( float rad );
 	void growPlain( int brushId );
@@ -82,9 +83,6 @@ private:
 	bool tDrawBorder;
 	bool tDrawStone;
 	ofColor selectedColor;
-
-
-	
 
 	int getNumberOfStrokes();
 

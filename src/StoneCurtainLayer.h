@@ -5,6 +5,7 @@
 #include "BrushStone.h"
 #include "VoronoiLayer.h"
 #include "StoneCurtain.h"
+#include "RandomWalkLayer.h"
 
 #include "ofxPostProcessing.h"
 #include "ofxVectorField.h"
@@ -36,6 +37,8 @@ public:
 
 	float noiseVal;
 	float movementSpeed;
+
+	RandomWalkLayer randomWalkLayer;
 
 	ofxVectorField vectorField;
 	bool showVectorField;

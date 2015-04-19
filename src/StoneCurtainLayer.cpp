@@ -80,6 +80,8 @@ void StoneCurtainLayer::draw()
 	stoneCurtainBuffer2.draw( stoneCurtainXpos2, 60 );
 	stoneCurtainBuffer2.draw( stoneCurtainXpos2 - 1920, 60 );
 	ofPopStyle();
+	randomWalkLayer.transparency = stoneCurtainTransparency;
+	randomWalkLayer.draw();
 }
 
 void StoneCurtainLayer::updateStoneCurtainPos()
@@ -94,6 +96,8 @@ void StoneCurtainLayer::updateStoneCurtainPos()
 	if( stoneCurtainXpos2 >= 1920 ) {
 		stoneCurtainXpos2 = 0;
 	}
+
+	randomWalkLayer.update();
 	/*
 	stoneCurtain.grow();
 	stoneCurtain2.grow();

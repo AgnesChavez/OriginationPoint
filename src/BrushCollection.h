@@ -12,6 +12,8 @@ public:
 	ofImage getCircleBrush();
 	ofImage getOwnBrush1();
 	ofFbo getBrushById( int id );
+	int brushCount;
+
 private:
 	std::vector< ofFbo > fboBrushes;
 	std::vector< ofImage > brushes;

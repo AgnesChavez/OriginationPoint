@@ -1,5 +1,6 @@
 #include "StoneCurtain.h"
 #include "Misc.h"
+#include "BrushCollection.h"
 
 StoneCurtain::StoneCurtain()
 {
@@ -39,7 +40,6 @@ void StoneCurtain::render()
 	pl.addVertex( 1920, 1080 );
 	pl.setClosed( true );
 
-
 	int xStoneCount = 6;
 	int yStoneCount = 4;
 	for( int y = 0; y < yStoneCount; y++ ) {
@@ -59,9 +59,11 @@ void StoneCurtain::render()
 			stones.push_back( s );
 		}
 	}
+	BrushCollection b;
 	for( int i = 0; i < stones.size(); i++ ) {
+		int brushId = ofRandom( b.brushCount );
 		for( int k = 0; k < 200; k++ ) {
-			stones.at( i ).grow();
+			stones.at( i ).grow( brushId );
 		}
 	}
 

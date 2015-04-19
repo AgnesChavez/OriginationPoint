@@ -233,6 +233,50 @@ void BrushStone::grow()
 	}
 }
 
+void BrushStone::grow(int brushIndex)
+{
+	currentGrowRad = currentGrowRad + 1.0f;
+	if( currentGrowRad < maxGrowRad ) {
+
+		//calcBorder( locationsPointsDrawn );
+
+		//underlyingLayer.begin();
+		//ofClear( 1.0 );
+		//underlyingLayer.end();
+
+		//renderBorder();
+
+		layer.begin();
+
+		int nrToCheck = ( int ) ( ofMap( currentGrowRad, 0, maxGrowRad, 5, 15 ) );
+
+		ofPushStyle();
+		//ofEnableAlphaBlending();
+		ofEnableBlendMode( OF_BLENDMODE_ADD );
+		for( int i = 0; i < nrToCheck; i++ ) {
+			float deg = ofRandom( 0, TWO_PI );
+			float _x = currentGrowRad * cos( deg );
+			float _y = currentGrowRad * sin( deg );
+			float s = ofRandom( brushStrokeSizeMin, brushStrokeSizeMax );
+			//int randomId = ofRandom( 0, points.size() );
+
+			ofVec2f p( centroid );
+			//ofVec2f p = getCenterById( randomId );
+			p += ofVec2f( _x, _y );
+
+			ofSetColor( colors.getRandomColor(), brushStrokeAlpha );
+			locationsPointsDrawn.push_back( ofVec2f( p.x, p.y ) );
+			brushes.getBrushById( brushIndex ).draw( p.x - s / 2.0, p.y - s / 2.0, s, s );
+
+		}
+		ofDisableBlendMode();
+		//ofDisableAlphaBlending();
+		ofPopStyle();
+
+		layer.end();
+	}
+}
+
 void BrushStone::grow( ofPolyline line, ofVec2f center )
 {
 	if( currentGrowRad < maxGrowRad ) {

@@ -26,6 +26,8 @@ BrushCollection::BrushCollection()
 
 	circleBrush.loadImage( "brush.png" );
 	ownBrush1.loadImage( "own_brush_2.png" );
+
+	brushCount = fboBrushes.size();
 }
 
 
