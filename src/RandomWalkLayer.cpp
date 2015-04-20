@@ -80,6 +80,6 @@ void RandomWalkLayer::clear()
 	}
 
 	buffer.begin();
-	ofClear( 0.0, 0.0, 0.0, 0.0 );
+	ofClear( 0.0, 0.0, 0.0, 255.0 );
 	buffer.end();
 }

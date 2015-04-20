@@ -55,7 +55,7 @@ void ActSequencer::setup()
 
 	fourRocksColor.setColor( ofColor( 255 ) );
 	fourRocksColor.setDuration( 0.5f );
-	fourRocksColor	.setCurve( EASE_IN );
+	fourRocksColor.setCurve( EASE_IN );
 
 	curtainLeftColor.setColor( ofColor( 255 ) );
 	curtainLeftColor.setDuration( 0.5f );
@@ -96,8 +96,8 @@ void ActSequencer::update()
 			// start color animations to colored
 			bigRockColor.animateTo( ofColor( 239, 206, 27 ) );
 			fourRocksColor.animateTo( ofColor( 255, 152, 29 ) );
-			curtainLeftColor.animateTo( ofColor( 33, 110, 13 ) );
-			curtainRightColor.animateTo( ofColor( 33, 110, 13 ) );
+			curtainLeftColor.animateTo( ofColor( 238, 213, 21 ) );
+			curtainRightColor.animateTo( ofColor( 238, 213, 21 ) );
 		}
 
 		prevVisualTrigger = true;
