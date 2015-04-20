@@ -23,8 +23,6 @@ void StopMotionStonesAct::setup()
 	transparency = 255;
 
 	stones.start();
-
-	
 }
 
 void StopMotionStonesAct::update( unsigned long long millis )

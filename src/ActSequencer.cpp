@@ -75,6 +75,8 @@ void ActSequencer::update()
 	lastElapsedMillis = ofGetElapsedTimeMillis();
 
 	currentMillisTimelinePosition += difference;
+
+	std::cout << "Current Millis: " << currentMillisTimelinePosition << std::endl;
 	float factor = 1;
 	
 	if( visualTrigger ) {
@@ -264,9 +266,10 @@ void ActSequencer::update()
 	}
 	
 
-	if( currentMillisTimelinePosition > startOverMills && currentMillisTimelinePosition < startOverMills + 500 ) {
+	if( currentMillisTimelinePosition > startOverMills) {
 		act1->setup();
-		act1->stones.start();
+		//act1->stones.start();
+		act1->stones.startedMillis = 0;
 
 		act2->setup();
 		act2->createStone( act1->stones.centered );
