@@ -355,7 +355,7 @@ void ActSequencer::draw()
 	ofMatrix4x4 mat = warper.getMatrix();
 	ofMultMatrix( mat );
 
-	buffer.draw( 0, 0, 1920, 1080 );
+	buffer.draw( 0, 0, 1280, 800 );
 	kinect.draw();
 
 	ofPopMatrix();
