@@ -69,6 +69,7 @@ void GrowingBrushStokeAct::setup() {
 	scaleVal = 0.0;
 	rockYpos = 0.0;
 	backgroundTransparency = 255;
+	secondBigRockSpeed = 0.5f;
 	
 	//ofBackground( 0 );
 	blackWhiteColor.colors.clear();
@@ -331,7 +332,7 @@ void GrowingBrushStokeAct::lowerScale()
 
 void GrowingBrushStokeAct::updateRockYpos()
 {
-	rockYpos += 0.5f;
+	rockYpos += secondBigRockSpeed;
 	if( rockYpos >= 1080 ){
 		rockYpos = 0;
 	}

@@ -60,6 +60,8 @@ public:
 	//EightGrowingRocks eightRocks;
 	FourGrowingStonesLayer * fourRocks;
 
+	float secondBigRockSpeed;
+
 	// voronoi web
 	std::vector< std::vector< ofPoint > > dottedPoints;
 	VoronoiLayer voro2;

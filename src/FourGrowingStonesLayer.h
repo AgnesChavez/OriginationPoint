@@ -18,6 +18,8 @@ public:
 	void update( int index );
 	void draw();
 
+	float speed;
+
 	void updateYpos();
 
 	VoronoiLayer voroFor4Stones;

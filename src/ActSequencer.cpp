@@ -442,6 +442,10 @@ void ActSequencer::setupGui()
 	gui->addSlider( "BigRockTransparency", 0.0f, 255.0f, &act2->transparency );
 	gui->addSlider( "FourRocksTransparency", 0.0f, 255.0f, &act2->fourRocks->transparency );
 	gui->addSlider( "CurtainTransparency", 0.0f, 255.0f, &act3->stoneCurtainTransparency );
+	gui->addLabel( "Act 3 - Speed" );
+	gui->addSlider( "CurtainSpeed", 0.0f, 50.0f, &act3->movementSpeed );
+	gui->addSlider( "SecondBigRockSpeed", 0.0f, 50.0f, &act2->secondBigRockSpeed );
+	gui->addSlider( "FourRockSpeed", 0.0f, 10.0f, &act2->fourRocks->speed );
 
 	gui->autoSizeToFitWidgets();
 	ofAddListener( gui->newGUIEvent, this, &ActSequencer::guiEvent );

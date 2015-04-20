@@ -36,6 +36,7 @@ void FourGrowingStonesLayer::init()
 	edge.end();
 
 	ypos = 0;
+	speed = 0.5f;
 
 
 	// adds four stones
@@ -145,7 +146,7 @@ void FourGrowingStonesLayer::draw()
 
 void FourGrowingStonesLayer::updateYpos()
 {
-	ypos -= 0.5;
+	ypos -= speed;
 	if( ypos < -1080 ) {
 		ypos = 0;
 	}
