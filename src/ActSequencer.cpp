@@ -75,7 +75,7 @@ void ActSequencer::update()
 	lastElapsedMillis = ofGetElapsedTimeMillis();
 
 	currentMillisTimelinePosition += difference;
-	float factor = 0.1;
+	float factor = 1;
 	
 	if( visualTrigger ) {
 		//act2->bigRockColor = ofColor( 239, 206, 27 );
