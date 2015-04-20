@@ -3,26 +3,9 @@
 
 RandomWalkLayer::RandomWalkLayer()
 {
-	randomWalkerCount = 35;
-	stepLength = 5;
-	walkSpeed = 5;
-	transparency = 140;
-
-	lineWeidthNoiseVal = 0.0;
-	colorNoiseVal = 0.0;
-	transparencyNoiseVal = 0.0;
-
 	buffer.allocate( Misc::getDefaultFboSettings() );
 
-	for( int i = 0; i < randomWalkerCount; i++ )
-	{
-		currentPositions.push_back( ofPoint(ofRandom( 0, 1920 ), ofRandom( 0, 1080 ) ) );
-		lastPositions.push_back( currentPositions.at( i ) );
-	}
-
-	buffer.begin();
-	ofClear( 0.0, 0.0, 0.0, 0.0 );
-	buffer.end();
+	clear();
 }
 
 
@@ -66,7 +49,6 @@ void RandomWalkLayer::update()
 		{
 			lastPositions.at( i ) = currentPositions.at( i );
 		}
-
 	}
 }
 
@@ -76,4 +58,28 @@ void RandomWalkLayer::draw()
 	ofSetColor( 255, transparency );
 	buffer.draw( 0, 0, 1920, 1080 );
 	ofPopStyle();
+}
+
+void RandomWalkLayer::clear()
+{
+	randomWalkerCount = 35;
+	stepLength = 5;
+	walkSpeed = 5;
+	transparency = 140;
+
+	lineWeidthNoiseVal = 0.0;
+	colorNoiseVal = 0.0;
+	transparencyNoiseVal = 0.0;
+
+	currentPositions.clear();
+	lastPositions.clear();
+	for( int i = 0; i < randomWalkerCount; i++ )
+	{
+		currentPositions.push_back( ofPoint( ofRandom( 0, 1920 ), ofRandom( 0, 1080 ) ) );
+		lastPositions.push_back( currentPositions.at( i ) );
+	}
+
+	buffer.begin();
+	ofClear( 0.0, 0.0, 0.0, 0.0 );
+	buffer.end();
 }

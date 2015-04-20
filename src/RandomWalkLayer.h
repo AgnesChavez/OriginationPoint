@@ -10,6 +10,7 @@ public:
 
 	void update();
 	void draw ();
+	void clear();
 
 	ofFbo buffer;
 	int randomWalkerCount, stepLength, walkSpeed;

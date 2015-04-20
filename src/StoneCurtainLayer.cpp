@@ -60,6 +60,8 @@ void StoneCurtainLayer::setup()
 	stoneCurtainXpos2 = -1920;
 	stoneCurtainTransparency = 0;
 	vectorFieldTransparency = 0;
+
+	randomWalkLayer.clear();
  }
 
 void StoneCurtainLayer::update()
