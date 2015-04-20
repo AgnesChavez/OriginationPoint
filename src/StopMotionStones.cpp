@@ -18,7 +18,7 @@ StopMotionStones::StopMotionStones() :
 	cutter.init();
 	noi.render();
 
-	vectorField.setup( 1920, 1080, 8 );
+	vectorField.setup( 1920, 1080, 12 );
 	vectorField.randomize();
 }
 
