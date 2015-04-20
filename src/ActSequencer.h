@@ -59,6 +59,8 @@ public:
 
 	ofxAnimatableOfColor bigRockColor, fourRocksColor, curtainLeftColor, curtainRightColor;
 
+	ofColor bigRockColorGui, fourRockColorGui, curtainLeftColorGui, curtainRightColorGui;
+
 private:
 	void sendKinectOscMessages( KinectInteractionManager * kinect );
 	void sendChapterOscMessages( int chapterId );

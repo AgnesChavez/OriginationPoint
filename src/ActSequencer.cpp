@@ -16,7 +16,7 @@ void ActSequencer::setup()
 
 	sender.setup( HOST, PORT );
 
-	setupGui();
+	
 	act1 = new StopMotionStonesAct();
 	act1->stones.start();
 
@@ -31,8 +31,8 @@ void ActSequencer::setup()
 	ofClear( 255, 255, 255, 0 );
 	buffer.end();
 
-	int WIDTH = 1920;
-	int HEIGHT = 1080;
+	int WIDTH = 1280;
+	int HEIGHT = 800;
 	warper.setSourceRect( ofRectangle( 0, 0, ofGetWidth(), ofGetHeight() ) );              // this is the source rectangle which is the size of the image and located at ( 0, 0 )
 	warper.setTopLeftCornerPosition( ofPoint( 0, 0 ) );             // this is position of the quad warp corners, centering the image on the screen.
 	warper.setTopRightCornerPosition( ofPoint( WIDTH, 0 ) );        // this is position of the quad warp corners, centering the image on the screen.
@@ -40,6 +40,8 @@ void ActSequencer::setup()
 	warper.setBottomRightCornerPosition( ofPoint( WIDTH, HEIGHT ) ); // this is position of the quad warp corners, centering the image on the screen.
 	warper.setup();
 	warper.load();
+
+	
 
 	currentMillisTimelinePosition = 0;
 	lastElapsedMillis = 0;
@@ -64,6 +66,13 @@ void ActSequencer::setup()
 	curtainRightColor.setColor( ofColor( 255 ) );
 	curtainRightColor.setDuration( 0.5f );
 	curtainRightColor.setCurve( EASE_IN );
+
+	bigRockColorGui = ofColor( 239, 206, 27 );
+	fourRockColorGui = ofColor( 255, 152, 29 );
+	curtainLeftColorGui = ofColor( 238, 213, 21 );
+	curtainRightColorGui = ofColor( 238, 213, 21 );
+
+	setupGui();
 }
 
 void ActSequencer::update()
@@ -76,8 +85,8 @@ void ActSequencer::update()
 
 	currentMillisTimelinePosition += difference;
 
-	std::cout << "Current Millis: " << currentMillisTimelinePosition << std::endl;
-	float factor = 1;
+	//std::cout << "Current Millis: " << currentMillisTimelinePosition << std::endl;
+	float factor = 0.1;
 	
 	if( visualTrigger ) {
 		//act2->bigRockColor = ofColor( 239, 206, 27 );
@@ -96,10 +105,12 @@ void ActSequencer::update()
 		if( !prevVisualTrigger )
 		{
 			// start color animations to colored
-			bigRockColor.animateTo( ofColor( 239, 206, 27 ) );
-			fourRocksColor.animateTo( ofColor( 255, 152, 29 ) );
-			curtainLeftColor.animateTo( ofColor( 238, 213, 21 ) );
-			curtainRightColor.animateTo( ofColor( 238, 213, 21 ) );
+			
+
+			bigRockColor.animateTo( bigRockColorGui );
+			fourRocksColor.animateTo( fourRockColorGui );
+			curtainLeftColor.animateTo( curtainLeftColorGui );
+			curtainRightColor.animateTo( curtainRightColorGui );
 		}
 
 		prevVisualTrigger = true;
@@ -422,9 +433,61 @@ void ActSequencer::setupGui()
 	gui->addLabel( "Kinect" );
 	gui->addSlider( "KinectDistance", 0.0f, 255.0f, &kinect.kinectToStoneDistance );
 	gui->addSpacer();
+	gui->addLabel( "Act 3 - Colors" );
+	gui->addSlider( "BigRock", 0.0f, 255.0f, bigRockColorGui.getHue() );
+	gui->addSlider( "FourRocks", 0.0f, 255.0f, fourRockColorGui.getHue() );
+	gui->addSlider( "CurtainL", 0.0f, 255.0f, curtainLeftColorGui.getHue() );
+	gui->addSlider( "CurtainR", 0.0f, 255.0f, curtainRightColorGui.getHue() );
+	gui->addLabel( "Act 3 - Transparencies" );
+	gui->addSlider( "BigRockTransparency", 0.0f, 255.0f, &act2->transparency );
+	gui->addSlider( "FourRocksTransparency", 0.0f, 255.0f, &act2->fourRocks->transparency );
+	gui->addSlider( "CurtainTransparency", 0.0f, 255.0f, &act3->stoneCurtainTransparency );
+
+	gui->autoSizeToFitWidgets();
+	ofAddListener( gui->newGUIEvent, this, &ActSequencer::guiEvent );
 }
 
 void ActSequencer::guiEvent( ofxUIEventArgs &e )
 {
-
+	std::string name = e.getName();
+	if( name == "BigRock" )
+	{
+		ofxUISlider * slider = ( ofxUISlider * )e.widget;
+		float val = slider->getValue();
+		float h, s, b;
+		bigRockColorGui.getHsb( h, s , b );
+		h = val;
+		bigRockColorGui.setHsb( h, s, b );
+		bigRockColor.animateTo( bigRockColorGui );
+	} 
+	else if( name == "FourRocks" )
+	{
+		ofxUISlider * slider = ( ofxUISlider * ) e.widget;
+		float val = slider->getValue();
+		float h, s, b;
+		fourRockColorGui.getHsb( h, s, b );
+		h = val;
+		fourRockColorGui.setHsb( h, s, b );
+		fourRocksColor.animateTo( fourRockColorGui );
+	}
+	else if( name == "CurtainL" )
+	{
+		ofxUISlider * slider = ( ofxUISlider * ) e.widget;
+		float val = slider->getValue();
+		float h, s, b;
+		curtainLeftColorGui.getHsb( h, s, b );
+		h = val;
+		curtainLeftColorGui.setHsb( h, s, b );
+		curtainLeftColor.animateTo( curtainLeftColorGui );
+	}
+	else if( name == "CurtainR" )
+	{
+		ofxUISlider * slider = ( ofxUISlider * ) e.widget;
+		float val = slider->getValue();
+		float h, s, b;
+		curtainRightColorGui.getHsb( h, s, b );
+		h = val;
+		curtainRightColorGui.setHsb( h, s, b );
+		curtainRightColor.animateTo( curtainRightColorGui );
+	}
 }
