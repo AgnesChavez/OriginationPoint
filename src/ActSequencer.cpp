@@ -151,10 +151,10 @@ void ActSequencer::update()
 	act3->leftColor = curtainLeftColor.getCurrentColor();
 	act3->rightColor = curtainRightColor.getCurrentColor();
 	
-	unsigned long long act2Time = 198000 * factor;
+	unsigned long long act2Time = 218000 * factor;
 	unsigned long long act2FadeInTime = act2Time + 3000 * factor;
 	unsigned long long act2UpdateStart = act2FadeInTime + 1000 * factor;
-	unsigned long long act2StartScaleRock = act2UpdateStart + 110000 * factor;
+	unsigned long long act2StartScaleRock = act2UpdateStart + 210000 * factor;
 	unsigned long long act2UpdateFourStonesStart = act2StartScaleRock + 55000 * factor; // 427000
 	unsigned long long startStoneCurtain = act2UpdateFourStonesStart + 100000 * factor; // 537000
 	unsigned long long moveFourSTones = startStoneCurtain + 30000 * factor;
@@ -247,13 +247,14 @@ void ActSequencer::update()
 	}
 
 	if( currentMillisTimelinePosition > fadeOut4Stones ) {
-		act2->fourRocks->transparency -= 0.5f;
-		act2->fourRocks->transparency = std::max( act2->fourRocks->transparency, 0.0f );
+		
 	}
 
 	if( currentMillisTimelinePosition > fadeOutBigStone ) {
 		act2->transparency -= 1.0f;
 		act2->transparency = std::max( act2->transparency, 1.5f );
+		act2->fourRocks->transparency -= 0.5f;
+		act2->fourRocks->transparency = std::max( act2->fourRocks->transparency, 0.0f );
 	}
 
 	if( currentMillisTimelinePosition > fadeoutBackground ) {
@@ -267,7 +268,7 @@ void ActSequencer::update()
 	}
 	
 	if( currentMillisTimelinePosition > fadeOutVectorField ) {
-		act3->vectorFieldTransparency -= 0.6f;
+		act3->vectorFieldTransparency -= 1.5f;
 		if( act3->vectorFieldTransparency < 0 ) {
 			act3->vectorFieldTransparency = 0;
 		}

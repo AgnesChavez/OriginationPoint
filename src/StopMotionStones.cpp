@@ -102,15 +102,15 @@ void StopMotionStones::update( unsigned long long millis )
 	unsigned long long millisStopMotionPart1AndAHalf = 40000;
 	unsigned long long millisStopMotionPart2 = 70000;
 	unsigned long long millisBrownianMotionPart1 = 115000;
-	unsigned long long millisBrownianMotionPart2 = 160000;
-	unsigned long long millisStartFadeAllOut = 177000;
+	unsigned long long millisBrownianMotionPart2 = 170000;
+	unsigned long long millisStartFadeAllOut = 197000;
 
 	if( isStarted ) {
 		if( isWithinMillis( millis, 0, millisStopMotionPart1 ) ) {
 			showVector = true;
 			toDrawStone.clear();
-			vectorFieldTransparency += 0.2;
-			vectorFieldTransparency = std::min( 255.0f, vectorFieldTransparency );
+			vectorFieldTransparency += 0.5;
+			vectorFieldTransparency = std::min( 80.0f, vectorFieldTransparency );
 			flickeringStonesRelativeTransparency += 1.5f;
 			flickeringStonesRelativeTransparency = std::min( 200.0f, flickeringStonesRelativeTransparency );
 			currentStone += 1;
@@ -140,15 +140,19 @@ void StopMotionStones::update( unsigned long long millis )
 			currentStone = getIndexFrom2D( ofPoint( _xIndex, _yIndx ) );
 		}
 		if( isWithinMillis( millis, millisStopMotionPart2, millisBrownianMotionPart1 ) ) {
-			toDrawStone.clear();
-			currentStone = doBrownianMotion( currentStone, 0 );
-			secondCurrentStone = doBrownianMotion( secondCurrentStone, 1 );
-			thirdCurrentStone = doBrownianMotion( thirdCurrentStone, 2 );
+			if( ofGetFrameNum() % 2 == 0 ) {
+				toDrawStone.clear();
+				currentStone = doBrownianMotion( currentStone, 0 );
+				secondCurrentStone = doBrownianMotion( secondCurrentStone, 1 );
+				thirdCurrentStone = doBrownianMotion( thirdCurrentStone, 2 );
+			}
 		}
 		if( isWithinMillis( millis, millisBrownianMotionPart1, millisBrownianMotionPart2 ) ) {
-			currentStone = doBrownianMotion( currentStone, 0 );
-			secondCurrentStone = doBrownianMotion( secondCurrentStone, 1 );
-			thirdCurrentStone = doBrownianMotion( thirdCurrentStone, 2 );
+			if( ofGetFrameNum() % 2 == 0 ) {
+				currentStone = doBrownianMotion( currentStone, 0 );
+				secondCurrentStone = doBrownianMotion( secondCurrentStone, 1 );
+				thirdCurrentStone = doBrownianMotion( thirdCurrentStone, 2 );
+			}
 			flickeringStonesRelativeTransparency -= 1;
 			flickeringStonesRelativeTransparency = std::max( 0.0f, flickeringStonesRelativeTransparency );
 			vectorFieldTransparency -= 1;
@@ -211,7 +215,7 @@ void StopMotionStones::draw()
 	if( showVector ) {
 		ofPushStyle();
 		vectorField.animate( 0.008 );
-		vectorField.draw( vectorFieldTransparency - 170 );
+		vectorField.draw( vectorFieldTransparency );
 		ofPopStyle();
 	}
 }
@@ -228,8 +232,8 @@ void StopMotionStones::drawCustomVoronoi()
 		// excludes cell centers at the edges
 		ofVec2f pt = pts[ inde ];
 		if( pt.x > 95 && pt.x < 1860 && pt.y > 68 && pt.y < 1037 ) {
-				ofSetColor( 0, transparencies.at( inde ) );
-				ofCircle( pts[ inde ].x, pts[ inde ].y, 2.5 );
+				//ofSetColor( 0, transparencies.at( inde ) );
+				//ofCircle( pts[ inde ].x, pts[ inde ].y, 2.5 );
 		}
 	}
 
@@ -282,9 +286,14 @@ bool StopMotionStones::isGrowing()
 
 void StopMotionStones::removeOuterEdges()
 {
+	int index = 1;
 	for( std::set<int>::iterator it = toDrawStone.begin(); it != toDrawStone.end(); ++it ) {
 		Stone * s = &stones.at( *it );
-		s->grow( voro->getLine( *it ), true );
+		int modulatedIndex = index % 5;
+		if( modulatedIndex == 0 ) modulatedIndex = 1;
+		if( ofGetFrameNum() % modulatedIndex == 0 ) {
+			s->grow( voro->getLine( *it ), true );
+		}
 		int ind = *it;
 		ofPoint p = get2DFromIndex( ind );
 		if( p.x == 0 ) {
@@ -299,6 +308,8 @@ void StopMotionStones::removeOuterEdges()
 		else if( p.y == y - 1 ) {
 			toDrawStone.erase( it );
 		}
+
+		index++;
 	}
 }
 
