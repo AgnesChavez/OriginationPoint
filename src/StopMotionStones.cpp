@@ -109,7 +109,7 @@ void StopMotionStones::update( unsigned long long millis )
 		if( isWithinMillis( millis, 0, millisStopMotionPart1 ) ) {
 			showVector = true;
 			toDrawStone.clear();
-			vectorFieldTransparency += 0.5;
+			vectorFieldTransparency += 0.2;
 			vectorFieldTransparency = std::min( 255.0f, vectorFieldTransparency );
 			flickeringStonesRelativeTransparency += 1.5f;
 			flickeringStonesRelativeTransparency = std::min( 200.0f, flickeringStonesRelativeTransparency );

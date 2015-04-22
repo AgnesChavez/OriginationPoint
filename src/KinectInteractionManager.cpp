@@ -106,27 +106,29 @@ void KinectInteractionManager::update()
 
 void KinectInteractionManager::draw()
 {
-	kinectFbo2.draw( 0, 0 );
-	ofPushStyle();
-	ofNoFill();
-	//ofSetColor( 255, 0, 0 );
-	for( int i = 0; i < contourFinder.blobs.size(); i++ )
-	{
-		ofPolyline cur1;
-		// add all the current vertices to cur polyline
-		cur1.addVertices( contourFinder.blobs[ i ].pts );
-		cur1.setClosed( true );
-		//cur.draw();
-		ofSetColor( 0, 0, 255 );
-		drawWithNormals( cur1 );
-		ofPolyline smoothed = cur1.getSmoothed( 8 );
-		ofSetColor( 0, 255, 255 );
-		drawWithNormals( smoothed );
+	if( displayKinect ) {
+		kinectFbo2.draw( 0, 0 );
+		ofPushStyle();
+		ofNoFill();
+		//ofSetColor( 255, 0, 0 );
+		for( int i = 0; i < contourFinder.blobs.size(); i++ )
+		{
+			ofPolyline cur1;
+			// add all the current vertices to cur polyline
+			cur1.addVertices( contourFinder.blobs[ i ].pts );
+			cur1.setClosed( true );
+			//cur.draw();
+			ofSetColor( 0, 0, 255 );
+			drawWithNormals( cur1 );
+			ofPolyline smoothed = cur1.getSmoothed( 8 );
+			ofSetColor( 0, 255, 255 );
+			drawWithNormals( smoothed );
 
-		ofSetColor( 255, 0, 0 );
-		ofRect( smoothed.getBoundingBox() );
+			ofSetColor( 255, 0, 0 );
+			ofRect( smoothed.getBoundingBox() );
+		}
+		ofPopStyle();
 	}
-	ofPopStyle();
 }
 
 std::vector< ofxCvBlob > KinectInteractionManager::getBlobs()

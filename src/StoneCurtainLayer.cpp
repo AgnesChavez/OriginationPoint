@@ -42,7 +42,7 @@ StoneCurtainLayer::StoneCurtainLayer()
 
 	setup();
 
-	movementSpeed = 25;
+	movementSpeed = 1.7f;
 
 	leftColor = ofColor( 232, 91, 32 );
 	rightColor = ofColor( 232, 91, 32 );

@@ -386,6 +386,7 @@ void ActSequencer::keyPressed( int key )
 	case ' ':
 		warper.toggleShow();
 		gui->toggleVisible();
+		kinect.displayKinect = !kinect.displayKinect;
 		break;
 	case 't':
 		//visualTrigger = !visualTrigger;
