@@ -151,7 +151,7 @@ void ActSequencer::update()
 	act3->leftColor = curtainLeftColor.getCurrentColor();
 	act3->rightColor = curtainRightColor.getCurrentColor();
 	
-	unsigned long long act2Time = 228000 * factor;
+	unsigned long long act2Time = 238000 * factor;
 	unsigned long long act2FadeInTime = act2Time + 3000 * factor;
 	unsigned long long act2UpdateStart = act2FadeInTime + 1000 * factor;
 	unsigned long long act2StartScaleRock = act2UpdateStart + 210000 * factor;
