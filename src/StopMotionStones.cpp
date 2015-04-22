@@ -101,15 +101,18 @@ void StopMotionStones::update( unsigned long long millis )
 	unsigned long long millisStopMotionPart1 = 30000;
 	unsigned long long millisStopMotionPart1AndAHalf = 40000;
 	unsigned long long millisStopMotionPart2 = 70000;
-	unsigned long long millisBrownianMotionPart1 = 110000;
-	unsigned long long millisBrownianMotionPart2 = 150000;
-	unsigned long long millisStartFadeAllOut = 162000;
+	unsigned long long millisBrownianMotionPart1 = 115000;
+	unsigned long long millisBrownianMotionPart2 = 160000;
+	unsigned long long millisStartFadeAllOut = 177000;
 
 	if( isStarted ) {
 		if( isWithinMillis( millis, 0, millisStopMotionPart1 ) ) {
 			showVector = true;
 			toDrawStone.clear();
 			vectorFieldTransparency += 0.5;
+			vectorFieldTransparency = std::min( 255.0f, vectorFieldTransparency );
+			flickeringStonesRelativeTransparency += 1.5f;
+			flickeringStonesRelativeTransparency = std::min( 200.0f, flickeringStonesRelativeTransparency );
 			currentStone += 1;
 		} 
 		if( isWithinMillis( millis, millisStopMotionPart1, millisStopMotionPart1AndAHalf ) ) {
@@ -146,8 +149,9 @@ void StopMotionStones::update( unsigned long long millis )
 			currentStone = doBrownianMotion( currentStone, 0 );
 			secondCurrentStone = doBrownianMotion( secondCurrentStone, 1 );
 			thirdCurrentStone = doBrownianMotion( thirdCurrentStone, 2 );
-			flickeringStonesRelativeTransparency--;
-			vectorFieldTransparency -= 0.25;
+			flickeringStonesRelativeTransparency -= 1;
+			flickeringStonesRelativeTransparency = std::max( 0.0f, flickeringStonesRelativeTransparency );
+			vectorFieldTransparency -= 1;
 		}
 		if( isWithinMillis( millis, millisBrownianMotionPart2, millisStartFadeAllOut ) ) {
 			showVector = false;
@@ -231,7 +235,7 @@ void StopMotionStones::drawCustomVoronoi()
 
 	for( int i = 0; i < voro->pts.size(); i++ ) {
 		ofPoint cent = voro->pts.at( i);
-		ofSetColor( ofRandom( 40, 100 ), 200 + flickeringStonesRelativeTransparency );
+		ofSetColor( ofRandom( 40, 100 ), flickeringStonesRelativeTransparency );
 		ofCircle( cent.x, cent.y, 1 );
 	}
 

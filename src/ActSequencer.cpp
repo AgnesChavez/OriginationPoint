@@ -8,8 +8,8 @@ void ActSequencer::setup()
 	ofSetFrameRate( 30 );
 	ofHideCursor();
 
-	TIME_SAMPLE_SET_FRAMERATE( 30.0f );
-	TIME_SAMPLE_SET_DRAW_LOCATION( TIME_MEASUREMENTS_TOP_RIGHT );
+	//TIME_SAMPLE_SET_FRAMERATE( 30.0f );
+	//TIME_SAMPLE_SET_DRAW_LOCATION( TIME_MEASUREMENTS_TOP_RIGHT );
 
 	kinect.init();
 	kinect.doBlobDetection = true;
@@ -41,14 +41,12 @@ void ActSequencer::setup()
 	warper.setup();
 	warper.load();
 
-	
-
 	currentMillisTimelinePosition = 0;
 	lastElapsedMillis = 0;
 
 	hasSentAct1 = hasSentAct2 = hasSentAct3 = hasSentPrevAct2 = hasSentPrevAct3 = false;
 
-	visualTrigger = false;
+	visualTrigger = true;
 	prevVisualTrigger = false;
 
 	bigRockColor.setColor( ofColor( 255 ) );
@@ -95,8 +93,8 @@ void ActSequencer::update()
 		//act3->rightColor = ofColor( 33, 110, 13 );
 		//act2->secondBigRockColor = ofColor( 255, 152, 29 );
 		//act1->stones.showVector = true;
-		act1->stones.vectorFieldTransparency += 2.0f;
-		act1->stones.vectorFieldTransparency = std::min( 255.0f, act1->stones.vectorFieldTransparency );
+		//act1->stones.vectorFieldTransparency += 2.0f;
+		//act1->stones.vectorFieldTransparency = std::min( 255.0f, act1->stones.vectorFieldTransparency );
 
 		act3->vectorFieldTransparency += 2.0f;
 		act3->vectorFieldTransparency = std::min( 255.0f, act3->vectorFieldTransparency );
@@ -107,10 +105,10 @@ void ActSequencer::update()
 			// start color animations to colored
 			
 
-			bigRockColor.animateTo( bigRockColorGui );
-			fourRocksColor.animateTo( fourRockColorGui );
-			curtainLeftColor.animateTo( curtainLeftColorGui );
-			curtainRightColor.animateTo( curtainRightColorGui );
+			//bigRockColor.animateTo( bigRockColorGui );
+			//fourRocksColor.animateTo( fourRockColorGui );
+			//curtainLeftColor.animateTo( curtainLeftColorGui );
+			//curtainRightColor.animateTo( curtainRightColorGui );
 		}
 
 		prevVisualTrigger = true;
@@ -121,8 +119,8 @@ void ActSequencer::update()
 		//act3->leftColor = ofColor( 255 );
 		//act3->rightColor = ofColor( 255 );
 		//act1->stones.showVector = false;
-		act1->stones.vectorFieldTransparency -= 2.0f;
-		act1->stones.vectorFieldTransparency = std::max( 0.0f, act1->stones.vectorFieldTransparency );
+		//act1->stones.vectorFieldTransparency -= 2.0f;
+		//act1->stones.vectorFieldTransparency = std::max( 0.0f, act1->stones.vectorFieldTransparency );
 		act3->vectorFieldTransparency -= 2.0f;
 		act3->vectorFieldTransparency = std::max( 0.0f, act3->vectorFieldTransparency );
 		if( act3->vectorFieldTransparency < 5 )
@@ -133,7 +131,7 @@ void ActSequencer::update()
 		if( prevVisualTrigger )
 		{
 			// start color animations to b/w
-			bigRockColor.animateTo( ofColor( 255 ) );
+			//bigRockColor.animateTo( ofColor( 255 ) );
 			fourRocksColor.animateTo( ofColor( 255 ) );
 			curtainLeftColor.animateTo( ofColor( 255 ) );
 			curtainRightColor.animateTo( ofColor( 255 ) );
@@ -153,11 +151,10 @@ void ActSequencer::update()
 	act3->leftColor = curtainLeftColor.getCurrentColor();
 	act3->rightColor = curtainRightColor.getCurrentColor();
 	
-
-	unsigned long long act2Time = 183000 * factor;
+	unsigned long long act2Time = 198000 * factor;
 	unsigned long long act2FadeInTime = act2Time + 3000 * factor;
 	unsigned long long act2UpdateStart = act2FadeInTime + 1000 * factor;
-	unsigned long long act2StartScaleRock = act2UpdateStart + 60000 * factor;
+	unsigned long long act2StartScaleRock = act2UpdateStart + 110000 * factor;
 	unsigned long long act2UpdateFourStonesStart = act2StartScaleRock + 55000 * factor; // 427000
 	unsigned long long startStoneCurtain = act2UpdateFourStonesStart + 100000 * factor; // 537000
 	unsigned long long moveFourSTones = startStoneCurtain + 30000 * factor;
@@ -391,7 +388,7 @@ void ActSequencer::keyPressed( int key )
 		gui->toggleVisible();
 		break;
 	case 't':
-		visualTrigger = !visualTrigger;
+		//visualTrigger = !visualTrigger;
 		break;
 	case 'f':
 		ofToggleFullscreen();

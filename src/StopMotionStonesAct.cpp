@@ -27,6 +27,8 @@ void StopMotionStonesAct::setup()
 
 void StopMotionStonesAct::update( unsigned long long millis )
 {
+	//stones.vectorFieldTransparency += 2.0f;
+	//stones.vectorFieldTransparency = std::min( stones.vectorFieldTransparency, 255.0f );
 	stones.transparency = transparency;
 	stones.update( millis );
 }
