@@ -140,7 +140,7 @@ void StopMotionStones::update( unsigned long long millis )
 			currentStone = getIndexFrom2D( ofPoint( _xIndex, _yIndx ) );
 		}
 		if( isWithinMillis( millis, millisStopMotionPart2, millisBrownianMotionPart1 ) ) {
-			if( ofGetFrameNum() % 2 == 0 ) {
+			if( ofGetFrameNum() % 4 == 0 ) {
 				toDrawStone.clear();
 				currentStone = doBrownianMotion( currentStone, 0 );
 				secondCurrentStone = doBrownianMotion( secondCurrentStone, 1 );
@@ -148,7 +148,7 @@ void StopMotionStones::update( unsigned long long millis )
 			}
 		}
 		if( isWithinMillis( millis, millisBrownianMotionPart1, millisBrownianMotionPart2 ) ) {
-			if( ofGetFrameNum() % 2 == 0 ) {
+			if( ofGetFrameNum() % 4 == 0 ) {
 				currentStone = doBrownianMotion( currentStone, 0 );
 				secondCurrentStone = doBrownianMotion( secondCurrentStone, 1 );
 				thirdCurrentStone = doBrownianMotion( thirdCurrentStone, 2 );
@@ -159,14 +159,13 @@ void StopMotionStones::update( unsigned long long millis )
 		}
 		if( isWithinMillis( millis, millisBrownianMotionPart2, millisStartFadeAllOut ) ) {
 			showVector = false;
-			for( int i = 0; i < 15; i++ ) {
+			for( int i = 0; i < 5; i++ ) {
 				auto rand = static_cast< int >( ofRandom( x * y ) );
 				toDrawStone.insert( rand );
 			}
 		}
 
 		if( isPastMillis( millis, millisStartFadeAllOut ) ) {
-				
 			for( int i = 0; i < 18; i++ ) {
 				int rand = ( int ) ( ofRandom( x * y ) );
 				transparencies.at( rand ) -= 2;

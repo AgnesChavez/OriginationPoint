@@ -201,7 +201,7 @@ void ActSequencer::update()
 			}
 
 			act2->fourRocks->transparency += 0.3;
-			act2->fourRocks->transparency = std::min( 160.0f, act2->fourRocks->transparency );
+			act2->fourRocks->transparency = std::min( 210.0f, act2->fourRocks->transparency );
 			act3->vectorFieldTransparency += 0.2;
 			act3->vectorFieldTransparency = std::min( 100.0f, act3->vectorFieldTransparency );
 			if( act3->vectorFieldTransparency > 20 )
@@ -269,9 +269,7 @@ void ActSequencer::update()
 	
 	if( currentMillisTimelinePosition > fadeOutVectorField ) {
 		act3->vectorFieldTransparency -= 1.5f;
-		if( act3->vectorFieldTransparency < 0 ) {
-			act3->vectorFieldTransparency = 0;
-		}
+		act3->vectorFieldTransparency = std::max( 0.0f, act3->vectorFieldTransparency );
 	}
 	
 
