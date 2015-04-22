@@ -119,7 +119,7 @@ void FourGrowingStonesLayer::init()
 
 void FourGrowingStonesLayer::update( int index )
 {
-	if( ofGetFrameNum() % 5 == 0 ) {
+	if( ofGetFrameNum() % 8 == 0 ) {
 		BrushStone * stone = &fourStonesLayer.at( index );
 		stone->grow( *voroFor4Stones.getLine( index ) );
 	}

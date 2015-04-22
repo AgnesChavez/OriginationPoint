@@ -22,7 +22,7 @@ StoneCurtainLayer::StoneCurtainLayer()
 	stoneCurtainBuffer.allocate( Misc::getDefaultFboSettings() );
 	stoneCurtainBuffer2.allocate( Misc::getDefaultFboSettings() );
 
-	vectorField.setup( 1920, 1080, 20 );
+	vectorField.setup( 1920, 1080, 13 );
 	vectorField.randomize();
 
 	// drawing stone curtain
