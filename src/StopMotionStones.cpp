@@ -102,8 +102,8 @@ void StopMotionStones::update( unsigned long long millis )
 	unsigned long long millisStopMotionPart1AndAHalf = 40000;
 	unsigned long long millisStopMotionPart2 = 70000;
 	unsigned long long millisBrownianMotionPart1 = 115000;
-	unsigned long long millisBrownianMotionPart2 = 175000;
-	unsigned long long millisStartFadeAllOut = 202000;
+	unsigned long long millisBrownianMotionPart2 = 185000;
+	unsigned long long millisStartFadeAllOut = 222000;
 
 	if( isStarted ) {
 		if( isWithinMillis( millis, 0, millisStopMotionPart1 ) ) {
