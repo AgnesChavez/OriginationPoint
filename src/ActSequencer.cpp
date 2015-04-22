@@ -203,7 +203,7 @@ void ActSequencer::update()
 			act2->fourRocks->transparency += 0.3;
 			act2->fourRocks->transparency = std::min( 210.0f, act2->fourRocks->transparency );
 			act3->vectorFieldTransparency += 0.2;
-			act3->vectorFieldTransparency = std::min( 100.0f, act3->vectorFieldTransparency );
+			act3->vectorFieldTransparency = std::min( 70.0f, act3->vectorFieldTransparency );
 			//if( act3->vectorFieldTransparency > 20 )
 			//{
 				act3->showVectorField = true;
@@ -229,7 +229,7 @@ void ActSequencer::update()
 	if( currentMillisTimelinePosition > startStoneCurtain && currentMillisTimelinePosition < fadeoutStoneCurtain + 20000 ) {
 		act3->updateStoneCurtainPos();
 		act3->stoneCurtainTransparency += 0.5f;
-		act3->stoneCurtainTransparency = std::min( 190.0f, act3->stoneCurtainTransparency );
+		act3->stoneCurtainTransparency = std::min( 130.0f, act3->stoneCurtainTransparency );
 	}
 
 	if( currentMillisTimelinePosition > moveFourSTones ) {
@@ -268,8 +268,9 @@ void ActSequencer::update()
 	}
 	
 	if( currentMillisTimelinePosition > fadeOutVectorField ) {
-		act3->vectorFieldTransparency -= 1.5f;
+		act3->vectorFieldTransparency -= 2.5f;
 		act3->vectorFieldTransparency = std::max( 0.0f, act3->vectorFieldTransparency );
+		std::cout << "fading out vector field trans:" << act3->vectorFieldTransparency << std::endl;
 	}
 	
 
@@ -393,12 +394,18 @@ void ActSequencer::keyPressed( int key )
 	case 'f':
 		ofToggleFullscreen();
 		break;
+	case 's':
+		ofImage im;
+		buffer.readToPixels( im.getPixelsRef() );
+		im.saveImage( "screenshot_" + ofGetTimestampString() + ".png" );
+		break;
 	}
 }
 
 void ActSequencer::sendKinectOscMessages( KinectInteractionManager * kin )
 {
 	int stones = kin->getBlobs().size();
+	std::cout << "detected stones: " << stones << std::endl;
 	ofxOscMessage msg;
 	msg.setAddress( "/stones" );
 	msg.addIntArg( stones );

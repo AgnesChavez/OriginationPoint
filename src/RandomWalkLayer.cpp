@@ -64,7 +64,7 @@ void RandomWalkLayer::clear()
 {
 	randomWalkerCount = 35;
 	stepLength = 5;
-	walkSpeed = 5;
+	walkSpeed = 2;
 	transparency = 140;
 
 	lineWeidthNoiseVal = 0.0;

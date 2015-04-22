@@ -211,7 +211,9 @@ void GrowingBrushStokeAct::update() {
 
 void GrowingBrushStokeAct::updateSecondStone()
 {
-	secondPlainStone->grow( *voro.getLine( 0 ), ofVec2f( 1920 / 2, 1080 / 2 ) );
+	if( ofGetFrameNum() % 4 == 0 ) {
+		secondPlainStone->grow( *voro.getLine( 0 ), ofVec2f( 1920 / 2, 1080 / 2 ) );
+	}
 }
 
 void GrowingBrushStokeAct::updateScale()

@@ -101,7 +101,7 @@ void KinectInteractionManager::update()
 	kinectFbo2.readToPixels( pix );
 	ofxCv::convertColor( pix, gr.getPixelsRef(), CV_RGBA2GRAY );
 	gr.threshold( 120 );
-	contourFinder.findContours( gr, 100, 5000, 3, false, true );
+	contourFinder.findContours( gr, 100, 5000, 4, false, true );
 }
 
 void KinectInteractionManager::draw()
