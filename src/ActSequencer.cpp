@@ -151,7 +151,7 @@ void ActSequencer::update()
 	act3->leftColor = curtainLeftColor.getCurrentColor();
 	act3->rightColor = curtainRightColor.getCurrentColor();
 	
-	unsigned long long act2Time = 223000 * factor;
+	unsigned long long act2Time = 228000 * factor;
 	unsigned long long act2FadeInTime = act2Time + 3000 * factor;
 	unsigned long long act2UpdateStart = act2FadeInTime + 1000 * factor;
 	unsigned long long act2StartScaleRock = act2UpdateStart + 210000 * factor;
@@ -204,10 +204,10 @@ void ActSequencer::update()
 			act2->fourRocks->transparency = std::min( 210.0f, act2->fourRocks->transparency );
 			act3->vectorFieldTransparency += 0.2;
 			act3->vectorFieldTransparency = std::min( 100.0f, act3->vectorFieldTransparency );
-			if( act3->vectorFieldTransparency > 20 )
-			{
+			//if( act3->vectorFieldTransparency > 20 )
+			//{
 				act3->showVectorField = true;
-			}
+			//}
 		}
 	}
 	else {
