@@ -123,10 +123,10 @@ void ActSequencer::update()
 		//act1->stones.vectorFieldTransparency = std::max( 0.0f, act1->stones.vectorFieldTransparency );
 		act3->vectorFieldTransparency -= 2.0f;
 		act3->vectorFieldTransparency = std::max( 0.0f, act3->vectorFieldTransparency );
-		if( act3->vectorFieldTransparency < 5 )
-		{
-			act3->showVectorField = false;
-		}
+		//if( act3->vectorFieldTransparency < 5 )
+		//{
+		//	act3->showVectorField = false;
+	//	}
 
 		if( prevVisualTrigger )
 		{
@@ -165,7 +165,7 @@ void ActSequencer::update()
 	unsigned long long fadeoutBackground = fadeOutBigStone + 20000 * factor;
 	unsigned long long fadeoutStoneCurtain = fadeoutBackground + 20000 * factor;
 	unsigned long long fadeOutVectorField = fadeoutStoneCurtain + 5000 * factor;
-	unsigned long long startOverMills = fadeOutVectorField + 20000 * factor;
+	unsigned long long startOverMills = fadeOutVectorField + 15000 * factor;
 
 	act3->showVectorField = false;
 
@@ -192,7 +192,16 @@ void ActSequencer::update()
 		}
 
 		if( currentMillisTimelinePosition > act2UpdateFourStonesStart ) {
-		
+			act2->noiseWarp->setEnabled( true );
+			act2->noiseWarp->setAmplitude( act2->noiseWarp->getAmplitude() + 0.0002 );
+			if( act2->noiseWarp->getAmplitude() >= 0.004 )
+			{
+				act2->noiseWarp->setAmplitude( 0.004 );
+			}
+
+			//act2->noiseWarp->setAmplitude( 0.004 );
+			act2->noiseWarp->setFrequency( 0.976 );
+
 			int padding = 10000;
 			for( int i = 0; i < 4; i++ ) {
 				if( currentMillisTimelinePosition > act2UpdateFourStonesStart + i * padding ) {
@@ -202,12 +211,7 @@ void ActSequencer::update()
 
 			act2->fourRocks->transparency += 0.3;
 			act2->fourRocks->transparency = std::min( 210.0f, act2->fourRocks->transparency );
-			act3->vectorFieldTransparency += 0.2;
-			act3->vectorFieldTransparency = std::min( 70.0f, act3->vectorFieldTransparency );
-			//if( act3->vectorFieldTransparency > 20 )
-			//{
-				act3->showVectorField = true;
-			//}
+			
 		}
 	}
 	else {
@@ -215,15 +219,12 @@ void ActSequencer::update()
 	}
 
 	if( currentMillisTimelinePosition > startStoneCurtain - 5000 ) {
-		act2->noiseWarp->setEnabled( true );
-		act2->noiseWarp->setAmplitude( act2->noiseWarp->getAmplitude() + 0.0002 );
-		if( act2->noiseWarp->getAmplitude() >= 0.004 )
-		{
-			act2->noiseWarp->setAmplitude( 0.004 );
-		}
-
-		//act2->noiseWarp->setAmplitude( 0.004 );
-		act2->noiseWarp->setFrequency( 0.976 );
+		act3->vectorFieldTransparency += 0.2;
+		act3->vectorFieldTransparency = std::min( 70.0f, act3->vectorFieldTransparency );
+		//if( act3->vectorFieldTransparency > 20 )
+		//{
+		act3->showVectorField = true;
+		//}
 	}
 
 	if( currentMillisTimelinePosition > startStoneCurtain && currentMillisTimelinePosition < fadeoutStoneCurtain + 20000 ) {
@@ -275,6 +276,9 @@ void ActSequencer::update()
 	
 
 	if( currentMillisTimelinePosition > startOverMills) {
+		currentMillisTimelinePosition = 0;
+		hasSentAct1 = hasSentAct2 = hasSentAct3 = hasSentPrevAct2 = hasSentPrevAct3 = false;
+
 		act1->setup();
 		//act1->stones.start();
 		act1->stones.startedMillis = 0;
@@ -286,8 +290,7 @@ void ActSequencer::update()
 
 		act3->setup();
 
-		currentMillisTimelinePosition = 0;
-		hasSentAct1 = hasSentAct2 = hasSentAct3 = hasSentPrevAct2 = hasSentPrevAct3 = false;
+		
 	}
 
 

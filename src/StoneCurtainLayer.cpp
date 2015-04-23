@@ -47,7 +47,7 @@ StoneCurtainLayer::StoneCurtainLayer()
 	leftColor = ofColor( 232, 91, 32 );
 	rightColor = ofColor( 232, 91, 32 );
 
-	showVectorField = false;
+	showVectorField = true;
 }
 
 StoneCurtainLayer::~StoneCurtainLayer()
