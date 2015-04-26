@@ -13,6 +13,8 @@ void ActSequencer::setup()
 
 	kinect.init();
 	kinect.doBlobDetection = true;
+	lastRockSampleCount = 100;
+	lastRockCountSent = 1;
 
 	sender.setup( HOST, PORT );
 
@@ -289,8 +291,6 @@ void ActSequencer::update()
 		act2->noiseWarp->setAmplitude( 0.0 );
 
 		act3->setup();
-
-		
 	}
 
 
@@ -408,11 +408,31 @@ void ActSequencer::keyPressed( int key )
 void ActSequencer::sendKinectOscMessages( KinectInteractionManager * kin )
 {
 	int stones = kin->getBlobs().size();
-	std::cout << "detected stones: " << stones << std::endl;
-	ofxOscMessage msg;
-	msg.setAddress( "/stones" );
-	msg.addIntArg( stones );
-	sender.sendMessage( msg );
+	lastRockCount.push_back( stones );
+	while( lastRockCount.size() > (int)(lastRockSampleCount ) )
+	{
+		lastRockCount.erase( lastRockCount.begin() );
+	}
+
+	float average = 0.0;
+	for( int i = 0; i < lastRockCount.size(); i++ )
+	{
+		average += lastRockCount.at( i );
+	}
+
+	average /= lastRockCount.size();
+
+	int finalRockCount = static_cast< int > ( average );
+
+	if( finalRockCount != lastRockCountSent ) {
+		std::cout << "Detected stones: " << finalRockCount << std::endl;
+		ofxOscMessage msg;
+		msg.setAddress( "/stones" );
+		msg.addIntArg( finalRockCount );
+		sender.sendMessage( msg );
+	}
+
+	lastRockCountSent = finalRockCount;
 }
 
 void ActSequencer::sendChapterOscMessages( int actId )
@@ -439,6 +459,9 @@ void ActSequencer::setupGui()
 	gui->addSpacer();
 	gui->addLabel( "Kinect" );
 	gui->addSlider( "KinectDistance", 0.0f, 255.0f, &kinect.kinectToStoneDistance );
+	gui->addSlider( "Rock detection Samplecount", 1.0f, 200.0f, &lastRockSampleCount );
+	gui->addSlider( "Blobsize Min", 0.0f, 10000.0f, &kinect.minBlobSize );
+	gui->addSlider( "Blobsize Max", 0.0f, 10000.0f, &kinect.maxBlobSize );
 	gui->addSpacer();
 	gui->addLabel( "Act 3 - Colors" );
 	gui->addSlider( "BigRock", 0.0f, 255.0f, bigRockColorGui.getHue() );

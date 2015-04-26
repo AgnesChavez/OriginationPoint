@@ -16,6 +16,10 @@ KinectInteractionManager::~KinectInteractionManager()
 
 void KinectInteractionManager::init()
 {
+
+	minBlobSize = 100;
+	maxBlobSize = 5000;
+
 	wrapper.openKinect();
 	wrapper.openDepthStream();
 
@@ -101,7 +105,7 @@ void KinectInteractionManager::update()
 	kinectFbo2.readToPixels( pix );
 	ofxCv::convertColor( pix, gr.getPixelsRef(), CV_RGBA2GRAY );
 	gr.threshold( 120 );
-	contourFinder.findContours( gr, 100, 5000, 4, false, true );
+	contourFinder.findContours( gr, minBlobSize, maxBlobSize, 4, false, true );
 }
 
 void KinectInteractionManager::draw()

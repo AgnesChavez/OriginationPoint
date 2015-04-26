@@ -61,6 +61,10 @@ public:
 
 	ofColor bigRockColorGui, fourRockColorGui, curtainLeftColorGui, curtainRightColorGui;
 
+	float lastRockSampleCount;
+	int lastRockCountSent;
+	std::vector< int > lastRockCount;
+
 private:
 	void sendKinectOscMessages( KinectInteractionManager * kinect );
 	void sendChapterOscMessages( int chapterId );

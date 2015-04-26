@@ -24,6 +24,8 @@ public:
 	float kinectToStoneDistance, offset;
 	bool displayKinect;
 
+	float minBlobSize, maxBlobSize;
+
 private: 
 	KinectWrapper wrapper;
 	
