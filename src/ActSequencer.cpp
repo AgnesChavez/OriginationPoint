@@ -13,7 +13,7 @@ void ActSequencer::setup()
 
 	kinect.init();
 	kinect.doBlobDetection = true;
-	lastRockSampleCount = 100;
+	lastRockSampleCount = 15;
 	lastRockCountSent = 1;
 
 	sender.setup( HOST, PORT );

@@ -28,6 +28,8 @@ public:
 
 private: 
 	KinectWrapper wrapper;
+
+	ofFbo maskImage;
 	
 	ofShader kinectShader;
 	ofFbo kinectFbo, kinectFbo2;

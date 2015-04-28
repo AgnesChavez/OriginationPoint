@@ -17,6 +17,14 @@ KinectInteractionManager::~KinectInteractionManager()
 void KinectInteractionManager::init()
 {
 
+	ofImage img;
+	img.loadImage( "kinect_mask.png" );
+	maskImage.allocate( img.width, img.height );
+	maskImage.begin();
+	ofBackground( 0 );
+	img.draw( 0, 0 );
+	maskImage.end();
+
 	minBlobSize = 100;
 	maxBlobSize = 5000;
 
@@ -46,6 +54,7 @@ void KinectInteractionManager::init()
 
 		// this is how we receive the texture
 		uniform sampler2DRect tex;
+		uniform sampler2DRect mask;
 
 		void main()
 		{
@@ -53,8 +62,9 @@ void KinectInteractionManager::init()
 
 			vec2 st = gl_TexCoord[ 0 ].st;
 			vec3 col = texture2DRect( tex, st ).rgb;
+			vec3 maskColor = texture2DRect( mask, st ).rgb;
 			if( col.x > min ) {
-				if( col.x < max ) {
+				if( col.x < max && maskColor.r > 0.5 ) {
 					colToSet = vec4( 1, 1, 1, 1 );
 				}
 			}
@@ -92,6 +102,7 @@ void KinectInteractionManager::update()
 		kinectShader.setUniform1f( "min", ( float ) ( ( kinectToStoneDistance - offset ) / 255.0 ) );
 		kinectShader.setUniform1f( "max", ( float ) ( ( kinectToStoneDistance + offset ) / 255.0 ) );
 		kinectShader.setUniformTexture( "tex", kinectFbo.getTextureReference(), 0 );
+		kinectShader.setUniformTexture( "mask", maskImage.getTextureReference(), 1 );
 		glBegin( GL_QUADS );
 		glTexCoord2f( 0, 0 ); glVertex3f( 0, 0, 0 );
 		glTexCoord2f( wrapper.grayscaleImage.width, 0 ); glVertex3f( wrapper.grayscaleImage.width, 0, 0 );
