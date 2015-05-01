@@ -73,6 +73,8 @@ void ActSequencer::setup()
 	curtainRightColorGui = ofColor( 238, 213, 21 );
 
 	setupGui();
+
+	sentGo1 = false;
 }
 
 void ActSequencer::update()
@@ -170,6 +172,16 @@ void ActSequencer::update()
 	unsigned long long startOverMills = fadeOutVectorField + 15000 * factor;
 
 	act3->showVectorField = false;
+
+	if( sentGo1 == false )
+	{
+		sentGo1 = true;
+		ofxOscMessage msg;
+		msg.setAddress( "/go" );
+		msg.addIntArg( 1 );
+		sender.sendMessage( msg );
+		std::cout << "send go1" << std::endl;
+	}
 
 	if( currentMillisTimelinePosition > act2Time ) {
 		act1->transparency -= 1.5;
@@ -291,6 +303,8 @@ void ActSequencer::update()
 		act2->noiseWarp->setAmplitude( 0.0 );
 
 		act3->setup();
+
+		sentGo1 = false;
 	}
 
 
@@ -440,6 +454,7 @@ void ActSequencer::sendChapterOscMessages( int actId )
 	ofxOscMessage msg;
 	msg.setAddress( "/act" );
 	msg.addIntArg( actId );
+	std::cout << "sent chapter message " + actId << std::endl;
 	sender.sendMessage( msg );
 }
 

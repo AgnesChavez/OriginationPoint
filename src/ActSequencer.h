@@ -56,6 +56,7 @@ public:
 	ofFbo buffer;
 
 	bool visualTrigger, prevVisualTrigger;
+	bool sentGo1;
 
 	ofxAnimatableOfColor bigRockColor, fourRocksColor, curtainLeftColor, curtainRightColor;
 
