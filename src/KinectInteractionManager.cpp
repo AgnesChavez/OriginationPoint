@@ -31,7 +31,7 @@ void KinectInteractionManager::init()
 	wrapper.openKinect();
 	wrapper.openDepthStream();
 
-	kinectToStoneDistance = 146.9f;
+	kinectToStoneDistance = 153.25f;
 	offset = 1.0f;
 	displayKinect = true;
 
