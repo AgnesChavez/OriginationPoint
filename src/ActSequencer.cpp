@@ -79,7 +79,7 @@ void ActSequencer::setup()
 	sentGo1 = false;
 	firstRun = true;
 
-	ofToggleFullscreen();
+	//ofToggleFullscreen();
 	warper.toggleShow();
 	gui->toggleVisible();
 	kinect.displayKinect = !kinect.displayKinect;
