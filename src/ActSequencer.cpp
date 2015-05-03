@@ -7,7 +7,7 @@ void ActSequencer::setup()
 	ofSetVerticalSync( true );
 	ofSetFrameRate( 30 );
 	ofHideCursor();
-
+	
 	//TIME_SAMPLE_SET_FRAMERATE( 30.0f );
 	//TIME_SAMPLE_SET_DRAW_LOCATION( TIME_MEASUREMENTS_TOP_RIGHT );
 
@@ -78,6 +78,11 @@ void ActSequencer::setup()
 
 	sentGo1 = false;
 	firstRun = true;
+
+	ofToggleFullscreen();
+	warper.toggleShow();
+	gui->toggleVisible();
+	kinect.displayKinect = !kinect.displayKinect;
 }
 
 void ActSequencer::update()
