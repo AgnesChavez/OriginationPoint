@@ -176,6 +176,7 @@
     <ClCompile Include="src\StopMotionStones.cpp" />
     <ClCompile Include="src\StopMotionStonesAct.cpp" />
     <ClCompile Include="src\testApp.cpp" />
+    <ClCompile Include="src\TimerThread.cpp" />
     <ClCompile Include="src\VoronoiLayer.cpp" />
     <ClCompile Include="..\..\..\addons\ofxOpenCv\src\ofxCvColorImage.cpp" />
     <ClCompile Include="..\..\..\addons\ofxOpenCv\src\ofxCvContourFinder.cpp" />
@@ -364,6 +365,7 @@
     <ClInclude Include="src\StopMotionStones.h" />
     <ClInclude Include="src\StopMotionStonesAct.h" />
     <ClInclude Include="src\testApp.h" />
+    <ClInclude Include="src\TimerThread.h" />
     <ClInclude Include="src\VoronoiLayer.h" />
     <ClInclude Include="..\..\..\addons\ofxOpenCv\src\ofxCvBlob.h" />
     <ClInclude Include="..\..\..\addons\ofxOpenCv\src\ofxCvColorImage.h" />

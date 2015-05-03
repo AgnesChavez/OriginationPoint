@@ -107,6 +107,8 @@ void StopMotionStones::update( unsigned long long millis )
 
 	if( isStarted ) {
 		if( isWithinMillis( millis, 0, millisStopMotionPart1 ) ) {
+			//std::cout << "millis: " << millis << std::endl;
+			//ofExit( 0 );
 			showVector = true;
 			toDrawStone.clear();
 			vectorFieldTransparency += 0.5;

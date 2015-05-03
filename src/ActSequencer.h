@@ -6,6 +6,7 @@
 #include "GrowingBrushStokeAct.h"
 #include "StoneCurtainLayer.h"
 #include "KinectInteractionManager.h"
+#include "TimerThread.h"
 
 #include "ofxPlaylist.h"
 #include "ofxQuadWarp.h"
@@ -38,9 +39,12 @@ public:
 	ofxOscSender sender;
 	bool hasSentAct1, hasSentAct2, hasSentAct3;
 	bool hasSentPrevAct2, hasSentPrevAct3;
+	TimerThread tt;
 
 	// projection mapping
 	ofxQuadWarp warper;
+
+
 
 	// the three acts
 	StopMotionStonesAct * act1;
@@ -56,7 +60,7 @@ public:
 	ofFbo buffer;
 
 	bool visualTrigger, prevVisualTrigger;
-	bool sentGo1;
+	bool sentGo1, firstRun;
 
 	ofxAnimatableOfColor bigRockColor, fourRocksColor, curtainLeftColor, curtainRightColor;
 
@@ -66,9 +70,10 @@ public:
 	int lastRockCountSent;
 	std::vector< int > lastRockCount;
 
+	void sendGo1();
+
 private:
 	void sendKinectOscMessages( KinectInteractionManager * kinect );
 	void sendChapterOscMessages( int chapterId );
 	void sendPreChapterOscMessages( int chapterId );
 };
-

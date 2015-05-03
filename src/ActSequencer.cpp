@@ -11,6 +11,8 @@ void ActSequencer::setup()
 	//TIME_SAMPLE_SET_FRAMERATE( 30.0f );
 	//TIME_SAMPLE_SET_DRAW_LOCATION( TIME_MEASUREMENTS_TOP_RIGHT );
 
+	tt.startThread( true, false );
+
 	kinect.init();
 	kinect.doBlobDetection = true;
 	lastRockSampleCount = 15;
@@ -75,6 +77,7 @@ void ActSequencer::setup()
 	setupGui();
 
 	sentGo1 = false;
+	firstRun = true;
 }
 
 void ActSequencer::update()
@@ -89,53 +92,19 @@ void ActSequencer::update()
 
 	//std::cout << "Current Millis: " << currentMillisTimelinePosition << std::endl;
 	float factor = 1;
+
+	
 	
 	if( visualTrigger ) {
-		//act2->bigRockColor = ofColor( 239, 206, 27 );
-		//act2->fourRocks->color = ofColor( 255, 152, 29 );
-		//act3->leftColor = ofColor( 33, 110, 13 );
-		//act3->rightColor = ofColor( 33, 110, 13 );
-		//act2->secondBigRockColor = ofColor( 255, 152, 29 );
-		//act1->stones.showVector = true;
-		//act1->stones.vectorFieldTransparency += 2.0f;
-		//act1->stones.vectorFieldTransparency = std::min( 255.0f, act1->stones.vectorFieldTransparency );
-
 		act3->vectorFieldTransparency += 2.0f;
 		act3->vectorFieldTransparency = std::min( 255.0f, act3->vectorFieldTransparency );
-		
-
-		if( !prevVisualTrigger )
-		{
-			// start color animations to colored
-			
-
-			//bigRockColor.animateTo( bigRockColorGui );
-			//fourRocksColor.animateTo( fourRockColorGui );
-			//curtainLeftColor.animateTo( curtainLeftColorGui );
-			//curtainRightColor.animateTo( curtainRightColorGui );
-		}
-
-		prevVisualTrigger = true;
 	}
 	else {
-		//act2->bigRockColor = ofColor( 255 );
-		//act2->fourRocks->color = ofColor( 255 );
-		//act3->leftColor = ofColor( 255 );
-		//act3->rightColor = ofColor( 255 );
-		//act1->stones.showVector = false;
-		//act1->stones.vectorFieldTransparency -= 2.0f;
-		//act1->stones.vectorFieldTransparency = std::max( 0.0f, act1->stones.vectorFieldTransparency );
 		act3->vectorFieldTransparency -= 2.0f;
 		act3->vectorFieldTransparency = std::max( 0.0f, act3->vectorFieldTransparency );
-		//if( act3->vectorFieldTransparency < 5 )
-		//{
-		//	act3->showVectorField = false;
-	//	}
-
 		if( prevVisualTrigger )
 		{
 			// start color animations to b/w
-			//bigRockColor.animateTo( ofColor( 255 ) );
 			fourRocksColor.animateTo( ofColor( 255 ) );
 			curtainLeftColor.animateTo( ofColor( 255 ) );
 			curtainRightColor.animateTo( ofColor( 255 ) );
@@ -173,14 +142,11 @@ void ActSequencer::update()
 
 	act3->showVectorField = false;
 
-	if( sentGo1 == false )
-	{
-		sentGo1 = true;
-		ofxOscMessage msg;
-		msg.setAddress( "/go" );
-		msg.addIntArg( 1 );
-		sender.sendMessage( msg );
-		std::cout << "send go1" << std::endl;
+	
+
+	// send start signal to max patch
+	if( currentMillisTimelinePosition > 9000 ) {
+		sendGo1();
 	}
 
 	if( currentMillisTimelinePosition > act2Time ) {
@@ -305,6 +271,14 @@ void ActSequencer::update()
 		act3->setup();
 
 		sentGo1 = false;
+
+		if( firstRun )
+		{
+			firstRun = false;
+		}
+
+		//tt.startThread( true, false );
+		//tt.sent = false;
 	}
 
 
@@ -539,4 +513,18 @@ void ActSequencer::guiEvent( ofxUIEventArgs &e )
 		curtainRightColorGui.setHsb( h, s, b );
 		curtainRightColor.animateTo( curtainRightColorGui );
 	}
+}
+
+void ActSequencer::sendGo1()
+{
+	
+	if( sentGo1 == false && firstRun == false ) {
+		sentGo1 = true;
+		ofxOscMessage msg;
+		msg.setAddress( "/go" );
+		msg.addIntArg( 1 );
+		sender.sendMessage( msg );
+		std::cout << "send go1" << std::endl;
+	}
+	
 }
